@@ -1,0 +1,67 @@
+QUESTIONS
+
+how to write an http server in c++?
+
+what is an http config file?
+
+what is poll(), select(), kqueue() and epoll()?
+
+What is RFC, telnet and NGINX?
+
+what makes a web server non-blocking and how to handle client disconections/connections.
+
+how to include I/O operations?
+
+How to read/recv or write/send trough poll() and equivalents?
+
+which Common macros are used in a web server and how to use them (FD_SET, FD_CLR, FD_ISSET, FD_ZERO)?
+
+how to make a server not hanging or how do I leave my server hanging?
+
+how do I make it compatible with web browsers?
+
+What are headers and answer behaviours?
+
+what are HTTP response statuses?
+
+how to provide error pages and what are default ones?
+
+when should I use fork()?
+
+What is CGI in a web server context?
+
+what makes a website fully static?
+
+how do I upload files?
+
+What are methods?
+
+How to implement GET, POST and DELETE methods?
+
+how to make a server stress-proof?
+
+How to make a server listen to multiple ports (trough config file)?
+
+How does NGINX implement server configurations?
+
+what is a chunk request?
+
+
+
+MR CAMERS (BONUS)
+
+What are cookies and how to implement them?
+
+How to implement session management?
+
+how to handle multiple CGI?
+
+
+
+PRIORITIES
+
+Understand how to start the project.
+
+Divide the work and set a task to each group member. 
+
+Define a data structure.
