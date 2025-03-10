@@ -6,7 +6,27 @@ what is an http config file?
 
 what is poll(), select(), kqueue() and epoll()?
 
+*
+By poll(), we are referring to a system call Input/Output multiplexing function called poll();
+poll() is used to monitor a single or a set of file descriptors, more specifically, their readiness to be written into or read from an outside source.
+There are 3 relevant flags that are used when we call the poll() function, which are:
+
+POLLIN, checks to see if the file descriptor can be read.
+POLLOUT, checks to see if the file descriptor can be written into.
+POLLERR, checks to see if there are any errors in the file descriptor.
+*
+
 What is RFC, telnet and NGINX?
+
+*
+RFC stands for Request For Comment. These are technical documments, descriptions and rulesets created by the IETF (Internet Engineering Task Force) as the de facto authoritative docummentation on default internet structuring, specifications, procedures and standards.
+Basically, its almost like a manual on how the internet is structured, and contains accurate descriptions on how "things work". Inside RFCs are things such as protocol specifications, encoding parameters and technical descriptions of coding languages and scripts.
+For the purposes of this project, RFCs contained useful information on chunked requests.
+
+A telnet (telecommunications network) is a simple protocol that opens a command line or terminal between client and server. It is what allows either side to issue commands or provide information to the other side. If you have ever used a terminal to issue a simple "cd" command to a virtual machine, then congratulations, you've used a telnet.
+
+NGINX is a tool used for configuring and hosting a webserver, more specifically acting as a reverse proxy by configuring the listening ports, IP addresses and the HTML text belonging to one or more websites associated with those IPs and Ports while encrypting all requests that are sent from the webserver.
+*
 
 what makes a web server non-blocking and how to handle client disconections/connections.
 
@@ -29,6 +49,29 @@ how to provide error pages and what are default ones?
 when should I use fork()?
 
 What is CGI in a web server context?
+
+*
+A CGI (Common Gateway Interface), at least in a webserver context, is a protocol that allows a webserver to interact with external programs (often referred as CGI Scripts) for the purpose of processing and generating web content. Web content can be composed of things such as usernames, emails, video and audio, database access, calculations and HTML code generation (accessing another page of the website, such as through a link).
+
+A practical example...
+
+User submits credentials onto a website login on a web browser.
+|
+V
+Webserver recieves a request through the browser.
+|
+V
+Webserver utilizes a CGI script to access a database and confirm that the user credentials exist, are correct, and that the account is available to be accessed.
+|
+V
+CGI script sends the result of their query to the webserver.
+|
+V
+Webserver delivers the result to the browser, which then delivers it to the user.
+
+In more simplified terms, CGI are scripts that allow a website to have features. Everything we do to interact with a website is done via CGI scripting.
+Keep in mind that PHP has made CGI basically obsolete... (unsure if PHP counts as a CGI, but Python scripting definitely counts as one for the purposes of the project.)
+*
 
 what makes a website fully static?
 
