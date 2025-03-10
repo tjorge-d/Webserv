@@ -1,6 +1,72 @@
+FUNCTIONS
+
+Used:
+socket (creates a socket)
+bind (binds the socket)
+connect (connects the socket)
+htons (conversion of the port)
+htonl (conversion of the adress)
+
+Unsused:
+execve
+dup
+dup2
+pipe
+strerror
+gai_strerror,
+errno
+dup
+dup2
+fork
+socketpair
+ntohs
+ntohl
+
+poll
+select
+epoll (epoll_create, epoll_ctl, epoll_wait)
+kqueue (kqueue, kevent)
+
+accept
+listen
+send
+recv
+chdir
+getaddrinfo
+freeaddrinfo
+setsockopt,
+getsockname
+getprotobyname
+fcntl
+close
+read,
+write
+waitpid
+kill
+signal
+access
+stat
+open,
+opendir
+readdir
+closedir
+
+
 QUESTIONS
 
 how to write an http server in c++?
+    - Create a socket object (Sys/socker.h)
+        - Store the socket in a "socket file descriptor"(int) using socket(int DOMAIN, int TYPE, int PROTOCOL)
+            - Domain (protocol family used for communication) -> AF_INET (IPv4 Internet protocols)
+            - Type (communication semantics) -> SOCK_STREAM (sequenced, reliable, two-way, connection-based byte streams)
+            - Protocol (protocol to be used) -> 0 (?)
+        - Bind(server-side) or Connect(client-side) the socket using bind/connect(int SOCKET, struct sockaddr *ADRESS, int ADDRESS_LEN)
+            - Socket (fd) -> The value given by socket()
+            - Address -> A data structure from "netinet/in.h" that needs to be filled prior (since we are using IPv4 we instanciate "sockaddr_in")
+                - Adress.sin_family -> Socket (fd)
+                - Adress.sin_port -> The port of the binding/connection using htons(int PORT) to convert it
+                - Adress.sin_addr -> The interface (address) of the binding using htonl(u_long INTERFACE)
+            - Address_len -> sizeof(Adress)
 
 what is an http config file?
 
@@ -65,3 +131,4 @@ Understand how to start the project.
 Divide the work and set a task to each group member. 
 
 Define a data structure.
+
