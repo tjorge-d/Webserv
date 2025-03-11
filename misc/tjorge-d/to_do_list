@@ -54,19 +54,50 @@ closedir
 
 QUESTIONS
 
-how to write an http server in c++?
-    - Create a socket object (Sys/socker.h)
-        - Store the socket in a "socket file descriptor"(int) using socket(int DOMAIN, int TYPE, int PROTOCOL)
-            - Domain (protocol family used for communication) -> AF_INET (IPv4 Internet protocols)
-            - Type (communication semantics) -> SOCK_STREAM (sequenced, reliable, two-way, connection-based byte streams)
-            - Protocol (protocol to be used) -> 0 (?)
-        - Bind(server-side) or Connect(client-side) the socket using bind/connect(int SOCKET, struct sockaddr *ADRESS, int ADDRESS_LEN)
-            - Socket (fd) -> The value given by socket()
-            - Address -> A data structure from "netinet/in.h" that needs to be filled prior (since we are using IPv4 we instanciate "sockaddr_in")
-                - Adress.sin_family -> Socket (fd)
-                - Adress.sin_port -> The port of the binding/connection using htons(int PORT) to convert it
-                - Adress.sin_addr -> The interface (address) of the binding using htonl(u_long INTERFACE)
-            - Address_len -> sizeof(Adress)
+WHAT IS A WEBSERVER?
+
+- It is a piece of software that serves web content -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview
+
+
+WHAT HAPPENS IN A WEBSERVER? (in order)
+
+- It LISTENS on a PORT for a REQUEST sent via a TRANSPORT LAYER PROTOCOL and returns a RESPONSE containing the requested RESOURCE -> https://i.sstatic.net/wOfS8.png
+	- LISTENS: Is idle waiting for a request, doesn't do anything
+	- PORT: Is a unique number used to identify where the information should be transmited
+	- REQUEST: Is sent using HTTP(Hypertext Transfer Protocol) and is made by a client(for example, aweb browser) to a server, in orderto retrieve a web page or other resources. There are many types of of web requests (methods) -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+		- GET: A request made on behalf of a client seeking data from a specified resource. The server will process the request, get the information/data and send it back to the client
+		- HEAD: It's similar to a GET method but only requests the header of the data. Might be used to rapidly/efficiently check the availability of the content
+		- POST: A request to submit an entity to a specified resource 
+		- PUT: Like the POST method, it is used to create but can also replace. Usually you choose to implement only one, POST or PUT, depending on the server (?)
+		- PATCH: A request that updates an entity in a specified resource
+		- DELETE: It deletes a specified resource
+		- CONNECT: Establishes a tunnel to the server identified by a target resource
+		- OPTIONS: Describes the communication options for the target resource
+		- TRACE: performs a message loop-back test along the path to the target resource
+	- TRANSPORT LAYER PROTOCOL: Is a set of rules and procedures used to deliver data between aplication processes on different hosts in the same network
+	- RESPONSE: respondes if a specific REQUEST has been successfully completed or not -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Status ; https://www.tutorialspoint.com/http/http_responses.htm
+		- Informational responses (100 – 199)
+		- Successful responses (200 – 299)
+		- Redirection messages (300 – 399)
+		- Client error responses (400 – 499)
+		- Server error responses (500 – 599)
+	- RESOURCE: A source of web content
+
+
+WRITING AN HTTP WEBSERVER
+
+- Create a socket object (Sys/socker.h)
+    - Store the socket in a "socket file descriptor"(int) using socket(int DOMAIN,int TYPE, int PROTOCOL)
+        - DOMAIN (protocol family used for communication) -> AF_INET (IPv4 Internet protocols)
+        - TYPE (communication semantics) -> SOCK_STREAM (sequenced, reliable, two-way, connection-based byte streams)
+        - PROTOCOL (protocol to be used) -> 0 (?)
+    - Bind(server-side) or Connect(client-side) the socket using bind/connect(int SOCKET, struct sockaddr *ADRESS, int ADDRESS_LEN)
+        - SOCKET (fd) -> The value given by socket()
+        - ADRESS -> A data structure from "netinet/in.h" that needs to be filled prior (since we are using IPv4 we instanciate "sockaddr_in")
+            - Adress.sin_family -> Socket (fd)
+            - Adress.sin_port -> The port of the binding/connection using htons(int PORT) to convert it
+            - Adress.sin_addr -> The interface (address) of the binding using htonl(u_long INTERFACE)
+        - ADDRESS_LEN -> sizeof(ADRESS)
 
 what is an http config file?
 
