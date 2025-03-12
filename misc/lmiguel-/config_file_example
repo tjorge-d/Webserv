@@ -1,0 +1,50 @@
+http {
+
+	client_max_body_size 10M;
+
+
+	server {
+		listen 80;
+		server_name localhost;
+
+		location / {
+
+			limit_except GET POST DELETE;
+			deny all;
+
+			root /var/www/dev;
+			index localhost_index.html;
+		}
+}
+
+
+
+	server {
+		listen 80;
+		server_name gofasdomain.com othergofasdomain.com;
+
+		error_page 404 /404.html;
+		error_page 500 502 503 504 /50x.html;
+
+		location / {
+
+			limit_except GET POST {
+            deny all;
+        }
+
+			root /var/www/gofas;
+			index gofas.html;
+		}
+
+		location /upload {
+
+			limit_except POST {
+				deny all;
+			}
+
+			root /var/www/upload;
+			index upload.html;
+		}
+
+}
+}
