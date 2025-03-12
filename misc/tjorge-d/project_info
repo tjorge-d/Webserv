@@ -67,7 +67,7 @@ WHAT HAPPENS IN A WEBSERVER? (in order)
 - It LISTENS on a PORT for a REQUEST sent via a TRANSPORT LAYER PROTOCOL and returns a RESPONSE containing the requested RESOURCE -> https://i.sstatic.net/wOfS8.png
 	- LISTENS: Is idle waiting for a request, doesn't do anything
 	- PORT: Is a unique number used to identify where the information should be transmited
-	- REQUEST: Is sent using HTTP(Hypertext Transfer Protocol) and is made by a client(for example, aweb browser) to a server, in orderto retrieve a web page or other resources. There are many types of of web requests (methods) -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
+	- REQUEST: Is sent using HTTP(Hypertext Transfer Protocol) and is made by a client(for example, a web browser) to a server, in order to retrieve a web page or other resources. There are many types of of web requests (methods) -> https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods
 		- GET: A request made on behalf of a client seeking data from a specified resource. The server will process the request, get the information/data and send it back to the client
 		- HEAD: It's similar to a GET method but only requests the header of the data. Might be used to rapidly/efficiently check the availability of the content
 		- POST: A request to submit an entity to a specified resource 
@@ -97,7 +97,7 @@ STATIC VS DYNAMIC WEBSITES -> https://rocketmedia.com/resources/static-vs-dynami
 
 WRITING A BASIC HTTP WEBSERVER -> https://www.youtube.com/watch?v=gk6NL1pZi1M
 
-- Create a listening socket, it must be client-side(binded)
+- Create a listening socket, it must be server-side(binded)
 - Create a signal or any other way to close the listening socket in case of the server being idle while waiting for a connection 
 - Create a loop that WAITS for connections, HANDLES them and then CLOSES them gracefully while the listening socket is still operating or in other specific conditions
 	- WAITING -> to wait for a connection you must use accept(int SOCKET, struct sockaddr *ADDRESS, int *ADDRESS_LEN). This function will give a new socket fd to communicate with the client or returns a negative value in case of a error 
@@ -112,7 +112,7 @@ WRITING A BASIC HTTP WEBSERVER -> https://www.youtube.com/watch?v=gk6NL1pZi1M
 
 
 
-CREATING A SOCKET (Sys/socker.h) -> https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-listen-prepare-server-incoming-client-requests
+CREATING A SOCKET (Sys/socket.h) -> https://www.ibm.com/docs/en/zos/2.4.0?topic=functions-listen-prepare-server-incoming-client-requests
 
 - To create a socket you must store it in a "socket file descriptor"(int) using socket(int DOMAIN,int TYPE, int PROTOCOL)
     - DOMAIN (protocol family used for communication) -> AF_INET (IPv4 Internet protocols)
