@@ -43,7 +43,7 @@ BindingSocket&	BindingSocket::operator=(const BindingSocket &copy)
 void	BindingSocket::configureSocket()
 {
 	std::cout << "B\n";
-	_address = IPv4AddressConvertion(_fd, _interface, _port);
+	_address = IPv4AddressConvertion(_domain, _interface, _port);
 	if (bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
 		throw SocketBindingFailure();
 }

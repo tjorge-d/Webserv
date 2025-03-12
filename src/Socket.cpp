@@ -95,10 +95,10 @@ void	Socket::safeCloseSocket()
 	}
 }
 
-struct sockaddr_in	Socket::IPv4AddressConvertion(int socket_fd, u_long interface , int port)
+struct sockaddr_in	Socket::IPv4AddressConvertion(int domain, u_long interface , int port)
 {
 	struct sockaddr_in	address;
-	address.sin_family = socket_fd;
+	address.sin_family = domain;
 	address.sin_addr.s_addr = htonl(interface);
 	address.sin_port = htons(port);
 	return (address);

@@ -18,7 +18,7 @@ class BindingSocket : public Socket
 		BindingSocket&	operator=(const BindingSocket &copy);
 		
 		// MEMBER FUNCTIONS
-		void	configureSocket();
+		virtual void	configureSocket();
 
 	class	SocketBindingFailure : public std::runtime_error
 	{

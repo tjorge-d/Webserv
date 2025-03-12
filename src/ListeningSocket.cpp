@@ -8,8 +8,6 @@ _backlog(backlog)
 {
 	//std::cout << "Socket custom constructor called\n";
 	configureSocket();
-    if (listen(_fd, _backlog) != 0)
-        throw SocketListeningFailure();
 }
 
 ListeningSocket::ListeningSocket(u_long interface, int port, int backlog) :
@@ -18,8 +16,6 @@ _backlog(backlog)
 {
 	//std::cout << "Socket custom constructor called\n";
 	configureSocket();
-    if (listen(_fd, _backlog) != 0)
-        throw SocketListeningFailure();
 }
 
 ListeningSocket::ListeningSocket(const ListeningSocket &copy) :
@@ -42,6 +38,14 @@ ListeningSocket&	ListeningSocket::operator=(const ListeningSocket &copy)
 	if (this != &copy)
 		BindingSocket::operator=(copy);
 	return (*this);
+}
+
+// MEMBER FUNCTIONS
+
+void	ListeningSocket::configureSocket()
+{
+    if (listen(_fd, _backlog) != 0)
+        throw SocketListeningFailure();
 }
 
 // EXCEPTIONS
