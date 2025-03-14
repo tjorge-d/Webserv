@@ -5,6 +5,7 @@
 class BindingSocket : public Socket
 {
 	private:
+		// CONSTRUCTORS/DESTRUCTORS
 		BindingSocket();
 
 	public:
@@ -20,6 +21,7 @@ class BindingSocket : public Socket
 		// MEMBER FUNCTIONS
 		virtual void	configureSocket();
 
+	// EXCEPTIONS
 	class	SocketBindingFailure : public std::runtime_error
 	{
 		public :

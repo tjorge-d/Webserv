@@ -42,7 +42,10 @@ ConnectingSocket&	ConnectingSocket::operator=(const ConnectingSocket &copy)
 
 void	ConnectingSocket::configureSocket()
 {
+	// Initializes the address structure
 	_address = IPv4AddressConvertion(_fd, _interface, _port);
+	
+	// Connects the socket to an address
 	if (connect(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
 		throw SocketConnectingFailure();
 }

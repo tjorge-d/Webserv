@@ -10,6 +10,7 @@
 class Socket
 {
 	private:
+		// CONSTRUCTORS/DESTRUCTORS
 		Socket();
 
 	protected:
@@ -41,10 +42,11 @@ class Socket
 		struct sockaddr_in	getAddress();
 
 		// MEMBER FUNCTIONS
-		void				safeCloseSocket();
+		void				closeSocket();
 		struct sockaddr_in	IPv4AddressConvertion(int socket_fd, u_long interface , int port);
 		virtual void		configureSocket() = 0;
 
+	// EXCEPTIONS
 	class	SocketCloseFailure : public std::runtime_error
 	{
 		public :

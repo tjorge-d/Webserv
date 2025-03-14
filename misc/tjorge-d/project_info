@@ -1,6 +1,6 @@
-FUNCTIONS
+USED FUNCTIONS
 
-Used:
+// Socket related functions //
 socket -> creates a socket
 bind -> binds the socket
 connect -> connects the socket
@@ -9,16 +9,33 @@ htonl -> conversion of the address for bind/connect
 listen -> puts a binded (client-side) socket in listening mode to accept client connections
 accept -> accepts the connection request of a client into a listening socket
 
-recv -> reads the data of a socket file descriptor
-read -> read the data of any file descriptor (universal)
+// File descriptor manipulation functions //
+recv -> reads the data from a socket file descriptor
 send -> writes data on a socket file descriptor
-write -> writes data on a file descriptor (universal)
 close -> closes a file descriptor (universal)
 
+// Signal related functions //
 signal -> replaces the behaviour of a signal
 
+// I/O management functions //
+epoll_create -> creates an epoll file descriptor
+epoll_ctl -> control interface for an epoll file descriptor
+epoll_wait ->
 
-Unused:
+
+
+UNUSED FUNCTIONS
+
+// I/O management functions //
+poll -> more portable than epoll(), it's less performative and older
+select -> Older than poll()
+kqueue(kqueue, kevent) -> less portable than poll(), only works on macOS
+
+// File descriptor manipulation functions //
+read -> read the data of any file descriptor (universal)
+write -> writes data on a file descriptor (universal)
+
+
 execve
 dup
 dup2
@@ -32,12 +49,6 @@ fork
 socketpair
 ntohs
 ntohl
-
-poll
-select
-epoll (epoll_create, epoll_ctl, epoll_wait)
-kqueue (kqueue, kevent)
-
 chdir
 getaddrinfo
 freeaddrinfo

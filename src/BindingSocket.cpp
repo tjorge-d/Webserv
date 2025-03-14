@@ -42,8 +42,10 @@ BindingSocket&	BindingSocket::operator=(const BindingSocket &copy)
 
 void	BindingSocket::configureSocket()
 {
-	std::cout << "B\n";
+	// Initializes the address structure
 	_address = IPv4AddressConvertion(_domain, _interface, _port);
+
+	// Binds the socket to an address
 	if (bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
 		throw SocketBindingFailure();
 }

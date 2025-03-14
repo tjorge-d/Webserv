@@ -44,6 +44,7 @@ ListeningSocket&	ListeningSocket::operator=(const ListeningSocket &copy)
 
 void	ListeningSocket::configureSocket()
 {
+	// Makes the socket passive and ready to accept incoming connection requests
     if (listen(_fd, _backlog) != 0)
         throw SocketListeningFailure();
 }

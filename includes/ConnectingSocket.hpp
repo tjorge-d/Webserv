@@ -5,6 +5,7 @@
 class ConnectingSocket : public Socket
 {
 	private:
+		// CONSTRUCTORS/DESTRUCTORS
 		ConnectingSocket();
 
 	public:
@@ -20,6 +21,7 @@ class ConnectingSocket : public Socket
 		// MEMBER FUNCTIONS
 		virtual void	configureSocket();
 
+	// EXCEPTIONS
 	class	SocketConnectingFailure : public std::runtime_error
 	{
 		public :

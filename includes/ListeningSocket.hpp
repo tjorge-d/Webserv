@@ -20,10 +20,11 @@ class ListeningSocket : public BindingSocket
 
 		// OPERATORS
 		ListeningSocket&	operator=(const ListeningSocket &copy);
-		
+
 		// MEMBER FUNCTIONS
 		virtual void	configureSocket();
 
+	// EXCEPTIONS
 	class	SocketListeningFailure : public std::runtime_error
 	{
 		public :

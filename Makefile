@@ -1,7 +1,7 @@
 NAME= webserv
 
-CC= cc
-CFLAGS= -Wall -Werror -Wextra -g
+CXX= c++
+CXXFLAGS= -Wall -Werror -Wextra -g
 
 SRC_A= $(addprefix src/, $(SOURCES_A))
 SOURCES_A= main.cpp BindingSocket.cpp ListeningSocket.cpp ConnectingSocket.cpp Socket.cpp

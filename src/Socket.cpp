@@ -10,6 +10,7 @@ _interface(interface),
 _port(port)
 {
 	//std::cout << "Socket custom constructor called\n";
+	//Creates an unbound socket
 	_fd = socket(_domain, _type, _protocol);
 	if (_fd == -1)
 		throw SocketOpenFailure();
@@ -24,7 +25,8 @@ Socket::Socket(const Socket &copy)
 Socket::~Socket()
 {
 	//std::cout << "Socket default destructor called\n";
-	safeCloseSocket();
+	// Closes the socket safely
+	closeSocket();
 }
 
 // GETTERS
@@ -71,7 +73,7 @@ Socket&	Socket::operator=(const Socket &copy)
 	//std::cout << "Socket copy assignment operator called\n";
 	if (this != &copy)
 	{
-		safeCloseSocket();
+		closeSocket();
 		_fd = copy._fd;
 		_domain = copy._domain;
 		_type = copy._type;
@@ -85,7 +87,7 @@ Socket&	Socket::operator=(const Socket &copy)
 
 // MEMBER FUNCTIONS
 
-void	Socket::safeCloseSocket()
+void	Socket::closeSocket()
 {
 	if (_fd >= 0)
 	{
