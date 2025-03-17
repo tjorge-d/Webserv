@@ -1,26 +1,13 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Parser.cpp                                         :+:      :+:    :+:   */
+/*   Location.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/17 14:45:57 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/17 18:05:40 by lmiguel-         ###   ########.fr       */
+/*   Created: 2025/03/17 16:28:18 by lmiguel-          #+#    #+#             */
+/*   Updated: 2025/03/17 16:28:41 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Parser.hpp"
-
-Parser::Parser(){
-	
-};
-
-Parser::~Parser(){
-	
-}
-
-void Parser::parseConfig( std::string filename ){
-
-	
-}
+#include "Location.hpp"

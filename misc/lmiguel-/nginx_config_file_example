@@ -35,7 +35,7 @@ http {
 		location /upload {
 
 			limit_except POST
-			
+
 			root /var/www/gofas;
 			index upload.html;
 			autoindex off;

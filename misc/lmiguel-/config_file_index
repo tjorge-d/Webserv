@@ -29,6 +29,5 @@ autoindex off;
 error_page 404 /404.html;
 error_page 500 502 503 504 /50x.html;
 
-#sets the default file to be shown when the request is for a #directory
+#sets the default file to be shown when the request is for a directory
 directory_request_redirect /var/www/dev/sideye.jpg;
-
