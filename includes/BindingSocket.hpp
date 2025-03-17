@@ -19,6 +19,7 @@ class BindingSocket : public Socket
 		BindingSocket&	operator=(const BindingSocket &copy);
 		
 		// MEMBER FUNCTIONS
+		// Configures the Socket
 		virtual void	configureSocket();
 
 	// EXCEPTIONS

@@ -10,6 +10,7 @@ listen -> puts a binded (client-side) socket in listening mode to accept client 
 accept -> accepts the connection request of a client into a listening socket
 
 // File descriptor manipulation functions //
+fcntl -> Performs actions in file descriptors
 recv -> reads the data from a socket file descriptor
 send -> writes data on a socket file descriptor
 close -> closes a file descriptor (universal)
@@ -17,10 +18,10 @@ close -> closes a file descriptor (universal)
 // Signal related functions //
 signal -> replaces the behaviour of a signal
 
-// I/O management functions //
+// I/O multiplexing functions //
 epoll_create -> creates an epoll file descriptor
 epoll_ctl -> control interface for an epoll file descriptor
-epoll_wait ->
+epoll_wait -> waits for an epoll event
 
 
 
@@ -55,7 +56,6 @@ freeaddrinfo
 setsockopt
 getsockname
 getprotobyname
-fcntl
 waitpid
 kill
 access
@@ -64,8 +64,6 @@ open
 opendir
 readdir
 closedir
-
-
 
 WHAT IS A WEBSERVER?
 
@@ -139,6 +137,18 @@ CREATING A SOCKET (Sys/socket.h) -> https://www.ibm.com/docs/en/zos/2.4.0?topic=
 - If the socket is server side you must make it a passive socket and ready to accept client connections using listen(int SOCKET, int BACKLOG)
 	- SOCKET (fd) -> The value given by socket()
 	- BACKLOG -> The maximum ammount of pending connections in a queue
+
+
+
+CREATING A POLL TO WAIT AND MANAGE I/O MULTIPLEXING -> https://medium.com/@avocadi/what-is-epoll-9bbc74272f7c
+
+- If we just use the function accept(), while we are dealing with the request of one connection we cannot get any other connection (Blocking I/O). To accept multiple connections in a row and deal with them afterwards we must create a epoll using it's funtions (epoll_create, epoll_ctl, epoll_wait). To handle multiple things inside one we call multiplexing.
+	- epoll_create -> Creates an epoll instance in the kernel
+	- epoll_ctl -> Tells the instance to gather fd's you're looking from with the use of the appropriate flags
+	- epoll_wait -> Waits for the instance to tell whenever a wanted fd has changed (can be a block of fd's)
+
+
+
 
 
 what is an http config file?

@@ -10,7 +10,7 @@ _interface(interface),
 _port(port)
 {
 	//std::cout << "Socket custom constructor called\n";
-	//Creates an unbound socket
+	//Creates a socket
 	_fd = socket(_domain, _type, _protocol);
 	if (_fd == -1)
 		throw SocketOpenFailure();
@@ -89,6 +89,7 @@ Socket&	Socket::operator=(const Socket &copy)
 
 void	Socket::closeSocket()
 {
+	// Safely closes the Socket fd
 	if (_fd >= 0)
 	{
 		if (close(_fd) == -1)
@@ -99,6 +100,7 @@ void	Socket::closeSocket()
 
 struct sockaddr_in	Socket::IPv4AddressConvertion(int domain, u_long interface , int port)
 {
+	// Fills and returns a sockaddr_in struct (for IPv4)
 	struct sockaddr_in	address;
 	address.sin_family = domain;
 	address.sin_addr.s_addr = htonl(interface);

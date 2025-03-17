@@ -42,8 +42,13 @@ class Socket
 		struct sockaddr_in	getAddress();
 
 		// MEMBER FUNCTIONS
+		// Safely closes the Socket
 		void				closeSocket();
+
+		// Returns a sockaddr_in struct (for IPv4)
 		struct sockaddr_in	IPv4AddressConvertion(int socket_fd, u_long interface , int port);
+		
+		// Mandatory socket configuration in derived classes
 		virtual void		configureSocket() = 0;
 
 	// EXCEPTIONS

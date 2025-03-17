@@ -19,6 +19,7 @@ class ConnectingSocket : public Socket
 		ConnectingSocket&	operator=(const ConnectingSocket &copy);
 		
 		// MEMBER FUNCTIONS
+		// Configures the socket
 		virtual void	configureSocket();
 
 	// EXCEPTIONS

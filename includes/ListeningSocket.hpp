@@ -22,6 +22,7 @@ class ListeningSocket : public BindingSocket
 		ListeningSocket&	operator=(const ListeningSocket &copy);
 
 		// MEMBER FUNCTIONS
+		// Configures the Socket
 		virtual void	configureSocket();
 
 	// EXCEPTIONS
