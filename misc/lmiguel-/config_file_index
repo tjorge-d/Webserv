@@ -1,0 +1,34 @@
+#begins a block;
+x_block start;
+
+#ends a block;
+x_block end;
+
+#sets the size limit of incoming client requests
+client_request_max_size 10Mb;
+
+#sets the port of our domain
+domain_port 80;
+
+#sets the address of our domain
+server_name localhost;
+
+#sets the default location for our webserver, AKA the place where all the #web pages and assets are stored
+default_location /;
+
+#determines which services are available in the domain
+services_available GET POST DELETE;
+
+#sets our domain's root directory
+root /var/www/dev;
+
+#set whether autoindex is on or off
+autoindex off;
+
+#determines our server's default error pages
+error_page 404 /404.html;
+error_page 500 502 503 504 /50x.html;
+
+#sets the default file to be shown when the request is for a #directory
+directory_request_redirect /var/www/dev/sideye.jpg;
+
