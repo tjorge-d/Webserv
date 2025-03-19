@@ -54,7 +54,7 @@ chdir
 getaddrinfo
 freeaddrinfo
 setsockopt
-getsockname
+getsockname -> gives the sockaddr_in of a socket
 getprotobyname
 waitpid
 kill

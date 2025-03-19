@@ -5,7 +5,7 @@ CXXFLAGS= -Wall -Werror -Wextra -g
 
 SRC_A= $(addprefix src/, $(SOURCES_A))
 SOURCES_A= main.cpp 	\
-IOHandler.cpp 			\
+EventHandler.cpp 			\
 BindingSocket.cpp 		\
 ListeningSocket.cpp 	\
 ConnectingSocket.cpp 	\
