@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 14:46:08 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/17 18:02:39 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/03/19 14:35:50 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <cstring>
 #include <iomanip>
 
 struct ServerInfo{
