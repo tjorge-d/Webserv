@@ -9,34 +9,32 @@
 # include <netinet/in.h>
 # include <vector>
 # include <fcntl.h>
+# include <map>
+# include "ListeningSocket.hpp"
+# include "Client.hpp"
 
 class EventHandler
 {
 	private:
 		// ATTRIBUTES
+		ListeningSocket				&_server;
+		std::map<int, Client*>		&_clients;
 		int							_epollFd;
-		int							_serverFd;
 		int							_eventsNumber;
 		std::vector<epoll_event>	_events;
 
-
-		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler();
-
 	public:
-		// ATTRIBUTES
 		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler(int serverFd);
-		EventHandler(const EventHandler &a);
+		EventHandler(ListeningSocket &server, std::map<int, Client*> &clients);
 		~EventHandler() ;
 		
 		// GETTERS
-		std::vector<epoll_event> getEvents();
-		epoll_event	getEvent(int index);
+		std::vector<epoll_event>	getEvents();
+		epoll_event					getEvent(int index);
+		int							getEventNumber();
 
 		// OPERATORS
-		EventHandler&	operator=(const EventHandler &copy);
-		epoll_event	operator[](int index) const;
+		epoll_event		operator[](int index) const;
 
 		// MEMBER FUNCTIONS
 		// Safely closes the Class

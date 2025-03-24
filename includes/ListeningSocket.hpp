@@ -5,9 +5,6 @@
 class ListeningSocket : public BindingSocket
 {
 	private:
-		// CONSTRUCTORS/DESTRUCTORS
-		ListeningSocket();
-
 		// ATTRIBUTES
 		int	_backlog;
 

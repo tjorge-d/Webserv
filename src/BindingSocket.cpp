@@ -33,7 +33,7 @@ BindingSocket::~BindingSocket()
 BindingSocket&	BindingSocket::operator=(const BindingSocket &copy)
 {
 	//std::cout << "BindingSocket copy assignment operator called\n";
-	if (this != &copy)
+	if(this != &copy)
 		Socket::operator=(copy);
 	return (*this);
 }
@@ -46,7 +46,7 @@ void	BindingSocket::configureSocket()
 	_address = IPv4AddressConvertion(_domain, _interface, _port);
 
 	// Binds the socket to an address
-	if (bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
+	if(bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
 		throw SocketBindingFailure();
 }
 

@@ -35,7 +35,7 @@ ListeningSocket::~ListeningSocket()
 ListeningSocket&	ListeningSocket::operator=(const ListeningSocket &copy)
 {
 	//std::cout << "ListeningSocket copy assignment operator called\n";
-	if (this != &copy)
+	if(this != &copy)
 		BindingSocket::operator=(copy);
 	return (*this);
 }
@@ -45,7 +45,7 @@ ListeningSocket&	ListeningSocket::operator=(const ListeningSocket &copy)
 void	ListeningSocket::configureSocket()
 {
 	// Makes the socket passive and ready to accept incoming connection requests
-    if (listen(_fd, _backlog) != 0)
+    if(listen(_fd, _backlog) != 0)
         throw SocketListeningFailure();
 }
 

@@ -12,7 +12,7 @@ _port(port)
 	//std::cout << "Socket custom constructor called\n";
 	//Creates a socket
 	_fd = socket(_domain, _type, _protocol);
-	if (_fd == -1)
+	if(_fd == -1)
 		throw SocketOpenFailure();
 }
 
@@ -71,7 +71,7 @@ struct sockaddr_in	Socket::getAddress()
 Socket&	Socket::operator=(const Socket &copy)
 {
 	//std::cout << "Socket copy assignment operator called\n";
-	if (this != &copy)
+	if(this != &copy)
 	{
 		closeSocket();
 		_fd = copy._fd;
@@ -90,9 +90,9 @@ Socket&	Socket::operator=(const Socket &copy)
 void	Socket::closeSocket()
 {
 	// Safely closes the Socket fd
-	if (_fd >= 0)
+	if(_fd >= 0)
 	{
-		if (close(_fd) == -1)
+		if(close(_fd) == -1)
 			throw SocketCloseFailure();
 		_fd = -1;
 	}

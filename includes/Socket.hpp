@@ -9,10 +9,6 @@
 
 class Socket
 {
-	private:
-		// CONSTRUCTORS/DESTRUCTORS
-		Socket();
-
 	protected:
 		// ATTRIBUTES
 		int					_fd;

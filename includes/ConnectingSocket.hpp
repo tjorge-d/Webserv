@@ -4,10 +4,6 @@
 
 class ConnectingSocket : public Socket
 {
-	private:
-		// CONSTRUCTORS/DESTRUCTORS
-		ConnectingSocket();
-
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
 		ConnectingSocket(int domain, int type, int protocol, u_long interface, int port);

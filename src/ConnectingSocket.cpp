@@ -33,7 +33,7 @@ ConnectingSocket::~ConnectingSocket()
 ConnectingSocket&	ConnectingSocket::operator=(const ConnectingSocket &copy)
 {
 	//std::cout << "ConnectingSocket copy assignment operator called\n";
-	if (this != &copy)
+	if(this != &copy)
 		Socket::operator=(copy);
 	return (*this);
 }
@@ -46,7 +46,7 @@ void	ConnectingSocket::configureSocket()
 	_address = IPv4AddressConvertion(_fd, _interface, _port);
 	
 	// Connects the socket to an address
-	if (connect(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
+	if(connect(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
 		throw SocketConnectingFailure();
 }
 

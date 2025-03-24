@@ -4,10 +4,6 @@
 
 class BindingSocket : public Socket
 {
-	private:
-		// CONSTRUCTORS/DESTRUCTORS
-		BindingSocket();
-
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
 		BindingSocket(int domain, int type, int protocol, u_long interface, int port);

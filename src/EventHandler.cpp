@@ -1,35 +1,26 @@
 #include "../includes/EventHandler.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
-EventHandler::EventHandler()
-{
-	//std::cout << "EventHandler default constructor called\n";
-}
-
-EventHandler::EventHandler(int serverFd) : _serverFd(serverFd)
+EventHandler::EventHandler(ListeningSocket &server, std::map<int, Client*> &clients) :
+_server(server), _clients(clients)
 {
 	//std::cout << "EventHandler custom constructor called\n";
 	// Creates an epoll instance in the kernel
 	_epollFd = epoll_create(1);
-	if (_epollFd == -1)
+	if(_epollFd == -1)
 		throw EPollCreationFailure();
 	
 	// Fills an epoll_event struct telling how the server fd should be dealt with
 	struct epoll_event event;
 	event.events = EPOLLIN;
-	event.data.fd = _serverFd;
+	event.data.fd = _server.getFD();
 
 	// Adds the server to the epoll instance in the kernel
-	if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, _serverFd, &event) != 0)
+	if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, _server.getFD(), &event) != 0)
 		throw EPollCTLFailure("add");
 	
 	_events.resize(10);
-}
-
-EventHandler::EventHandler(const EventHandler &copy)
-{
-	//std::cout << "EventHandler copy constructor called\n";
-	*this = copy;
+	(void)_clients;
 }
 
 EventHandler::~EventHandler()
@@ -48,30 +39,23 @@ std::vector<epoll_event>	EventHandler::getEvents()
 
 epoll_event	EventHandler::getEvent(int index)
 {
-	if (index >= _eventsNumber || index < 0)
+	if(index >= _eventsNumber || index < 0)
 		throw EventOutOfBounds();
 	return (_events.at(index));
+}
+
+int	EventHandler::getEventNumber()
+{
+	return (_eventsNumber);
 }
 
 // SETTERS
 
 
 // OPERATORS
-
-EventHandler&	EventHandler::operator=(const EventHandler &copy)
-{
-	//std::cout << "EventHandler copy assignment operator called\n";
-	if (this != &copy)
-	{
-		closeHandler();
-		_epollFd = copy._epollFd;
-	}
-	return (*this);
-}
-
 epoll_event	EventHandler::operator[](int index) const
 {
-	if (index >= _eventsNumber || index < 0)
+	if(index >= _eventsNumber || index < 0)
 		throw EventOutOfBounds();
 	return (_events[index]);
 }
@@ -81,9 +65,9 @@ epoll_event	EventHandler::operator[](int index) const
 void	EventHandler::closeHandler()
 {
 	// Safely closes the epoll fd
-	if (_epollFd >= 0)
+	if(_epollFd >= 0)
 	{
-		if (close(_epollFd) != 0)
+		if(close(_epollFd) != 0)
 			throw EPollCloseFailure();
 		_epollFd = -1;
 	}
@@ -100,8 +84,10 @@ void	EventHandler::addClient(int client_fd)
 	event.data.fd = client_fd;
 
 	// Adds the client to the epoll instance in the kernel
-	if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, client_fd, &event) != 0)
+	if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, client_fd, &event) != 0)
 		throw EPollCTLFailure("add");
+
+	// Adds the client to the std::map _clients
 
 	std::cout << "The client " << event.data.fd << " connected\n";
 }
@@ -117,25 +103,31 @@ void	EventHandler::waitEvents(int timeout)
 {
 	// Waits for events and fills "_events" with the ready ones
 	_eventsNumber = epoll_wait(_epollFd, _events.data(), _events.size(), timeout);
-	if (_eventsNumber == -1)
+	if(_eventsNumber == -1)
 		throw EPollWaitFailure();
 }
 
 void	EventHandler::checkEvents()
 {
-	for (int i = 0; i < _eventsNumber; i++)
+	for(int i = 0; i < _eventsNumber; i++)
 	{
 		// Handles new connections to the server
-		if (_events[i].data.fd == _serverFd)
+		if(_events[i].data.fd == _server.getFD())
 		{
-			int					client;
+			// Accepts a new connection
+			int					client_fd;
 			struct sockaddr_in	client_addr;
 			socklen_t			client_size = sizeof(client_addr);
-			client = accept(_serverFd, (struct sockaddr *)&client_addr, &client_size);
-			if (client == -1)
+			client_fd = accept(_server.getFD(), (struct sockaddr *)&client_addr, &client_size);
+			if(client_fd == -1)
 				throw ConnectionAcceptFailure();
+			
+			// Adds the new client to the std::map of clients
+			Client	*client = new Client(client_fd);
+			_clients[client_fd] = client;
+
 			// Adds the new client connection to epoll
-			addClient(client);
+			addClient(client_fd);
 		}
 		// Handles the non server events in epoll 
 		else
@@ -150,18 +142,20 @@ void	EventHandler::handleEvent(epoll_event& event)
 	char	buffer[b_size];
 	buffer[b_size] = '\0';
 	int		bytes;
-	bytes = recv(event.data.fd, buffer, b_size, 0); 
-	if (bytes == -1)
+	bytes = recv(event.data.fd, buffer, b_size, 0);
+	if(bytes == -1)
 		throw RecieveFailure();
-	if (bytes == 0)
+	if(bytes == 0)
 	{
+		// Removes the Client from the server and epoll
 		std::cout << "The client " << event.data.fd << " disconnected\n";
-		close(event.data.fd);
-		return ;
+		delete _clients[event.data.fd];
+		_clients.erase(event.data.fd);
+		return;
 	}
 	std::cout << "The client " << event.data.fd << " sent:\n";
 	std::cout << buffer << std::endl;
-	//send(event.data.fd, buffer, b_size + 1, 0);
+	send(event.data.fd, "HI\n", 4, 0);
 }
 
 // EXCEPTIONS
