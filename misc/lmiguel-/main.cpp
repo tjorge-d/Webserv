@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/19 15:22:52 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:28:14 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,36 +35,44 @@
 */
 
 #include "Parser.hpp"
+#include "Exception.hpp"
 
-
-bool domainBlockSolver()
+/* bool domainBlockSolver()
 {
 	
-}
+} */
 
 int main(int argc, char **argv){
 
 	std::ifstream	config_file;
-	std::size_t		start;
+	//std::size_t		start;
 	std::string		line;
-	bool			client_request_accquired = false;
-	
+	std::string		newline;
+	std::string		current_start;
 
+	ServerInfo *Server = new ServerInfo();
 	try{
 		
 		if (argc != 2) //only 2 arguments are required: ./webserv and [config_file]. anything else is invalid
-			throw "Invalid number of arguments.";
+			throw ParserException("Invalid number of arguments.");
 		config_file.open (argv[1]);
 		if (!config_file) //if the config file cannot be opened/doesn't exist, throw this error.
-			throw std::exception();
-		while (std::getline(config_file, line))//main loop, continue until text ends
+			throw ParserException("Invalid config file");
+		while (std::getline(config_file, line)) //main loop, continue until text ends
 		{
-			if ()
+			newline += line;
+			newline += '\n';
+		}
+		std::cout << newline << std::endl; //EXPERIMENTAL: print the entire file.
+		while ((newline.find("client_request_max_size")) == std::string::npos)
+		{
+			throw ParserException("Could not find client_request_max_size.");
 		}
 	}
-	catch(std::string error_msg){
-		std::cout << "The parser ran into a problem: " << error_msg << std::endl;
+	catch(std::exception &e){
+		std::cerr << e.what() << std::endl; //catch and print all exceptions thrown during code execution.
 	}
+	delete Server;
 	if (config_file.is_open())
 		config_file.close();
 }

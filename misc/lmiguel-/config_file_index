@@ -31,3 +31,6 @@ error_page 500 502 503 504 /50x.html;
 
 #sets the default file to be shown when the request is for a directory
 directory_request_redirect /var/www/dev/sideye.jpg;
+
+#sets the domain's index file to be shown on access
+index gofas.html;

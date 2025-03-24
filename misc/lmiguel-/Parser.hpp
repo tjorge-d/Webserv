@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 14:46:08 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/19 14:35:50 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/03/24 16:17:38 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,24 +21,24 @@
 
 struct ServerInfo{
 
-	int			client_request_max_size;
-	Domain		domain;
-	Location	location;
+	int				client_request_max_size;
+	/* Domain		domain;
+	Location		location; */
 };
 
-struct Domain{
+/* struct ServerBlock{
 
-	int			domain_port;
-	std::string	domain_name;
+	int				domain_port;
+	std::string		server_name;
 };
 
-struct Location{
+struct DomainBlock{
 
-	bool		autoindex_state;
-	std::string	allowed_services;
-	std::string	root_directory;
-	std::string	index_file;
-};
+	bool			autoindex;
+	std::string		allowed_services[];
+	std::string		root_directory;
+	std::string		index_file;
+}; */
 
 /* class Parser{
 
