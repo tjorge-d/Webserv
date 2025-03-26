@@ -2,6 +2,7 @@ USED FUNCTIONS
 
 // Socket related functions //
 socket -> creates a socket
+setsockopt -> sets options for the socket
 bind -> binds the socket
 connect -> connects the socket
 htons -> conversion of the port for bind/connect
@@ -53,7 +54,6 @@ ntohl
 chdir
 getaddrinfo
 freeaddrinfo
-setsockopt
 getsockname -> gives the sockaddr_in of a socket
 getprotobyname
 waitpid

@@ -42,6 +42,8 @@ BindingSocket&	BindingSocket::operator=(const BindingSocket &copy)
 
 void	BindingSocket::configureSocket()
 {
+	int opt = 1;
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 	// Initializes the address structure
 	_address = IPv4AddressConvertion(_domain, _interface, _port);
 

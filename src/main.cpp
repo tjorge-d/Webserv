@@ -27,6 +27,20 @@ void	delete_clients(std::map<int, Client*> &clients)
 		delete i->second;
 }
 
+void	pending_clients(std::map<int, Client*> &clients)
+{
+	state	c_state;
+	for(std::map<int, Client*>::iterator i = clients.begin(); i != clients.end(); i++)
+	{
+		c_state = i->second->getState();
+
+		if (c_state == RECIEVING_REQUEST || c_state == CLEANING_INVALID_REQUEST)
+			i->second->recieveRequestChunk(8);
+		else if (c_state == SENDING_RESPONSE)
+			i->second->sendResponseChunk(8);
+	}
+}
+
 int main(int argc, char **argv)
 {
 	try
@@ -37,10 +51,10 @@ int main(int argc, char **argv)
 		(void)argv;
 		(void)argc;
 		// Server configuration parse
-		//configuration_parser() -> to be worked on
+		//configuration_parser() -> TODO
 		
 		// Server initialization
-		ListeningSocket 		server(INADDR_ANY, 8080, max_connections);
+		ListeningSocket 		server(INADDR_ANY, 6969, max_connections);
 		std::map<int, Client*>	clients;
 		EventHandler			events(server, clients);
 		
@@ -58,14 +72,23 @@ int main(int argc, char **argv)
 				// Waits for events 
 				debug_msg("WAITING...");
 				events.waitEvents(timeout);
-				
+
 				// Event loop
 				debug_msg("CHECKING EVENTS...");
 				events.checkEvents();
+
+				// Reads/Writes pending requests/responses
+				debug_msg("CHECKING EVENTS...");
+				pending_clients(clients);
+
+				//while(debug)
+				//{;}
+				// Pending
 			}
 			catch(const std::exception& e)
 			{
 				std::cerr << e.what() << '\n';
+				std::cerr << errno << '\n';
 			}
 		}
 		debug_msg("TERMINATING...");

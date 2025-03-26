@@ -80,7 +80,7 @@ void	EventHandler::addClient(int client_fd)
 
 	// Fills an epoll_event struct telling how the fd should be dealt with
 	struct epoll_event event;
-	event.events = EPOLLIN | EPOLLET;
+	event.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
 	event.data.fd = client_fd;
 
 	// Adds the client to the epoll instance in the kernel
@@ -137,25 +137,24 @@ void	EventHandler::checkEvents()
 
 void	EventHandler::handleEvent(epoll_event& event)
 {
-	std::cout << "The client " << event.data.fd << " triggered an event\n";
-	int		b_size = 1000;
-	char	buffer[b_size];
-	buffer[b_size] = '\0';
-	int		bytes;
-	bytes = recv(event.data.fd, buffer, b_size, 0);
-	if(bytes == -1)
-		throw RecieveFailure();
-	if(bytes == 0)
+	//int	chunk_s = 1024;
+	std::cout << "\nThe client " << event.data.fd << " triggered an event\n";
+	// Checks if the event was triggered because of disconnection
+	if (event.events & EPOLLRDHUP)
 	{
 		// Removes the Client from the server and epoll
 		std::cout << "The client " << event.data.fd << " disconnected\n";
 		delete _clients[event.data.fd];
 		_clients.erase(event.data.fd);
-		return;
+		return ;
 	}
-	std::cout << "The client " << event.data.fd << " sent:\n";
-	std::cout << buffer << std::endl;
-	send(event.data.fd, "HI\n", 4, 0);
+
+	// Recieves and stores the data in the client class
+	_clients[event.data.fd]->newRequest();
+	// int	bytes = _clients[event.data.fd]->recieveRequestChunk(chunk_s);
+	// if (bytes <= chunk_s)
+	// 	_clients[event.data.fd]->parseRequestHeader();
+	// _clients[event.data.fd]->sendResponseChunk(chunk_s);
 }
 
 // EXCEPTIONS
@@ -176,6 +175,3 @@ runtime_error("The index provided is out of bounds"){}
 
 EventHandler::ConnectionAcceptFailure::ConnectionAcceptFailure() :
 runtime_error("Failed to accept a new connection"){}
-
-EventHandler::RecieveFailure::RecieveFailure() :
-runtime_error("Failed to recieve data from an event"){}

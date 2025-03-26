@@ -39,7 +39,7 @@ class EventHandler
 		// MEMBER FUNCTIONS
 		// Safely closes the Class
 		void	closeHandler();
-		
+
 		// Adds a client to the epoll instance in the Kernel
 		void	addClient(int client_fd);
 		
@@ -88,13 +88,7 @@ class EventHandler
 	{
 		public :
 			ConnectionAcceptFailure();
-	};
-
-	class	RecieveFailure : public std::runtime_error
-	{
-		public :
-			RecieveFailure();
-	};		
+	};	
 };
 
 #endif
