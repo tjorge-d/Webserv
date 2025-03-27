@@ -19,6 +19,8 @@ class EventHandler
 		// ATTRIBUTES
 		ListeningSocket				&_server;
 		std::map<int, Client*>		&_clients;
+		int							_connections;
+		int							_maxConnections;
 		int							_epollFd;
 		int							_eventsNumber;
 		std::vector<epoll_event>	_events;

@@ -4,6 +4,7 @@
 
 Client::Client(int fd) : 
 _fd(fd),
+_connected(true),
 _pendingRequests(0),
 _chunksNumber(0),
 _waitingHeader(0),
@@ -18,6 +19,7 @@ Client::~Client()
 	std::cout << "Client destructor called\n";
 	closeClient();
 }
+
 
 // GETTERS
 
@@ -35,6 +37,7 @@ std::vector<char>	Client::getResponse()
 {
 	return (_response);
 }
+
 
 // MEMBER FUNCTIONS
 
@@ -58,6 +61,41 @@ void	Client::newRequest()
 		_waitingBody = 0;
 	}
 	_pendingRequests++;
+	std::cout << "Added a new request to the client " << _fd
+	<< "\nTotal requests: " << _pendingRequests << "\n";
+}
+
+void	Client::sendMode()
+{
+	_state = SENDING_RESPONSE;
+	_bytesSent = 0;
+}
+
+void	Client::maxClientsResponse()
+{
+	std::string str = "Daqui fala a Marta da teleseguros, por favor tente mais tarde.";
+	int			size = str.size();
+	std::stringstream s;
+	s << size;
+	std::string n = s.str();
+
+	int	seconds = 10;
+	std::stringstream sec;
+	sec << seconds;
+
+	std::string response;
+	response += "HTTP/1.1 503 Service Unavailable\r\n"
+	"Content-Type: text/plain\r\n"
+	"Content-Length: " + n + "\r\n"
+	"Retry-After: " + sec.str() + "\r\n"
+	"Connection: close\r\n"
+	"\r\n" + str;
+
+    // Convert the string to a vector<char>
+    _response = std::vector<char>(response.begin(), response.end());
+	_responseSize = _response.size();
+	_connected = 0;
+	_pendingRequests++;
 }
 
 void	Client::appendToRequest(char* str, int size)
@@ -68,44 +106,60 @@ void	Client::appendToRequest(char* str, int size)
 	if (_waitingHeader)
 	{
 		// Checks if the read data contains the end of a request header
-		int off_set = size + 4 * (_chunksNumber != 0);
+		int offset = size + 4 * (_chunksNumber != 0);
 		std::vector<char>::iterator it;
-		it = std::search(_request.end() - off_set, _request.end(), \
+		it = std::search(_request.end() - offset, _request.end(), \
 			"\r\n\r\n", &"\r\n\r\n"[4]);
-
-		// Finds the beggining of the Header and cleans what's behind
-		if (_state == CLEANING_INVALID_REQUEST)
-		{
-			//cleanInvalidRequest(findRequestBegin());
-			_state = RECIEVING_REQUEST;
-		}
-
+		
 		// Parses the header if found
 		if (it != _request.end())
+		{
+			// Finds the beggining of the Header and cleans what's behind
+			if (_state == CLEANING_INVALID_REQUEST)
+			{
+				//cleanInvalidRequest(findRequestBegin());
+				_state = RECIEVING_REQUEST;
+			}			
 			parseRequestHeader(it + 4);
+			if (!_waitingBody)
+				sendMode();
+		}
 	}
 }
 
 void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 {
-	// Parses the request
-	_response = _request;
-	_request.clear();
-	_responseSize = _response.size();
-	_bytesSent = 0;
+	std::string str = "BOAAAAAS PESSOAL!";
+	int			size = str.size();
+	std::stringstream s;
+	s << size;
+	std::string n = s.str();
 
-	// INVALID HEADER CONDITION
+	std::string response;
+	response += "HTTP/1.1 200 OK\r\n"
+	"Content-Type: text/plain\r\n"
+	"Content-Length: " + n + "\r\n"
+	"Connection: close\r\n"
+	"\r\n" + str;
+
+	// Convert the string to a vector<char>
+	_response = std::vector<char>(response.begin(), response.end());
+	_responseSize = _response.size();
+
+	// PARSES THE REQUEST -> todo
+
+	// INVALID HEADER CONDITION -> todo
 	if (0)
-	{
-		// Erases the invalid header from _request
-		std::vector<char>::iterator it;
-		it = std::search(_request.begin(), _request.end(), \
-			"\r\n\r\n", &"\r\n\r\n"[4]);
-		_pendingRequests--;
-		//	throw InvalidHeader()
-	}
+	{}
+
 	_waitingHeader = false;
+
+	// REQUEST METHOD THAT NEEDS A BODY CONDITION -> todo
+	if (0)
+		_waitingBody = true;
+
 	_request.erase(_request.begin(), header_end);
+	_request.shrink_to_fit();
 }
 
 int	Client::recieveRequestChunk(int chunk_size)
@@ -117,9 +171,8 @@ int	Client::recieveRequestChunk(int chunk_size)
 	// Sets and fills a buffer with data from the client _fd
 	char	buffer[chunk_size];
 	int		bytes = recv(_fd, buffer, chunk_size, 0);
-	//if(bytes == -1)
-	//	throw RecieveFailure();
-	std::cout << "bytes: " << bytes << " bytes\n";
+	if(bytes == -1)
+		throw RecieveFailure();
 
 	// Apppends the filled buffer to _request
 	appendToRequest(buffer, bytes);
@@ -128,18 +181,9 @@ int	Client::recieveRequestChunk(int chunk_size)
 	// Behaves accordingly in case of not having anything else to read
 	if(bytes < chunk_size || !bytes)
 	{
-		// Initializing SENDING_RESPONSE mode (should be done after a valid header parsing)
-		_state = SENDING_RESPONSE;
-		_response = _request;
-		_request.clear();
-		_responseSize = _response.size();
-		_bytesSent = 0;
-		_chunksNumber = 0;
-		///////////////////////////////////
-
 		if(_waitingHeader){}
 			// throw InvalidHeader()
-		if(_waitingBody) {}
+		if(_waitingBody && _bytesSent != _responseSize){}
 			//parseRequestBody(_request.end());
 	}
 
@@ -158,27 +202,32 @@ int	Client::sendResponseChunk(int chunk_size)
 
 	// Sends the response in chunks
 	int	bytes = send(_fd, &_response[_bytesSent], chunk_size, 0);
-	//if (bytes == -1)
-	//throw SendFailure();
+	if (bytes == -1)
+		throw SendFailure();
 	_bytesSent += bytes;
-	std::cout << "Sending chunk: " << chunk_size << " bytes\n";
-	std::cout << "Bytes sent so far: " << _bytesSent << "\n";
-	std::cout << "Response size: " << _responseSize << "\n";
 
 	// Resets the response status of the client when over
 	if (_bytesSent == _responseSize)
 	{
 		_pendingRequests--;
 		_response.clear();
-		_bytesSent = 0;
+		_response.shrink_to_fit();
+		_responseSize = 0; // Remove later after tests
+		_waitingBody = 0;
 		if (_pendingRequests)
 			_state = RECIEVING_REQUEST;
 		else
+		{
+			_request.clear();
+			_request.shrink_to_fit();
+			_chunksNumber = 0;
 			_state = WAITING;
+		}
 	}
 
 	return (bytes);
 }
+
 
 // EXCEPTIONS
 Client::ClientCloseFailure::ClientCloseFailure() :

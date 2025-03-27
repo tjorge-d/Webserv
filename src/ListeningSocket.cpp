@@ -40,6 +40,13 @@ ListeningSocket&	ListeningSocket::operator=(const ListeningSocket &copy)
 	return (*this);
 }
 
+// GETTERS
+
+int		ListeningSocket::getBacklog()
+{
+	return (_backlog);
+}
+
 // MEMBER FUNCTIONS
 
 void	ListeningSocket::configureSocket()

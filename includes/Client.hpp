@@ -8,6 +8,7 @@
 # include <sys/socket.h>
 # include <vector>
 # include <algorithm>
+# include <sstream>
 
 enum state
 {
@@ -23,6 +24,7 @@ class Client
 		// ATTRIBUTES
 		// Client Data
 		int					_fd;
+		bool				_connected;
 		
 		// Request data
 		int					_pendingRequests;
@@ -43,29 +45,37 @@ class Client
 		// Appends a char* to _request(vector<char>)
 		void	appendToRequest(char* str, int size);
 
-		// Parses a request header;
+		// Parses a request header
 		void	parseRequestHeader(std::vector<char>::iterator header_end);
 
-		// Parses a request body;
+		// Parses a request body
 		void	parseRequestBody(std::vector<char>::iterator body_end);
 
+		
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
 		Client(int fd);
 		Client(const Client &copy);
 		~Client();
-
+		
 		// GETTERS
 		int					getFD();
+		bool				getConnected();
 		state				getState();
 		std::vector<char>	getResponse();
-
+		
 		// MEMBER FUNCTIONS
 		// Safely closes the Client
 		void	closeClient();
 
+		// Activates send mode
+		void	sendMode();
+
 		// Tells the Client he wants to wait for a new request
 		void	newRequest();
+
+		// Tells the Client to Send a max clients response
+		void	maxClientsResponse();
 
 		// Recieves from his _fd in a chunk
 		int	recieveRequestChunk(int chunk_size);

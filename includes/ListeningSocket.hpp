@@ -7,6 +7,10 @@ class ListeningSocket : public BindingSocket
 	private:
 		// ATTRIBUTES
 		int	_backlog;
+		
+		// MEMBER FUNCTIONS
+		// Configures the Socket
+		virtual void	configureSocket();
 
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
@@ -15,12 +19,11 @@ class ListeningSocket : public BindingSocket
 		ListeningSocket(const ListeningSocket &a);
 		~ListeningSocket();
 
+		// GETTERS
+		int	getBacklog();
+
 		// OPERATORS
 		ListeningSocket&	operator=(const ListeningSocket &copy);
-
-		// MEMBER FUNCTIONS
-		// Configures the Socket
-		virtual void	configureSocket();
 
 	// EXCEPTIONS
 	class	SocketListeningFailure : public std::runtime_error
