@@ -17,17 +17,17 @@ class EventHandler
 {
 	private:
 		// ATTRIBUTES
-		ListeningSocket				&_server;
-		std::map<int, Client*>		&_clients;
-		int							_connections;
-		int							_maxConnections;
-		int							_epollFd;
-		int							_eventsNumber;
-		std::vector<epoll_event>	_events;
+		std::map<int, ListeningSocket*>	&_gateways;
+		std::map<int, Client*>			&_clients;
+		int								_connections;
+		int								_maxConnections;
+		int								_epollFd;
+		int								_eventsNumber;
+		std::vector<epoll_event>		_events;
 
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler(ListeningSocket &server, std::map<int, Client*> &clients);
+		EventHandler(std::map<int, ListeningSocket*>	&gateways, std::map<int, Client*> &clients, int	maxConnections);
 		~EventHandler() ;
 		
 		// GETTERS

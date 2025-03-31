@@ -22,7 +22,7 @@ class Socket
 		// CONSTRUCTORS/DESTRUCTORS
 		Socket(int domain, int type, int protocol, u_long interface, int port);
 		Socket(const Socket &a);
-		~Socket();
+		virtual ~Socket();
 
 		// OPERATORS
 		Socket&	operator=(const Socket &copy);

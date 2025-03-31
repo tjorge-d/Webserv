@@ -1,8 +1,8 @@
 #include "../includes/EventHandler.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
-EventHandler::EventHandler(ListeningSocket &server, std::map<int, Client*> &clients) :
-_server(server), _clients(clients), _connections(0), _maxConnections(server.getBacklog())
+EventHandler::EventHandler(std::map<int, ListeningSocket*> &gateways, std::map<int, Client*> &clients, int maxConnections) :
+_gateways(gateways), _clients(clients), _connections(0), _maxConnections(maxConnections)
 {
 	//std::cout << "EventHandler custom constructor called\n";
 	// Creates an epoll instance in the kernel
@@ -10,17 +10,20 @@ _server(server), _clients(clients), _connections(0), _maxConnections(server.getB
 	if(_epollFd == -1)
 		throw EPollCreationFailure();
 	
-	// Fills an epoll_event struct telling how the server fd should be dealt with
-	struct epoll_event event;
-	event.events = EPOLLIN;
-	event.data.fd = _server.getFD();
+	// Configures the ports where the server listens from 
+	for(std::map<int, ListeningSocket*>::iterator i = _gateways.begin(); i != _gateways.end(); i++)
+	{
+		// Fills an epoll_event struct to configure the event of the port
+		struct epoll_event event;
+		event.events = EPOLLIN;
+		event.data.fd = i->second->getFD();
 
-	// Adds the server to the epoll instance in the kernel
-	if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, _server.getFD(), &event) != 0)
-		throw EPollCTLFailure("add");
-	
+		// Adds the gateway to the epoll instance in the kernel
+		if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, event.data.fd, &event) != 0)
+			throw EPollCTLFailure("add");
+	}
+
 	_events.resize(_maxConnections);
-	(void)_clients;
 }
 
 EventHandler::~EventHandler()
@@ -77,24 +80,24 @@ void	EventHandler::closeHandler()
 
 void	EventHandler::addClient(int client_fd)
 {
-	std::cout << "\nSERVER!!!\n";
 	// Adds a flag to the socket making it non-blocking
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 
 	// Fills an epoll_event struct telling how the fd should be dealt with
 	struct epoll_event event;
-	event.events = EPOLLIN | EPOLLRDHUP | EPOLLET;
+	event.events = EPOLLIN | EPOLLOUT | EPOLLRDHUP | EPOLLET;
 	event.data.fd = client_fd;
 
 	// Adds the client to the epoll instance in the kernel
 	if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, client_fd, &event) != 0)
 		throw EPollCTLFailure("add");
 
+	// Fills a "Max Clients" response if the server is full
 	if (_connections == _maxConnections)
 		_clients[client_fd]->maxClientsResponse();
 	else
 		_connections++;
-	std::cout << "The client " << event.data.fd << " connected\n";
+	std::cout << "The client " << client_fd << " connected\n";
 }
 
 void	EventHandler::removeClient(int client_fd)
@@ -117,25 +120,23 @@ void	EventHandler::checkEvents()
 	std::cout << "Connections: " << _connections << std::endl;
 	for(int i = 0; i < _eventsNumber; i++)
 	{
-		// Handles new connections to the server
-		if(_events[i].data.fd == _server.getFD())
+		// Checks if the event comes from the gateways
+		if(_gateways.count(_events[i].data.fd))
 		{
 			// Accepts a new connection
 			int					client_fd;
 			struct sockaddr_in	client_addr;
 			socklen_t			client_size = sizeof(client_addr);
-			client_fd = accept(_server.getFD(), (struct sockaddr *)&client_addr, &client_size);
+			client_fd = accept(_events[i].data.fd, (struct sockaddr *)&client_addr, &client_size);
 			if(client_fd == -1)
 				throw ConnectionAcceptFailure();
-			
+
+			// Checks if the client is already connected
 			if (_clients.count(client_fd))
 			{
 				std::cout << "The Client " << client_fd << " is already connected!" << std::endl;
 				return ;
 			}
-
-
-			std::cout << "New connection accepted. Client FD: " << client_fd << std::endl;
 
 			// Adds the new client to the std::map of clients
 			Client	*client = new Client(client_fd);
@@ -144,7 +145,7 @@ void	EventHandler::checkEvents()
 			// Adds the new client connection to epoll
 			addClient(client_fd);
 		}
-		// Handles the non server events in epoll 
+		// Handles events already exiting in epoll 
 		else
 			handleEvent(_events[i]);
 	}
@@ -157,7 +158,7 @@ void	EventHandler::handleEvent(epoll_event& event)
 	// Checks if the event was triggered because of disconnection
 	if (event.events & EPOLLRDHUP)
 	{
-		// Removes the Client from the server and epoll
+		// Removes the Client from the server
 		std::cout << "\nThe client " << event.data.fd << " disconnected\n";
 		if (_clients[event.data.fd]->getConnected())
 			_connections--;
@@ -165,16 +166,16 @@ void	EventHandler::handleEvent(epoll_event& event)
 		_clients.erase(event.data.fd);
 		return ;
 	}
-
-	// Recieves and stores the data in the client class
-	if (_clients[event.data.fd]->getConnected())
-		_clients[event.data.fd]->newRequest();
-	else
-		_clients[event.data.fd]->sendMode();
-	// int	bytes = _clients[event.data.fd]->recieveRequestChunk(chunk_s);
-	// if (bytes <= chunk_s)
-	// 	_clients[event.data.fd]->parseRequestHeader();
-	// _clients[event.data.fd]->sendResponseChunk(chunk_s);
+	// Checks if the client is sending a request
+	else if (event.events & EPOLLOUT && event.events & EPOLLIN)
+	{
+		std::cout << "\nThe client " << event.data.fd << " sent a request\n";
+		// Recieves and stores the data in the client class
+		if (_clients[event.data.fd]->getConnected())
+			_clients[event.data.fd]->newRequest();
+		else
+			_clients[event.data.fd]->sendMode();
+	}
 }
 
 // EXCEPTIONS

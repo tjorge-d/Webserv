@@ -14,6 +14,7 @@ enum state
 {
 	WAITING,
 	RECIEVING_REQUEST,
+	READING_FILE,
 	CLEANING_INVALID_REQUEST,
 	SENDING_RESPONSE
 };
@@ -21,7 +22,6 @@ enum state
 class Client
 {
 	private:
-		// ATTRIBUTES
 		// Client Data
 		int					_fd;
 		bool				_connected;

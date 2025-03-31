@@ -21,6 +21,12 @@ void	delete_clients(std::map<int, Client*> &clients)
 		delete i->second;
 }
 
+void	delete_gateways(std::map<int, ListeningSocket*> &gateways)
+{
+	for(std::map<int, ListeningSocket*>::iterator i = gateways.begin(); i != gateways.end(); i++)
+		delete i->second;
+}
+
 void	pending_clients(std::map<int, Client*> &clients)
 {
 	state	c_state;
@@ -41,11 +47,12 @@ void	pending_clients(std::map<int, Client*> &clients)
 	}
 }
 
+
 int main(int argc, char **argv)
 {
 	try
 	{
-		int							max_connections = 3;
+		int							max_connections = 5;
 		int							timeout = 1000;
 
 		(void)argv;
@@ -60,10 +67,18 @@ int main(int argc, char **argv)
 		signal(SIGQUIT, debug_signal);
 		//signal(SIGQUIT, SIG_IGN);
 
-		// Server initialization
-		ListeningSocket 		server(INADDR_ANY, 6969, max_connections);
+		// Initializing...
+		ListeningSocket* a = new ListeningSocket(INADDR_ANY, 8080, max_connections);
+		ListeningSocket* b = new ListeningSocket(INADDR_ANY, 6969, max_connections);
+		ListeningSocket* c = new ListeningSocket(INADDR_ANY, 4200, max_connections);
+
+		std::map<int, ListeningSocket*> gateways;
+		gateways.insert(std::pair<int, ListeningSocket*>(a->getFD(), a));
+    	gateways.insert(std::pair<int, ListeningSocket*>(b->getFD(), b));
+		gateways.insert(std::pair<int, ListeningSocket*>(c->getFD(), c));
+
 		std::map<int, Client*>	clients;
-		EventHandler			events(server, clients);
+		EventHandler			events(gateways, clients, max_connections);
 		
 		// Server loop
 		while(running)
@@ -88,6 +103,7 @@ int main(int argc, char **argv)
 			}
 		}
 		delete_clients(clients);
+		delete_gateways(gateways);
 	}
 	catch(const std::exception &e)
 	{
