@@ -10,7 +10,8 @@ BindingSocket.cpp 		\
 ListeningSocket.cpp 	\
 ConnectingSocket.cpp 	\
 Socket.cpp	\
-Client.cpp
+Client.cpp	\
+HttpResponse.cpp
 		
 OBJ_DIR= objects
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))

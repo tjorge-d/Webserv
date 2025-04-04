@@ -9,37 +9,41 @@
 # include <vector>
 # include <algorithm>
 # include <sstream>
+# include "../includes/Webserv.h"
+# include "HttpResponse.hpp"
+
+# define CHUNK_SIZE 1024
+
+//class	EventHandler;
 
 enum state
 {
-	WAITING,
+	WAITING_TO_RECIEVE,
 	RECIEVING_REQUEST,
-	READING_FILE,
-	CLEANING_INVALID_REQUEST,
-	SENDING_RESPONSE
+	BUILDING_RESPONSE_BODY,
+	WAITING_TO_SEND,
+	SENDING_HEADER,
+	SENDING_BODY,
+	CLEANING_INVALID_REQUEST
 };
 
 class Client
 {
 	private:
-		// Client Data
-		int					_fd;
-		bool				_connected;
-		
-		// Request data
-		int					_pendingRequests;
-		int					_chunksNumber;
-		std::vector<char>	_request;
+		// ATTRIBUTES
+		// Client data
+		int				_fd;
+		EventHandler	&_events;
 
-		// Response data
-		std::vector<char>	_response;
-		int					_responseSize;
-		int 				_bytesSent;
-		
+		// HTTP data
+		std::vector<char>	_request;
+		HttpResponse		_response;
+
 		// Flags
-		bool				_waitingHeader;
-		bool				_waitingBody;
-		state				_state;
+		bool	_connected;
+		bool	_recievingHeader;
+		bool	_recievingBody;
+		state	_state;
 
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)
@@ -51,54 +55,65 @@ class Client
 		// Parses a request body
 		void	parseRequestBody(std::vector<char>::iterator body_end);
 
-		
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
-		Client(int fd);
+		Client(int fd, EventHandler &events);
 		Client(const Client &copy);
 		~Client();
-		
+
 		// GETTERS
-		int					getFD();
-		bool				getConnected();
-		state				getState();
-		std::vector<char>	getResponse();
-		
+		int					getFD() const;
+		state				getState() const;
+		HttpResponse const	&getResponse() const;
+
+		// SETTERS
+		void	setState(state state);
+
 		// MEMBER FUNCTIONS
+		// Tells if the client has a regular connection
+		bool	isConnected() const;
+
 		// Safely closes the Client
 		void	closeClient();
 
 		// Activates send mode
 		void	sendMode();
 
-		// Tells the Client he wants to wait for a new request
-		void	newRequest();
+		// Activates send mode
+		void	recieveMode();
+
+		// Activates send mode
+		void	waitingMode();
+
+		// Sets the content type of the file to send
+		void	setContentType();
 
 		// Tells the Client to Send a max clients response
 		void	maxClientsResponse();
 
+		// Opens a file from the desired path
+		void	openRequestedFile(std::string path);
+
 		// Recieves from his _fd in a chunk
-		int	recieveRequestChunk(int chunk_size);
+		int	recieveRequestChunk();
 
-		// Sends to his _fd in a chunk
-		int	sendResponseChunk(int chunk_size);
-	
-	class	ClientCloseFailure : public std::runtime_error
+		// Sends the response header in a chunk
+		void	sendHeaderChunk();
+
+		// Sends the response body in a chunk 
+		void	sendBodyChunk();
+
+
+		// ERASE LATER
+		std::string getPath();
+
+	class	ClientException : public std::runtime_error
 	{
 		public :
-			ClientCloseFailure();
-	};
+			ClientException(std::string info, int fd);
 
-	class	RecieveFailure : public std::runtime_error
-	{
-		public :
-			RecieveFailure();
-	};
-
-	class	SendFailure : public std::runtime_error
-	{
-		public :
-			SendFailure();
+		private:
+			std::string createMessage(std::string info, int fd);
 	};
 };
 

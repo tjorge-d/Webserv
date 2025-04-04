@@ -1,5 +1,8 @@
 # include "../includes/Webserv.h"
 
+bool running = true;
+bool debug = false;
+
 void	stop_signal(int signal)
 {
 	(void)signal;
@@ -29,24 +32,32 @@ void	delete_gateways(std::map<int, ListeningSocket*> &gateways)
 
 void	pending_clients(std::map<int, Client*> &clients)
 {
-	state	c_state;
-	int		chunk_size = 50;
+	int		client_fd;
 	for(std::map<int, Client*>::iterator i = clients.begin(); i != clients.end(); i++)
 	{
-		c_state = i->second->getState();
-		if (c_state == RECIEVING_REQUEST || c_state == CLEANING_INVALID_REQUEST)
+		client_fd = i->second->getFD();
+		switch(i->second->getState())
 		{
-			std::cout << "The client " << i->second->getFD() << " is Recieving\n";
-			i->second->recieveRequestChunk(chunk_size);
-		}
-		else if (c_state == SENDING_RESPONSE)
-		{
-			std::cout << "The client " << i->second->getFD() << " is Sending\n";
-			i->second->sendResponseChunk(chunk_size);
-		}
+			case RECIEVING_REQUEST:
+			case CLEANING_INVALID_REQUEST:
+				std::cout << "\nRecieving from client " << client_fd << " ...\n";
+				i->second->recieveRequestChunk();
+				break;
+
+			case SENDING_HEADER:
+				std::cout << "\nSending the Header to client " << client_fd << " ...\n";
+				i->second->sendHeaderChunk();
+				break;
+
+			case SENDING_BODY:
+				std::cout << "\nSending the Body to client " << client_fd << " ...\n";
+				i->second->sendBodyChunk();
+				break;
+
+			default:;
+		};
 	}
 }
-
 
 int main(int argc, char **argv)
 {
@@ -62,12 +73,12 @@ int main(int argc, char **argv)
 		
 		// Setting up signals to exit the server loop
 		running = 1;
-		debug = 1;
+		debug = 0;
 		signal(SIGINT, stop_signal);
 		signal(SIGQUIT, debug_signal);
 		//signal(SIGQUIT, SIG_IGN);
 
-		// Initializing...
+		// Initializing variables
 		ListeningSocket* a = new ListeningSocket(INADDR_ANY, 8080, max_connections);
 		ListeningSocket* b = new ListeningSocket(INADDR_ANY, 6969, max_connections);
 		ListeningSocket* c = new ListeningSocket(INADDR_ANY, 4200, max_connections);
@@ -76,6 +87,8 @@ int main(int argc, char **argv)
 		gateways.insert(std::pair<int, ListeningSocket*>(a->getFD(), a));
     	gateways.insert(std::pair<int, ListeningSocket*>(b->getFD(), b));
 		gateways.insert(std::pair<int, ListeningSocket*>(c->getFD(), c));
+
+
 
 		std::map<int, Client*>	clients;
 		EventHandler			events(gateways, clients, max_connections);
@@ -99,7 +112,6 @@ int main(int argc, char **argv)
 			catch(const std::exception& e)
 			{
 				std::cerr << e.what() << '\n';
-				std::cerr << errno << '\n';
 			}
 		}
 		delete_clients(clients);

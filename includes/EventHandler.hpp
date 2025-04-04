@@ -10,14 +10,15 @@
 # include <vector>
 # include <fcntl.h>
 # include <map>
-# include "ListeningSocket.hpp"
-# include "Client.hpp"
+# include "Webserv.h"
+
+class Client;
 
 class EventHandler
 {
 	private:
 		// ATTRIBUTES
-		std::map<int, ListeningSocket*>	&_gateways;
+		std::map<int, ListeningSocket*>	&_servers;
 		std::map<int, Client*>			&_clients;
 		int								_connections;
 		int								_maxConnections;
@@ -27,7 +28,7 @@ class EventHandler
 
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler(std::map<int, ListeningSocket*>	&gateways, std::map<int, Client*> &clients, int	maxConnections);
+		EventHandler(std::map<int, ListeningSocket*> &servers, std::map<int, Client*> &clients, int maxConnections);
 		~EventHandler() ;
 		
 		// GETTERS
@@ -39,58 +40,44 @@ class EventHandler
 		epoll_event		operator[](int index) const;
 
 		// MEMBER FUNCTIONS
-		// Safely closes the Class
-		void	closeHandler();
+		// Safely closes the epoll fd
+		void	safeClose();
+
+		// Waits for events and fills "_events" with ready ones
+		void	waitEvents(int timeout);
+
+		// Checks the triggered events
+		void	checkEvents();
+
+		// Handles client events
+		void	handleClientEvent(epoll_event& event);
+
+		// Handles server events
+		void	handleServerEvent(int server_fd);
 
 		// Adds a client to the epoll instance in the Kernel
 		void	addClient(int client_fd);
-		
+
 		// Removes a client from the epoll instance in the Kernel (doesn't close the fd)
 		void	removeClient(int client_fd);
 
-		// Waits for events, fills "_events" with ready ones and returns its number 
-		void	waitEvents(int timeout);
+		// Modifies a client event
+		void	modifyClient(int client_fd, uint32_t flags);
 
-		void	checkEvents();
-
-		void	handleEvent(epoll_event& event);
-		
 	// EXCEPTIONS
-	class	EPollCreationFailure : public std::runtime_error
+
+	class	EPollException : public std::runtime_error
 	{
 		public :
-			EPollCreationFailure();
+			EPollException(std::string info);
 	};
 
-	class	EPollCloseFailure : public std::runtime_error
+	class	EPollErrorException : public std::runtime_error
 	{
 		public :
-			EPollCloseFailure();
+			EPollErrorException(std::string info);
 	};
 
-	class	EPollCTLFailure : public std::runtime_error
-	{
-		public :
-			EPollCTLFailure(std::string info);
-	};
-
-	class	EPollWaitFailure : public std::runtime_error
-	{
-		public :
-			EPollWaitFailure();
-	};
-
-	class	EventOutOfBounds : public std::runtime_error
-	{
-		public :
-			EventOutOfBounds();
-	};
-
-	class	ConnectionAcceptFailure : public std::runtime_error
-	{
-		public :
-			ConnectionAcceptFailure();
-	};	
 };
 
 #endif
