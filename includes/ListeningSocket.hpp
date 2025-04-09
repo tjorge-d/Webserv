@@ -16,20 +16,16 @@ class ListeningSocket : public BindingSocket
 		// CONSTRUCTORS/DESTRUCTORS
 		ListeningSocket(int domain, int type, int protocol, u_long interface, int port,int backlog);
 		ListeningSocket(u_long interface, int port, int backlog);
-		ListeningSocket(const ListeningSocket &a);
 		~ListeningSocket();
 
 		// GETTERS
 		int	getBacklog();
 
-		// OPERATORS
-		ListeningSocket&	operator=(const ListeningSocket &copy);
-
 	// EXCEPTIONS
-	class	SocketListeningFailure : public std::runtime_error
+	class	ListeningSocketException : public std::runtime_error
 	{
 		public :
-			SocketListeningFailure();
+			ListeningSocketException(std::string info);
 	};
 };
 

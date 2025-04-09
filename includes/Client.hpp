@@ -1,20 +1,19 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
-# include <stdio.h>
+# include <vector>
+# include <fstream>
+# include <sstream>
 # include <iostream>
 # include <string.h>
-# include <fstream>
 # include <unistd.h>
-# include <sys/socket.h>
-# include <vector>
 # include <algorithm>
-# include <sstream>
-# include "../includes/Webserv.h"
+# include <sys/socket.h>
 # include "HttpResponse.hpp"
+# include "EventHandler.hpp"
 
 # define CHUNK_SIZE 1024
 
-//class	EventHandler;
+class	EventHandler;
 
 enum state
 {

@@ -211,10 +211,28 @@ how to handle multiple CGI?
 
 
 
-PRIORITIES
+TASKS DONE
+- Your server must remain non-blocking at all times and properly handle client disconnections when necessary
+- It must be non-blocking and use only 1 poll() (or equivalent) for all the I/O operations between the client and the server (listen included)
+- poll() (or equivalent) must monitor both reading and writing simultaneously
+- You must never do a read or a write operation without going through poll() (or equivalent)
+- Checking the value of errno is strictly forbidden after performing a read or write operation
+- We will consider that NGINX is HTTP 1.1 compliant and may be used to compare headers and answer behaviors
+- Your server must be able to listen to multiple ports (see Configuration file)
 
-Understand how to start the project.
-
-Divide the work and set a task to each group member. 
-
-Define a data structure.
+TODO LIST
+- Your program must take a configuration file as an argument, or use a default path
+- You cannot execve another web server (?)
+- You are not required to use poll() (or equivalent) before reading your configuration file
+- You can use every macro and define like FD_SET, FD_CLR, FD_ISSET and, FD_ZERO (understanding what they do and how they work is very useful) (?)
+- A request to your server should never hang indefinitely
+- Your server must be compatible with standard web browsers of your choice
+- Your server must have default error pages if none are provided
+- Your HTTP response status codes must be accurate
+- You can’t use fork for anything other than CGI (like PHP, or Python, and so forth)
+- You must be able to serve a fully static website
+- Clients must be able to upload files
+- You need at least the GET, POST, and DELETE methods
+- Stress test your server to ensure it remains available at all times
+- Support cookies and session management (provide simple examples)
+- Handle multiple CGI

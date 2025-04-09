@@ -4,25 +4,22 @@
 
 class BindingSocket : public Socket
 {
+	protected:
+		// MEMBER FUNCTIONS
+		// Configures the socket
+		virtual void	configureSocket();
+
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
 		BindingSocket(int domain, int type, int protocol, u_long interface, int port);
 		BindingSocket(u_long interface, int port);
-		BindingSocket(const BindingSocket &a);
 		~BindingSocket();
 
-		// OPERATORS
-		BindingSocket&	operator=(const BindingSocket &copy);
-		
-		// MEMBER FUNCTIONS
-		// Configures the Socket
-		virtual void	configureSocket();
-
 	// EXCEPTIONS
-	class	SocketBindingFailure : public std::runtime_error
+	class	BindingSocketException : public std::runtime_error
 	{
 		public :
-			SocketBindingFailure();
+			BindingSocketException(std::string info);
 	};
 };
 

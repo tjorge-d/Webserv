@@ -1,18 +1,17 @@
 #ifndef EVENTHANDLER_HPP
 # define EVENTHANDLER_HPP
-# include <stdio.h>
+# include <map>
+# include <vector>
+# include <fcntl.h>
 # include <unistd.h>
 # include <iostream>
 # include <string.h>
-# include <fstream>
 # include <sys/epoll.h>
 # include <netinet/in.h>
-# include <vector>
-# include <fcntl.h>
-# include <map>
-# include "Webserv.h"
+# include "ListeningSocket.hpp"
+# include "Client.hpp"
 
-class Client;
+//class Client;
 
 class EventHandler
 {

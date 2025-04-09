@@ -1,12 +1,11 @@
 #ifndef HTTPRESPONSE_HPP
 # define HTTPRESPONSE_HPP
-# include <stdio.h>
-# include <iostream>
-# include <string.h>
-# include <fstream>
-# include <sys/stat.h>
+# include <map>
 # include <vector>
-# include <string.h>
+# include <fstream>
+# include <sstream>
+# include <stdexcept>
+# include <sys/stat.h>
 
 class HttpResponse
 {

@@ -4,25 +4,22 @@
 
 class ConnectingSocket : public Socket
 {
-	public:
-		// CONSTRUCTORS/DESTRUCTORS
-		ConnectingSocket(int domain, int type, int protocol, u_long interface, int port);
-		ConnectingSocket(u_long interface, int port);
-		ConnectingSocket(const ConnectingSocket &a);
-		~ConnectingSocket();
-
-		// OPERATORS
-		ConnectingSocket&	operator=(const ConnectingSocket &copy);
-		
+	private:
 		// MEMBER FUNCTIONS
 		// Configures the socket
 		virtual void	configureSocket();
 
+	public:
+		// CONSTRUCTORS/DESTRUCTORS
+		ConnectingSocket(int domain, int type, int protocol, u_long interface, int port);
+		ConnectingSocket(u_long interface, int port);
+		~ConnectingSocket();
+
 	// EXCEPTIONS
-	class	SocketConnectingFailure : public std::runtime_error
+	class	ConnectingSocketException : public std::runtime_error
 	{
 		public :
-			SocketConnectingFailure();
+			ConnectingSocketException(std::string info);
 	};
 };
 

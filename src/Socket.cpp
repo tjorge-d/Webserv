@@ -13,13 +13,7 @@ _port(port)
 	//Creates a socket
 	_fd = socket(_domain, _type, _protocol);
 	if(_fd == -1)
-		throw SocketOpenFailure();
-}
-
-Socket::Socket(const Socket &copy)
-{
-	//std::cout << "Socket copy constructor called\n";
-	*this = copy;
+		throw SocketException("Failed to create a socket");
 }
 
 Socket::~Socket()
@@ -66,24 +60,6 @@ struct sockaddr_in	Socket::getAddress()
 	return(_address);
 }
 
-// OPERATORS
-
-Socket&	Socket::operator=(const Socket &copy)
-{
-	//std::cout << "Socket copy assignment operator called\n";
-	if(this != &copy)
-	{
-		closeSocket();
-		_fd = copy._fd;
-		_domain = copy._domain;
-		_type = copy._type;
-		_protocol = copy._protocol;
-		_interface = copy._interface;
-		_port = copy._port;
-		_address = copy._address;
-	}
-	return (*this);
-}
 
 // MEMBER FUNCTIONS
 
@@ -93,7 +69,7 @@ void	Socket::closeSocket()
 	if(_fd >= 0)
 	{
 		if(close(_fd) == -1)
-			throw SocketCloseFailure();
+			throw SocketException("Failed to close a socket");
 		_fd = -1;
 	}
 }
@@ -109,8 +85,5 @@ struct sockaddr_in	Socket::IPv4AddressConvertion(int domain, u_long interface , 
 }
 
 // EXCEPTIONS
-Socket::SocketCloseFailure::SocketCloseFailure() :
-runtime_error("A Socket failed to close"){}
-
-Socket::SocketOpenFailure::SocketOpenFailure() :
-runtime_error("A Socket failed to open"){}
+Socket::SocketException::SocketException(std::string info) :
+runtime_error(info + " (" + std::string(strerror(errno)) + ")"){}

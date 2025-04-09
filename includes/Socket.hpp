@@ -2,10 +2,8 @@
 # define SOCKET_HPP
 # include <sys/socket.h>
 # include <netinet/in.h>
-# include <arpa/inet.h>
 # include <stdexcept>
 # include <unistd.h>
-# include <iostream>
 
 class Socket
 {
@@ -21,11 +19,17 @@ class Socket
 		
 		// CONSTRUCTORS/DESTRUCTORS
 		Socket(int domain, int type, int protocol, u_long interface, int port);
-		Socket(const Socket &a);
 		virtual ~Socket();
 
-		// OPERATORS
-		Socket&	operator=(const Socket &copy);
+		// MEMBER FUNCTIONS
+		// Safely closes the Socket
+		void	closeSocket();
+		
+		// Returns a sockaddr_in struct (for IPv4)
+		struct sockaddr_in	IPv4AddressConvertion(int socket_fd, u_long interface , int port);
+				
+		// Mandatory socket configuration in derived classes
+		virtual void	configureSocket() = 0;
 		
 	public:
 		// GETTERS
@@ -37,27 +41,11 @@ class Socket
 		int					getPort();
 		struct sockaddr_in	getAddress();
 
-		// MEMBER FUNCTIONS
-		// Safely closes the Socket
-		void				closeSocket();
-
-		// Returns a sockaddr_in struct (for IPv4)
-		struct sockaddr_in	IPv4AddressConvertion(int socket_fd, u_long interface , int port);
-		
-		// Mandatory socket configuration in derived classes
-		virtual void		configureSocket() = 0;
-
 	// EXCEPTIONS
-	class	SocketCloseFailure : public std::runtime_error
+	class	SocketException : public std::runtime_error
 	{
 		public :
-			SocketCloseFailure();
-	};
-
-	class	SocketOpenFailure : public std::runtime_error
-	{
-		public :
-			SocketOpenFailure();
+			SocketException(std::string info);
 	};
 };
 

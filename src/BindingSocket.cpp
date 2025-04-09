@@ -16,43 +16,29 @@ Socket(AF_INET, SOCK_STREAM, 0, interface, port)
 	configureSocket();
 }
 
-BindingSocket::BindingSocket(const BindingSocket &copy) :
-Socket(0,0,0,0,0)
-{
-	//std::cout << "BindingSocket copy constructor called\n";
-	*this = copy;
-}
-
 BindingSocket::~BindingSocket()
 {
 	//std::cout << "BindingSocket default destructor called\n";
-}
-
-// OPERATORS
-
-BindingSocket&	BindingSocket::operator=(const BindingSocket &copy)
-{
-	//std::cout << "BindingSocket copy assignment operator called\n";
-	if(this != &copy)
-		Socket::operator=(copy);
-	return (*this);
 }
 
 // MEMBER FUNCTIONS
 
 void	BindingSocket::configureSocket()
 {
+	// Sets the options of the socket
 	int opt = 1;
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
+		throw BindingSocketException("Failed to set the socket options");
+
 	// Initializes the address structure
 	_address = IPv4AddressConvertion(_domain, _interface, _port);
 
 	// Binds the socket to an address
 	if(bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
-		throw SocketBindingFailure();
+		throw BindingSocketException("Failed to bind a socket");
 }
 
 // EXCEPTIONS
 
-BindingSocket::SocketBindingFailure::SocketBindingFailure() :
-runtime_error("A Socket failed to bind"){}
+BindingSocket::BindingSocketException::BindingSocketException(std::string info) :
+runtime_error(info + " (" + std::string(strerror(errno)) + ")"){}
