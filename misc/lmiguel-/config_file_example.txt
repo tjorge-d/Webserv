@@ -1,4 +1,4 @@
-client_request_max_sizse 10Mb;
+client_request_max_size 10Mb;
 
 server_block start;
 
@@ -20,7 +20,13 @@ domain_block end;
 
 error_page 404 /404.html;
 
-error_page 500 502 503 504 /50x.html;
+error_page 500 /500.html;
+
+error_page 502 /502.html;
+
+error_page 503 /503.html;
+
+error_page 504 /504.html;
 
 directory_request_redirect /var/www/dev/sideye.jpg;
 

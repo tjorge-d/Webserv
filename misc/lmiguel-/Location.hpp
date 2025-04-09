@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 15:48:27 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/17 16:44:22 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/03 14:41:25 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ class Location{
 
 	private:
 
-	bool		_autoindexState;
-	std::string	_allowedServices;
-	std::string	_rootDirectory;
-	std::string	_indexFile;
+	bool			_autoindexState;
+	std::string		_allowedServices;
+	std::string		_rootDirectory;
+	std::string		_indexFile;
 };
 
 #endif

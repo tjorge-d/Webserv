@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 14:46:08 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/03/24 16:17:38 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/09 18:27:12 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,29 +18,36 @@
 #include <fstream>
 #include <cstring>
 #include <iomanip>
+#include <cstdlib>
+#include <map>
+#include <vector>
+
+struct DomainBlock{
+	
+	bool							autoindex;
+	std::string						allowed_services;
+	std::string						root_directory;
+	std::string						index_file;
+};
+
+struct ServerBlock{
+	
+	int								domain_port;
+	std::string						server_name;
+	std::string						redirect_directory;
+	std::map<int, std::string>		error_codes;
+	DomainBlock						domain;
+};
 
 struct ServerInfo{
 
-	int				client_request_max_size;
-	/* Domain		domain;
-	Location		location; */
+	std::string						client_request_max_size;
+	ServerBlock						location;
 };
 
-/* struct ServerBlock{
 
-	int				domain_port;
-	std::string		server_name;
-};
 
-struct DomainBlock{
-
-	bool			autoindex;
-	std::string		allowed_services[];
-	std::string		root_directory;
-	std::string		index_file;
-}; */
-
-/* class Parser{
+class Parser{
 
 	public:
 	
@@ -53,6 +60,6 @@ struct DomainBlock{
 	void	parseDomainPort( std::ifstream file );
 	void	parseServerName( std::ifstream file );
 	
-}; */
+};
 
 #endif
