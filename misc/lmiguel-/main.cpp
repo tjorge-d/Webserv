@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/09 18:50:11 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/10 18:00:08 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 	CHECK IF ARGUMENT IS A CONFIG FILE
 	CHECK IF CONFIG FILE IS VALID
 	CHECK IF FILE CONTAINS EVERYTHING (could be saved for last? checkmark system?
-	requires knowing what is essential for our webserver to function)
+	requires knowing what is essential for our webserver to function) (yes, it will be saved for last)
 
 	THINGS TO PASS DOWN:
 
@@ -42,16 +42,59 @@
 	
 } */
 
-int main(int argc, char **argv){
+void parserOKChecker( ServerInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize){
+
+	//This function will check if everything is gucci, AKA:
+	
+	//Is the client_max_body_size different from 0? if not, convert to 1 Mb, or 1024^2 (Client max size will always be in bytes to make things easier)
+	
+	//Are the ServerBlock structs filled? if even one of them is empty, its invalid. Likewise for DomainBlock, except the autoindex boolean. The default value is false, therefore it can safely be removed from the checks.
+
+	//Practice using stringstream for things with more than one string, such as all the methods and the client max size. (methods done)
+
+	std::stringstream			stream(acquired_services);
+	std::string					current_method;
+	std::vector<std::string>	methods;
+	unsigned int				unconverted_maxbodysize;
+
+	//check valid methods (also stringstream practice)
+	while (stream >> current_method){
+		std::cout << current_method << std::endl;
+		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
+			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
+		methods.push_back(current_method);
+	}
+	webserver->location.domain.allowed_services = methods;
+
+	//reset the stream, clear any error codes and set it to the acquired_maxbodysize variable to begin the conversion to bytes
+	stream.clear();
+	stream.str("");
+	stream.str(acquired_maxbodysize);
+	current_method == "";
+	
+	//check for valid client_max_body_size and convert it to Bytes, if necessary
+	/* 
+	
+		BYTE CONVERSION FOR DUMMIES
+		
+		n Kb = n x (1024) Bytes
+		n Mb = n x (1024^2) Bytes
+		n Gb = n x (1024^3) Bytes
+	 */
+	while(stream >> current_method){
+		std::cout << 
+	}
+};
+
+int	main(int argc, char **argv){
 
 	std::string		start;
 	std::string		line;
 	std::string		newline;
 	std::string		current_start;
+	std::string		acquired_services;
+	std::string		acquired_max_body_size;
 	std::ifstream	config_file;
-	//std::string		info;
-	//int				serverblocknum = 0;
-	//int				server_block_num;
 	bool			max_size_acquired = false;
 	bool			server_setup_mode = false;
 	bool			domain_setup_mode = false;
@@ -65,19 +108,22 @@ int main(int argc, char **argv){
 			throw ParserException("Invalid number of arguments.");
 		config_file.open (argv[1]);
 		if (!config_file) //if the config file cannot be opened/doesn't exist, throw this error.
-			throw ParserException("Invalid config file");
-		while (std::getline(config_file, line)) //main loop, continue until text ends
-		{
+			throw ParserException("Invalid config file.");
+		if (config_file.is_open() && config_file.peek() == EOF)
+			throw ParserException("Your config file is empty.");
+		while (std::getline(config_file, line)){ //main loop, continue until text ends
+			if (line.size() > 0 && line[line.size() - 1] != ';')
+				throw ParserException("All lines must end in the ';' character.");
 			//----------------------------SERVER SPECIFIC INFO, DOES NOT REQUIRE A SERVERBLOCK TO EXIST----------------------------
-			if ((line.find("client_request_max_size")) != std::string::npos){
+			if ((line.find("client_max_body_size")) != std::string::npos ){
 				if (max_size_acquired == false){
-					Server->client_request_max_size = line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2);
-					if (atoi(Server->client_request_max_size.c_str()) == 0)
-						throw ParserException ("Your client_request_max_size is zero.");
+					acquired_max_body_size = line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') + 1);
+					if (atoi(acquired_max_body_size.c_str()) <= 0)
+						throw ParserException ("Your client_max_body_size is invalid.");
 					max_size_acquired = true;
 				}
 				else
-					throw ParserException("Multiple client_request_max_size detected.");
+					throw ParserException("Multiple client_max_body_size detected.");
 			}
 			if ((line.find("server_block start;")) != std::string::npos){
 				if (server_setup_mode == false)
@@ -85,13 +131,13 @@ int main(int argc, char **argv){
 				else
 					throw ParserException("Attempt to create server block inside another server block.");
 			}
-			//----------------------------SERVERBLOCK SPECIFIC INFO, REQUIRES A SERVERBLOCK TO EXIST----------------------------
 			if ((line.find("server_block end;")) != std::string::npos){
 				if (server_setup_mode == true)
 					server_setup_mode = false;
 				else
 					throw ParserException("Attempt to finish unexistent server block.");
 			}
+			//----------------------------SERVERBLOCK SPECIFIC INFO, REQUIRES A SERVERBLOCK TO EXIST----------------------------
 			if ((line.find("domain_block start;")) != std::string::npos){
 				if (server_setup_mode == true && domain_setup_mode == false)
 					domain_setup_mode = true;
@@ -134,8 +180,8 @@ int main(int argc, char **argv){
 				if (server_setup_mode == true){
 					Server->location.error_codes.insert( std::pair<int, std::string>
 					(atoi(line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') - 2).c_str()), line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)));
-					for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it) {
-						if (it->first == 0 || it->second.empty())
+					for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it){
+						if (it->first <= 0 || it->second.empty())
 							throw ParserException("Your error code or coresponding page is invalid/nonexistent.");
 					}
 				}
@@ -157,8 +203,8 @@ int main(int argc, char **argv){
 			}
 			if ((line.find("services_available")) != std::string::npos){
 				if (domain_setup_mode == true){
-					Server->location.domain.allowed_services = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
-					if (Server->location.domain.allowed_services.empty())
+					acquired_services = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+					if (acquired_services.empty())
 						throw ParserException("Your allowed services are empty.");
 				}
 				else
@@ -177,15 +223,16 @@ int main(int argc, char **argv){
 			newline += '\n';
 		}
 		std::cout << newline << std::endl; //EXPERIMENTAL: print the entire file. (WORKING)
-		std::cout << Server->client_request_max_size << std::endl; //correct;
+		std::cout << acquired_max_body_size << std::endl; //correct;
 		std::cout << Server->location.domain_port << std::endl; //correct, figure out how to send to corresponding server;
 		std::cout << Server->location.server_name << std::endl; //correct, need to cover "server_name;"? (YES)
 		std::cout << Server->location.domain.autoindex << std::endl; //correct, perfect as it is.
-		std::cout << Server->location.domain.allowed_services << std::endl; //correct;
+		std::cout << acquired_services << std::endl; //correct, further checking in the parserOKChecker function.
 		std::cout << Server->location.redirect_directory << std::endl; //correct
 		for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it) {
 			std::cout << "Error " << it->first << ": " << it->second << std::endl;
 	}
+		parserOKChecker(Server, acquired_services, acquired_max_body_size);
 	}
 	catch(std::exception &e){
 		std::cerr << e.what() << std::endl; //catch and print all exceptions thrown during code execution.

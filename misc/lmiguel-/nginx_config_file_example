@@ -1,6 +1,6 @@
 http {
 
-	client_max_body_size 10M; #limits the size of incoming client requests to 10 Mb.
+	client_max_body_size 10M; #limits the size of incoming client requests to 10 Mb. returns 413 Request Entity Too Large if size is exceeded.
 
 	server {
 		listen 80; #the port of our domain;

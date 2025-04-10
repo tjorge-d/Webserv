@@ -1,8 +1,8 @@
-client_request_max_size 10Mb;
+client_max_body_size 10 Mb;
 
 server_block start;
 
-domain_port 80;
+domain_port 8080;
 
 server_name gofas;
 
@@ -19,6 +19,8 @@ autoindex off;
 domain_block end;
 
 error_page 404 /404.html;
+
+error_page 413 /413.html;
 
 error_page 500 /500.html;
 
