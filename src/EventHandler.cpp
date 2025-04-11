@@ -38,9 +38,7 @@ EventHandler::~EventHandler()
 // GETTERS
 
 std::vector<epoll_event>	EventHandler::getEvents()
-{
-	return (_events);
-}
+{ return (_events); }
 
 epoll_event	EventHandler::getEvent(int index)
 {
@@ -50,17 +48,10 @@ epoll_event	EventHandler::getEvent(int index)
 }
 
 int	EventHandler::getEventNumber()
-{
-	return (_eventsNumber);
-}
+{ return (_eventsNumber); }
 
-// OPERATORS
-epoll_event	EventHandler::operator[](int index) const
-{
-	if(index >= _eventsNumber || index < 0)
-		throw EPollException("Index Out of bounds");
-	return (_events[index]);
-}
+int	EventHandler::getConnections()
+{ return(_connections); }
 
 // MEMBER FUNCTIONS
 
@@ -86,7 +77,11 @@ void	EventHandler::addClient(int client_fd)
 
 	// Adds the client to the epoll instance in the kernel
 	if(epoll_ctl(_epollFd, EPOLL_CTL_ADD, client_fd, &event) != 0)
+	{
+		delete _clients[client_fd];
+		_clients.erase(client_fd);
 		throw EPollErrorException("Failed to add a client event to epoll");
+	}
 
 	// Fills a "Max Clients" response if the server is full
 	if (_connections == _maxConnections)
@@ -104,10 +99,20 @@ void	EventHandler::removeClient(int client_fd)
 		throw EPollErrorException("Failed to delete a client event from epoll");
 }
 
+void	EventHandler::deleteClient(int	client_fd)
+{
+	if (_clients[client_fd]->isConnected())
+			_connections--;
+
+	delete _clients[client_fd];
+	_clients.erase(client_fd);
+	std::cout << "The client " << client_fd << " disconnected\n";
+}
+
 void	EventHandler::modifyClient(int client_fd, uint32_t flags)
 {
 	// Fills an epoll_event struct telling how the fd should be dealt with
-	struct epoll_event event;
+	struct epoll_event	event;
 	event.events = flags;
 	event.data.fd = client_fd;
 
@@ -124,18 +129,25 @@ void	EventHandler::waitEvents(int timeout)
 		throw EPollErrorException("Failed to wait for the events");
 }
 
-
-
 void	EventHandler::checkEvents()
 {
-	std::cout << "Connections: " << _connections << std::endl;
 	for(int i = 0; i < _eventsNumber; i++)
 	{
-		// Checks if the event comes from a server or a client and handles it
-		if(_servers.count(_events[i].data.fd))
-			handleServerEvent(_events[i].data.fd);
-		else
-			handleClientEvent(_events[i]);
+		try
+		{
+			// Checks if the event comes from a server or a client and handles it
+			if(_servers.count(_events[i].data.fd))
+				handleServerEvent(_events[i].data.fd);
+			else
+				handleClientEvent(_events[i]);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+			if (!_servers.count(_events[i].data.fd))
+				deleteClient(_events[i].data.fd);
+		}
+		
 	}
 }
 
@@ -169,12 +181,7 @@ void	EventHandler::handleClientEvent(epoll_event& event)
 	// Checks if the event was triggered because of disconnection
 	if (event.events & EPOLLRDHUP)
 	{
-		// Removes the Client from the server
-		if (_clients[event.data.fd]->isConnected())
-			_connections--;
-		delete _clients[event.data.fd];
-		_clients.erase(event.data.fd);
-		std::cout << "The client " << event.data.fd << " disconnected\n";
+		deleteClient(event.data.fd);
 		return ;
 	}
 	// Checks if the client is ready to be read from

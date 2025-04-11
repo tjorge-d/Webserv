@@ -11,7 +11,8 @@
 # include "HttpResponse.hpp"
 # include "EventHandler.hpp"
 
-# define CHUNK_SIZE 1024
+# define CHUNK_SIZE 4096
+# define MAX_BODY 1048576
 
 class	EventHandler;
 
@@ -35,6 +36,7 @@ class Client
 		EventHandler	&_events;
 
 		// HTTP data
+		int					_requestBodySize;
 		std::vector<char>	_request;
 		HttpResponse		_response;
 
@@ -57,7 +59,6 @@ class Client
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
 		Client(int fd, EventHandler &events);
-		Client(const Client &copy);
 		~Client();
 
 		// GETTERS
@@ -102,7 +103,6 @@ class Client
 		// Sends the response body in a chunk 
 		void	sendBodyChunk();
 
-
 		// ERASE LATER
 		std::string getPath();
 
@@ -110,6 +110,15 @@ class Client
 	{
 		public :
 			ClientException(std::string info, int fd);
+
+		private:
+			std::string createMessage(std::string info, int fd);
+	};
+
+	class	ClientErrorException : public std::runtime_error
+	{
+		public :
+			ClientErrorException(std::string info, int fd);
 
 		private:
 			std::string createMessage(std::string info, int fd);

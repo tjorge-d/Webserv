@@ -34,9 +34,7 @@ class EventHandler
 		std::vector<epoll_event>	getEvents();
 		epoll_event					getEvent(int index);
 		int							getEventNumber();
-
-		// OPERATORS
-		epoll_event		operator[](int index) const;
+		int							getConnections();
 
 		// MEMBER FUNCTIONS
 		// Safely closes the epoll fd
@@ -59,6 +57,9 @@ class EventHandler
 
 		// Removes a client from the epoll instance in the Kernel (doesn't close the fd)
 		void	removeClient(int client_fd);
+
+		// Deletes a client from the map
+		void	deleteClient(int client_fd);
 
 		// Modifies a client event
 		void	modifyClient(int client_fd, uint32_t flags);

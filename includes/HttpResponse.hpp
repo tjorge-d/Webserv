@@ -7,6 +7,7 @@
 # include <stdexcept>
 # include <sys/stat.h>
 
+
 class HttpResponse
 {
 	public:

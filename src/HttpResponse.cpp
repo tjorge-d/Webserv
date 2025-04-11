@@ -36,6 +36,7 @@ void	HttpResponse::simpleHTTP(std::string path)
 	setStatus();
 	setContentType();
 	setContentLength();
+	setConnection();
 	buildHeader();
 }
 
@@ -99,11 +100,11 @@ void	HttpResponse::buildHeader()
 	header_str += "HTTP/1.1 " + status + "\r\n";
 	header_str += "Content-Type: " + contentType + "\r\n";
 	header_str += "Content-Length: " + lenght.str() + "\r\n";
-	header_str += "Connection: " + connection;
-	header_str += "\r\n\r\n";
+	header_str += "Connection: " + connection + "\r\n\r\n";
 
 	header = std::vector<char>(header_str.begin(), header_str.end());
 	headerSize = header_str.size();
+	std::cout << "Response:" << std::endl << header_str << std::endl;
 }
 
 void	HttpResponse::resetResponse()

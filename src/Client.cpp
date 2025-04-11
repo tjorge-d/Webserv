@@ -5,6 +5,7 @@
 Client::Client(int fd, EventHandler &events) :
 _fd(fd),
 _events(events),
+_requestBodySize(0),
 _response(),
 _connected(1),
 _recievingHeader(1),
@@ -50,7 +51,7 @@ void	Client::closeClient()
 	if(_fd >= 0)
 	{
 		if(close(_fd) == -1)
-			throw ClientException("Failed to close fd", _fd);
+			throw ClientErrorException("Failed to close fd", _fd);
 		_fd = -1;
 	}
 }
@@ -58,6 +59,7 @@ void	Client::closeClient()
 void	Client::recieveMode()
 {
 	_state = WAITING_TO_RECIEVE;
+	_requestBodySize = 0;
 	_recievingHeader = 1;
 	_recievingBody = 0;
 
@@ -110,23 +112,27 @@ void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 	// PARSES THE REQUEST -> todo
 
 	// INVALID HEADER CONDITION -> todo
-	if (0)
+	if(0)
 	{}
+
 	_recievingHeader = false;
 
 	// REQUEST METHOD THAT NEEDS A BODY CONDITION -> todo
-	if (0)
+	if(0)
 		_recievingBody = true;
 
+	std::cout << "The request header is valid" << std::endl;
 	_response.simpleHTTP(getPath());
 	_request.erase(_request.begin(), header_end);
 	_request.shrink_to_fit();
+
+	_requestBodySize = _request.size();
 }
 
 int	Client::recieveRequestChunk()
 {
 	// Protects the client from recieving if not necessary
-	if (_state != RECIEVING_REQUEST && _state != CLEANING_INVALID_REQUEST)
+	if(_state != RECIEVING_REQUEST && _state != CLEANING_INVALID_REQUEST)
 	throw ClientException("Invalid client state to call recieveResponseChunk()", _fd);
 
 	// Sets and fills a buffer with data from the client fd
@@ -134,6 +140,14 @@ int	Client::recieveRequestChunk()
 	int		bytes = recv(_fd, buffer, CHUNK_SIZE, 0);
 	if(bytes == -1)
 		throw ClientException("Failed to recieve a request", _fd);
+
+	// Cheeks the booty side
+	if (_recievingBody)
+	{
+		_requestBodySize += bytes;
+		if(_requestBodySize > MAX_BODY)
+			throw ClientException("The request body has reached the maximum size", _fd);
+	}
 
 	// Apppends the filled buffer to _request
 	appendToRequest(buffer, bytes);
@@ -168,10 +182,8 @@ std::string	Client::getPath()
 
     // Ensure the method is GET
 
-	std::cout << "request: " << requestString << std::endl;
-	std::cout << "line: " << requestLine << std::endl;
-	std::cout << "path: " << path << std::endl;
-    return ("./var/www/dev/" + path);
+	std::cout << requestString << std::endl;
+    return ("./var/www/dev" + path);
 }
 
 void	Client::appendToRequest(char* str, int size)
@@ -190,6 +202,7 @@ void	Client::appendToRequest(char* str, int size)
 		// Parses the header if found
 		if (it != _request.end())
 		{
+			std::cout << "Request header found" << std::endl;
 			if (_state == CLEANING_INVALID_REQUEST)
 			{
 				// Finds the beggining of the Header and cleans what's behind
@@ -237,7 +250,7 @@ void	Client::sendBodyChunk()
 	char	buffer[CHUNK_SIZE];
 	_response.fileStream.read(buffer, CHUNK_SIZE);
     std::streamsize bytes = _response.fileStream.gcount();
-	// fail() will trigger if the eof is found, therefore we ignore it the eof is found
+	// fail() will trigger if the eof is found, therefore we ignore it if the eof is found
 	if (_response.fileStream.fail() && !_response.fileStream.eof())
         throw ClientException("Failed to read from file", _fd);
 
@@ -258,6 +271,15 @@ runtime_error(createMessage(info, fd)){}
 std::string Client::ClientException::createMessage(std::string info, int fd)
 {
 	std::ostringstream oss;
-	oss << info << " (Client " << fd << " error:" + std::string(strerror(errno)) + ")";
+	oss << info << " (Client " << fd << ": " + std::string(strerror(errno)) + ")";
+	return oss.str();
+}
+
+Client::ClientErrorException::ClientErrorException(std::string info, int fd) :
+runtime_error(createMessage(info, fd)){}
+std::string Client::ClientErrorException::createMessage(std::string info, int fd)
+{
+	std::ostringstream oss;
+	oss << info << " (Client " << fd << ")";
 	return oss.str();
 }
