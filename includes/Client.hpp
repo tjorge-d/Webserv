@@ -39,6 +39,9 @@ class Client
 		int					_requestBodySize;
 		std::vector<char>	_request;
 		HttpResponse		_response;
+		std::string 		_requestMethod;
+		std::string 		_requestPath;
+		std::fstream		_postFile;
 
 		// Flags
 		bool	_connected;
@@ -104,7 +107,7 @@ class Client
 		void	sendBodyChunk();
 
 		// ERASE LATER
-		std::string getPath();
+		void fetchRequestInfo();
 
 	class	ClientException : public std::runtime_error
 	{

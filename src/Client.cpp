@@ -59,6 +59,9 @@ void	Client::closeClient()
 void	Client::recieveMode()
 {
 	_state = WAITING_TO_RECIEVE;
+	_request.erase(_request.begin(), _request.end());
+	_requestMethod.erase(_requestMethod.begin(), _requestMethod.end());
+	_requestPath.erase(_requestPath.begin(), _requestPath.end());
 	_requestBodySize = 0;
 	_recievingHeader = 1;
 	_recievingBody = 0;
@@ -108,25 +111,33 @@ void	Client::maxClientsResponse()
 
 void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 {
-
 	// PARSES THE REQUEST -> todo
 
+	
 	// INVALID HEADER CONDITION -> todo
 	if(0)
-	{}
-
+	{
+		
+	}
 	_recievingHeader = false;
 
-	// REQUEST METHOD THAT NEEDS A BODY CONDITION -> todo
-	if(0)
-		_recievingBody = true;
-
 	std::cout << "The request header is valid" << std::endl;
-	_response.simpleHTTP(getPath());
+
+	// Fetches the header information and cleans the parsed header from the buffer
+	fetchRequestInfo();
 	_request.erase(_request.begin(), header_end);
 	_request.shrink_to_fit();
-
 	_requestBodySize = _request.size();
+
+	if (_requestMethod == "GET")
+		_response.simpleHTTP("./var/www/dev" + _requestPath);
+	else if(_requestMethod == "POST")
+	{
+		_recievingBody = true;
+		_response.simpleHTTP("./var/www/dev/parabens.html");
+		_postFile.open("./var/www/sussy_files/file", std::ios::out);
+	}
+	std::cout << "Body Size: " << _requestBodySize << std::endl;
 }
 
 int	Client::recieveRequestChunk()
@@ -141,31 +152,42 @@ int	Client::recieveRequestChunk()
 	if(bytes == -1)
 		throw ClientException("Failed to recieve a request", _fd);
 
-	// Cheeks the booty side
 	if (_recievingBody)
-	{
 		_requestBodySize += bytes;
+
+	// Apppends the filled buffer to _request
+	if(_recievingHeader)
+		appendToRequest(buffer, bytes);
+
+	// Sends the post method to the path desired
+	if(_recievingBody)
+	{
+		if (bytes > _requestBodySize)
+			_postFile.write(buffer + bytes - _requestBodySize, _requestBodySize);
+		else
+			_postFile.write(buffer, bytes);
+
 		if(_requestBodySize > MAX_BODY)
 			throw ClientException("The request body has reached the maximum size", _fd);
 	}
-
-	// Apppends the filled buffer to _request
-	appendToRequest(buffer, bytes);
 
 	// Behaves accordingly in case of not having anything else to read
 	if(bytes < CHUNK_SIZE || !bytes)
 	{
 		if(_recievingHeader)
 			throw ClientException("Incomplete request header", _fd);
-		if(_recievingBody){}
-			//parseRequestBody(_request.end());
+		if(_recievingBody)
+		{
+			_postFile.close();
+			sendMode();
+		}
 	}
 
 	return (bytes);
 }
 
 // ERASE LATER (FOR TESTING)
-std::string	Client::getPath()
+void	Client::fetchRequestInfo()
 {
     // Convert the request vector to a string
     std::string requestString(_request.begin(), _request.end());
@@ -180,10 +202,9 @@ std::string	Client::getPath()
     std::string method, path, version;
     lineStream >> method >> path >> version;
 
-    // Ensure the method is GET
-
+	_requestMethod = method;
+	_requestPath = path;
 	std::cout << requestString << std::endl;
-    return ("./var/www/dev" + path);
 }
 
 void	Client::appendToRequest(char* str, int size)

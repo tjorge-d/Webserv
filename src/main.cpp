@@ -66,10 +66,14 @@ void	pending_clients(std::map<int, Client*> &clients, EventHandler &events)
 		}
 		catch(const std::exception &e)
 		{
+			std::map<int, Client*>::iterator delete_i = i;
+			i++;
 			std::cerr << "Error : " << e.what() << std::endl;
-			std::cout << "Deleting client " << i->second->getFD() << "..." << std::endl;
-			events.deleteClient(i->second->getFD());
-		}
+			std::cout << "Deleting client " <<  delete_i->second->getFD() << "..." << std::endl;
+			events.deleteClient(delete_i->second->getFD());
+			if (i == clients.end())
+				break ;
+		};
 	}
 }
 
