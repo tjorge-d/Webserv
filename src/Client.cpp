@@ -5,7 +5,7 @@
 Client::Client(int fd, EventHandler &events) :
 _fd(fd),
 _events(events),
-_requestBodySize(0),
+_request(),
 _response(),
 _connected(1),
 _recievingHeader(1),
@@ -59,14 +59,12 @@ void	Client::closeClient()
 void	Client::recieveMode()
 {
 	_state = WAITING_TO_RECIEVE;
-	_request.erase(_request.begin(), _request.end());
-	_requestMethod.erase(_requestMethod.begin(), _requestMethod.end());
-	_requestPath.erase(_requestPath.begin(), _requestPath.end());
-	_requestBodySize = 0;
+	
 	_recievingHeader = 1;
 	_recievingBody = 0;
 
-	_response.resetResponse();
+	_request.reset();
+	_response.reset();
 
 	// Changes the client event to trigger when ready to be read from
 	_events.modifyClient(_fd, EPOLLIN | EPOLLRDHUP | EPOLLET);
@@ -111,8 +109,19 @@ void	Client::maxClientsResponse()
 
 void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 {
-	// PARSES THE REQUEST -> todo
-
+	//PARSES THE REQUEST -> todo
+	//	Information needed:
+	//		_request.method
+	//		_request.path
+	//		_request.contentLenght
+	//		_response.status
+	//		_response.contentType
+	//		_response.contentLenght;
+	//		_response.connection;
+	//		_response.headerSize; >> After building the header to be sent
+	//		_response.filePath;
+	//		_response.fileStats;
+	//		_response.fileStream;
 	
 	// INVALID HEADER CONDITION -> todo
 	if(0)
@@ -125,51 +134,49 @@ void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 
 	// Fetches the header information and cleans the parsed header from the buffer
 	fetchRequestInfo();
-	_request.erase(_request.begin(), header_end);
-	_request.shrink_to_fit();
-	_requestBodySize = _request.size();
+	_request.eraseBufferRange(_request.buffer.begin(), header_end);
 
-	if (_requestMethod == "GET")
-		_response.simpleHTTP("./var/www/dev" + _requestPath);
-	else if(_requestMethod == "POST")
+	if (_request.method == "GET")
+		_response.simpleHTTP("./var/www/dev" + _request.path);
+	else if(_request.method == "POST")
 	{
 		_recievingBody = true;
+		_request.bodySize = _request.buffer.size();
 		_response.simpleHTTP("./var/www/dev/parabens.html");
+		// parsePost();
 		_postFile.open("./var/www/sussy_files/file", std::ios::out);
+		_postFile.write(_request.buffer.data(), _request.bodySize);
 	}
-	std::cout << "Body Size: " << _requestBodySize << std::endl;
+	std::cout << "Body Size: " << _request.bodySize << std::endl;
 }
 
 int	Client::recieveRequestChunk()
 {
 	// Protects the client from recieving if not necessary
-	if(_state != RECIEVING_REQUEST && _state != CLEANING_INVALID_REQUEST)
+	if(_state != RECIEVING_REQUEST)
 	throw ClientException("Invalid client state to call recieveResponseChunk()", _fd);
 
-	// Sets and fills a buffer with data from the client fd
+	// Stores the data from the client fd in a buffer
 	char	buffer[CHUNK_SIZE];
 	int		bytes = recv(_fd, buffer, CHUNK_SIZE, 0);
 	if(bytes == -1)
 		throw ClientException("Failed to recieve a request", _fd);
 
+	// Writes the buffer content onto the POST method path
 	if (_recievingBody)
-		_requestBodySize += bytes;
+	{
+		_postFile.write(buffer, bytes);
+		_request.bodySize += bytes;
+		if(_request.bodySize > MAX_BODY)
+		{
+			// maxBodySizeResponse();
+			throw ClientException("The request body has reached the maximum size", _fd);
+		}
+	}
 
 	// Apppends the filled buffer to _request
 	if(_recievingHeader)
 		appendToRequest(buffer, bytes);
-
-	// Sends the post method to the path desired
-	if(_recievingBody)
-	{
-		if (bytes > _requestBodySize)
-			_postFile.write(buffer + bytes - _requestBodySize, _requestBodySize);
-		else
-			_postFile.write(buffer, bytes);
-
-		if(_requestBodySize > MAX_BODY)
-			throw ClientException("The request body has reached the maximum size", _fd);
-	}
 
 	// Behaves accordingly in case of not having anything else to read
 	if(bytes < CHUNK_SIZE || !bytes)
@@ -179,8 +186,10 @@ int	Client::recieveRequestChunk()
 		if(_recievingBody)
 		{
 			_postFile.close();
-			sendMode();
+			if (_request.bodySize < _request.contentLenght)
+				throw ClientException("Incomplete request body", _fd);
 		}
+		sendMode();
 	}
 
 	return (bytes);
@@ -190,7 +199,7 @@ int	Client::recieveRequestChunk()
 void	Client::fetchRequestInfo()
 {
     // Convert the request vector to a string
-    std::string requestString(_request.begin(), _request.end());
+    std::string requestString(_request.buffer.begin(), _request.buffer.end());
 
     // Find the first line (request line)
     std::istringstream requestStream(requestString);
@@ -202,37 +211,26 @@ void	Client::fetchRequestInfo()
     std::string method, path, version;
     lineStream >> method >> path >> version;
 
-	_requestMethod = method;
-	_requestPath = path;
+	_request.method = method;
+	_request.path = path;
 	std::cout << requestString << std::endl;
 }
 
-void	Client::appendToRequest(char* str, int size)
+void	Client::appendToRequest(char* buffer, int size)
 {
-	// Inserts the string given as an argument at the end of _request
-	_request.insert(_request.end(), str, str + size);
+	// Appends the buffer given as an argument to the request
+	_request.appendToBuffer(buffer, size);
 
 	if (_recievingHeader)
 	{
 		// Checks if the read data contains the end of a request header
-		int offset = size + 4 * (static_cast<int>(_request.size()) >= size + 4);
-		std::vector<char>::iterator it;
-		it = std::search(_request.end() - offset, _request.end(), \
-			"\r\n\r\n", &"\r\n\r\n"[4]);
-		
+		std::vector<char>::iterator it = _request.findHeader(size);
+
 		// Parses the header if found
-		if (it != _request.end())
+		if (it != _request.buffer.end())
 		{
 			std::cout << "Request header found" << std::endl;
-			if (_state == CLEANING_INVALID_REQUEST)
-			{
-				// Finds the beggining of the Header and cleans what's behind
-				//cleanInvalidRequest(findRequestBegin());
-				_state = RECIEVING_REQUEST;
-			}
 			parseRequestHeader(it + 4);
-			if (!_recievingBody)
-				sendMode();
 		}
 	}
 }

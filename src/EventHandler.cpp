@@ -143,7 +143,7 @@ void	EventHandler::checkEvents()
 		}
 		catch(const std::exception& e)
 		{
-			std::cerr << e.what() << '\n';
+			std::cerr << e.what() << std::endl;
 			if (!_servers.count(_events[i].data.fd))
 				deleteClient(_events[i].data.fd);
 		}

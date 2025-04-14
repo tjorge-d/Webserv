@@ -9,6 +9,7 @@
 # include <algorithm>
 # include <sys/socket.h>
 # include "HttpResponse.hpp"
+# include "HttpRequest.hpp"
 # include "EventHandler.hpp"
 
 # define CHUNK_SIZE 4096
@@ -20,11 +21,9 @@ enum state
 {
 	WAITING_TO_RECIEVE,
 	RECIEVING_REQUEST,
-	BUILDING_RESPONSE_BODY,
 	WAITING_TO_SEND,
 	SENDING_HEADER,
-	SENDING_BODY,
-	CLEANING_INVALID_REQUEST
+	SENDING_BODY
 };
 
 class Client
@@ -36,11 +35,8 @@ class Client
 		EventHandler	&_events;
 
 		// HTTP data
-		int					_requestBodySize;
-		std::vector<char>	_request;
+		HttpRequest			_request;		
 		HttpResponse		_response;
-		std::string 		_requestMethod;
-		std::string 		_requestPath;
 		std::fstream		_postFile;
 
 		// Flags

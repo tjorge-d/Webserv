@@ -8,6 +8,7 @@
 # include "EventHandler.hpp"
 # include "Client.hpp"
 # include "HttpResponse.hpp"
+# include "HttpRequest.hpp"
 
 # include <errno.h>
 # include <string.h>

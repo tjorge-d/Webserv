@@ -4,15 +4,16 @@ CXX= c++
 CXXFLAGS= -Wall -Werror -Wextra -g
 
 SRC_A= $(addprefix src/, $(SOURCES_A))
-SOURCES_A= main.cpp 	\
-EventHandler.cpp 			\
-BindingSocket.cpp 		\
-ListeningSocket.cpp 	\
-ConnectingSocket.cpp 	\
+SOURCES_A= main.cpp	\
+EventHandler.cpp	\
+BindingSocket.cpp	\
+ListeningSocket.cpp	\
+ConnectingSocket.cpp	\
 Socket.cpp	\
 Client.cpp	\
-HttpResponse.cpp
-		
+HttpResponse.cpp	\
+HttpRequest.cpp
+
 OBJ_DIR= objects
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))
 

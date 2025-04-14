@@ -107,13 +107,20 @@ void	HttpResponse::buildHeader()
 	std::cout << "Response:" << std::endl << header_str << std::endl;
 }
 
-void	HttpResponse::resetResponse()
+void	HttpResponse::reset()
 {
+	status.clear();
+	contentType.clear();
+	contentLenght = 0;
+	connection.clear();
+
 	header.clear();
+	headerSize = 0;
+	bytesSent = 0;
+
 	filePath.clear();
 	if (fileStream.is_open())
 		fileStream.close();
-
 }
 
 HttpResponse::ResponseException::ResponseException(std::string info) :

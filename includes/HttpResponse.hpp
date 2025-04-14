@@ -39,7 +39,7 @@ class HttpResponse
 		void	setContentLength();
 		void	setConnection();
 		void	buildHeader();
-		void	resetResponse();
+		void	reset();
 
 	// EXCEPTIONS
 	class	ResponseException : public std::runtime_error
