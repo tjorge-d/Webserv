@@ -12,7 +12,8 @@ ConnectingSocket.cpp	\
 Socket.cpp	\
 Client.cpp	\
 HttpResponse.cpp	\
-HttpRequest.cpp
+HttpRequest.cpp	\
+Parser.cpp
 
 OBJ_DIR= objects
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))

@@ -31,9 +31,9 @@ void delete_clients(std::map<int, Client *> &clients)
 		delete i->second;
 }
 
-void delete_gateways(std::map<int, ListeningSocket *> &gateways)
+void delete_servers(std::map<int, ListeningSocket *> &servers)
 {
-	for (std::map<int, ListeningSocket *>::iterator i = gateways.begin(); i != gateways.end(); i++)
+	for (std::map<int, ListeningSocket *>::iterator i = servers.begin(); i != servers.end(); i++)
 		delete i->second;
 }
 
@@ -60,7 +60,7 @@ void pending_clients(std::map<int, Client *> &clients, EventHandler &events)
 				i->second->sendBodyChunk();
 				break;
 
-			default:
+			default:;
 			};
 		}
 		catch (const std::exception &e)
@@ -76,17 +76,29 @@ void pending_clients(std::map<int, Client *> &clients, EventHandler &events)
 	}
 }
 
+std::map<int, ListeningSocket *> create_servers(std::vector<ServerBlock> &servers_info)
+{
+	std::map<int, ListeningSocket *> servers;
+	std::cout << "Domain: " << servers_info.back().port << "\n";
+	std::cout << "Domain: " << servers_info.front().port << "\n";
+	for (std::vector<ServerBlock>::iterator i = servers_info.begin(); i != servers_info.end(); ++i)
+	{
+		ListeningSocket *new_server = new ListeningSocket(INADDR_ANY, i->port, SOCKET_BACKLOG);
+		servers[new_server->getFD()] = new_server;
+	}
+	return (servers);
+}
+
 int main(int argc, char **argv)
 {
 	try
 	{
-		int max_connections = 5;
-		int timeout = 0;
+		// Parsing the arguments (expecting a config_file)
+		if (argc != 2)
+			throw ParserException("Invalid number of arguments.");
+		ServerInfo	*config = config_parser(argv[1]);
 		(void)argv;
 		(void)argc;
-
-		// Server configuration parse
-		// configuration_parser() -> TODO
 
 		// Setting up signals to exit the server loop
 		signal(SIGINT, stop_signal);
@@ -94,16 +106,10 @@ int main(int argc, char **argv)
 		signal(SIGTSTP, print_signal);
 
 		// Initializing servers
-		std::map<int, ListeningSocket *> servers;
-		ListeningSocket *a = new ListeningSocket(INADDR_ANY, 8080, max_connections);
-		servers.insert(std::pair<int, ListeningSocket *>(a->getFD(), a));
-		ListeningSocket *b = new ListeningSocket(INADDR_ANY, 6969, max_connections);
-		servers.insert(std::pair<int, ListeningSocket *>(b->getFD(), b));
-		ListeningSocket *c = new ListeningSocket(INADDR_ANY, 4200, max_connections);
-		servers.insert(std::pair<int, ListeningSocket *>(c->getFD(), c));
-
-		std::map<int, Client *> clients;
-		EventHandler events(servers, clients, max_connections);
+		std::cout << "domain: " << config->servers.back().port << "\n";
+		std::map<int, ListeningSocket *>	servers = create_servers(config->servers);
+		std::map<int, Client *> 			clients;
+		EventHandler 						events(servers, clients, MAX_CONNECTIONS);
 
 		// Server loop
 		while (running)
@@ -111,7 +117,7 @@ int main(int argc, char **argv)
 			try
 			{
 				// Waits for events
-				events.waitEvents(timeout);
+				events.waitEvents(0);
 
 				// Event loop
 				events.checkEvents();
@@ -136,7 +142,8 @@ int main(int argc, char **argv)
 			}
 		}
 		delete_clients(clients);
-		delete_gateways(servers);
+		delete_servers(servers);
+		delete config;
 	}
 	catch (const std::exception &e)
 	{

@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/16 14:38:25 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/16 15:25:30 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,13 @@
 	DEFAULT FILE FOR DIRECTORY REQUESTS
 */
 
-#include "Parser.hpp"
-#include "Exception.hpp"
-
+#include "../includes/Webserv.h"
 /* bool domainBlockSolver()
 {
 
 } */
 
-void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize)
+static void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize)
 {
 
 	// This function will check if everything is gucci, AKA:
@@ -76,7 +74,6 @@ void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::
 	stream.str("");
 	stream.str(acquired_maxbodysize);
 	current_method = "";
-	throw ParserException("Invalid maximum client request body size.");
 	// check for valid client_max_body_size and convert it to Bytes, if necessary
 	/*
 
@@ -94,6 +91,7 @@ void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::
 		unconverted_maxbodysize = unconverted_maxbodysize * 1024;
 	else
 		throw ParserException("Invalid client request body size storage unit, please use Mb/mb or Kb/kb as the storage unit.");
+	std::cout << "size: " << unconverted_maxbodysize << "\n";
 	if (unconverted_maxbodysize <= 0 || unconverted_maxbodysize > INT_MAX)
 		throw ParserException("Invalid maximum client request body size.");
 	webserver->client_max_body_size = unconverted_maxbodysize;
@@ -160,7 +158,8 @@ ServerInfo *config_parser(char *file_path)
 			if (server_setup_mode == true)
 			{
 				server_setup_mode = false;
-				Server->location.push_back(current_server_block);
+				Server->servers.push_back(current_server_block);
+				std::cout << "domain: " << Server->servers.back().port << "\n";
 			}
 			else
 				throw ParserException("Attempt to finish nonexistent server block.");
@@ -188,7 +187,7 @@ ServerInfo *config_parser(char *file_path)
 		if ((line.find("domain_port")) != std::string::npos)
 		{
 			if (server_setup_mode == true)
-				current_server_block.domain_port = atoi((line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)).c_str());
+				current_server_block.port = atoi((line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)).c_str());
 			else
 				throw ParserException("Attempting to set up ports on nonexistent server block.");
 		}

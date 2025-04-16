@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 14:46:08 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/16 14:37:34 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/16 14:54:14 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ struct DomainBlock{
 
 struct ServerBlock{
 	
-	int								domain_port;
+	int								port;
 	std::string						server_name;
 	std::string						redirect_directory;
 	std::map<int, std::string>		error_codes;
@@ -46,7 +46,7 @@ struct ServerBlock{
 struct ServerInfo{
 
 	int								client_max_body_size;
-	std::vector<ServerBlock>		location;
+	std::vector<ServerBlock>		servers;
 };
 
 class ParserException : public std::runtime_error{
@@ -55,5 +55,7 @@ class ParserException : public std::runtime_error{
 
 	ParserException (std::string error);
 };
+
+ServerInfo *config_parser(char *file_path);
 
 #endif
