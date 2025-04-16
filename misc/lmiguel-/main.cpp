@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/10 18:00:08 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/16 14:20:46 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,8 +54,11 @@ void parserOKChecker( ServerInfo *webserver, std::string acquired_services, std:
 
 	std::stringstream			stream(acquired_services);
 	std::string					current_method;
+	std::string					body_size;
+	std::string					unit;
 	std::vector<std::string>	methods;
-	unsigned int				unconverted_maxbodysize;
+	std::map<int, std::string>	client_max_body_size;
+	int							unconverted_maxbodysize;
 
 	//check valid methods (also stringstream practice)
 	while (stream >> current_method){
@@ -64,40 +67,53 @@ void parserOKChecker( ServerInfo *webserver, std::string acquired_services, std:
 			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
 		methods.push_back(current_method);
 	}
-	webserver->location.domain.allowed_services = methods;
+	/* webserver->location.domain.allowed_services = methods; */
 
 	//reset the stream, clear any error codes and set it to the acquired_maxbodysize variable to begin the conversion to bytes
 	stream.clear();
 	stream.str("");
 	stream.str(acquired_maxbodysize);
-	current_method == "";
-	
+	current_method = "";
+	throw ParserException("Invalid maximum client request body size.");
 	//check for valid client_max_body_size and convert it to Bytes, if necessary
 	/* 
 	
-		BYTE CONVERSION FOR DUMMIES
+		BYTE CONVERSION
 		
 		n Kb = n x (1024) Bytes
 		n Mb = n x (1024^2) Bytes
 		n Gb = n x (1024^3) Bytes
 	 */
-	while(stream >> current_method){
-		std::cout << 
-	}
+	stream >> body_size >> unit;
+	unconverted_maxbodysize = atoi(body_size.c_str());
+	if (unit == "Mb" || unit == "mb")
+		unconverted_maxbodysize = unconverted_maxbodysize * 1024 * 1024;
+	else if (unit == "Kb" || unit == "kb")
+		unconverted_maxbodysize = unconverted_maxbodysize * 1024;
+	else
+		throw ParserException("Invalid client request body size storage unit, please use Mb/mb or Kb/kb as the storage unit.");
+	if (unconverted_maxbodysize <= 0 || unconverted_maxbodysize > INT_MAX)
+		throw ParserException("Invalid maximum client request body size.");
+	webserver->client_max_body_size = unconverted_maxbodysize;
+	std::cout << webserver->client_max_body_size << std::endl;
 };
 
 int	main(int argc, char **argv){
 
-	std::string		start;
-	std::string		line;
-	std::string		newline;
-	std::string		current_start;
-	std::string		acquired_services;
-	std::string		acquired_max_body_size;
-	std::ifstream	config_file;
-	bool			max_size_acquired = false;
-	bool			server_setup_mode = false;
-	bool			domain_setup_mode = false;
+	bool						max_size_acquired = false;
+	bool						server_setup_mode = false;
+	bool						domain_setup_mode = false;
+	//int							server_block_num = 1;
+	//int							domain_block_num = 1;
+	ServerBlock					current_server_block;
+	DomainBlock					current_domain_block;
+	std::string					start;
+	std::string					line;
+	std::string					newline;
+	std::string					current_start;
+	std::string					acquired_services;
+	std::string					acquired_max_body_size;
+	std::ifstream				config_file;
 
 	ServerInfo *Server = new ServerInfo();
 	if (!Server)
@@ -126,16 +142,19 @@ int	main(int argc, char **argv){
 					throw ParserException("Multiple client_max_body_size detected.");
 			}
 			if ((line.find("server_block start;")) != std::string::npos){
-				if (server_setup_mode == false)
+				if (server_setup_mode == false){
 					server_setup_mode = true;
+				}
 				else
 					throw ParserException("Attempt to create server block inside another server block.");
 			}
 			if ((line.find("server_block end;")) != std::string::npos){
-				if (server_setup_mode == true)
+				if (server_setup_mode == true){
 					server_setup_mode = false;
+					Server->location.push_back(current_server_block);
+				}
 				else
-					throw ParserException("Attempt to finish unexistent server block.");
+					throw ParserException("Attempt to finish nonexistent server block.");
 			}
 			//----------------------------SERVERBLOCK SPECIFIC INFO, REQUIRES A SERVERBLOCK TO EXIST----------------------------
 			if ((line.find("domain_block start;")) != std::string::npos){
@@ -147,21 +166,23 @@ int	main(int argc, char **argv){
 					throw ParserException("Attempt to create domain block outside of server block.");
 			}
 			if ((line.find("domain_block end;")) != std::string::npos){
-				if (domain_setup_mode == true)
+				if (domain_setup_mode == true){
 					domain_setup_mode = false;
+					current_server_block.domain.push_back(current_domain_block);
+				}
 				else
-					throw ParserException("Attempt to finish unexistent domain block.");
+					throw ParserException("Attempt to finish nonexistent domain block.");
 			}
 			if ((line.find("domain_port")) != std::string::npos){
 				if (server_setup_mode == true)
-					Server->location.domain_port = atoi((line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)).c_str());
+					current_server_block.domain_port = atoi((line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)).c_str());
 				else
 					throw ParserException("Attempting to set up ports on nonexistent server block.");
 			}
 			if ((line.find("server_name")) != std::string::npos){
 				if (server_setup_mode == true){
-					Server->location.server_name = line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2);
-					if (Server->location.server_name.empty())
+					current_server_block.server_name = line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2);
+					if (current_server_block.server_name.empty())
 						throw ParserException("Your server name is empty.");
 				}
 				else
@@ -169,8 +190,8 @@ int	main(int argc, char **argv){
 			}
 			if ((line.find("directory_request_redirect")) != std::string::npos){
 				if (server_setup_mode == true){
-					Server->location.redirect_directory = line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2);
-					if (Server->location.redirect_directory.empty())
+					current_server_block.redirect_directory = line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2);
+					if (current_server_block.redirect_directory.empty())
 						throw ParserException("Your directory request redirection file is invalid/nonexistent.");
 				}
 				else
@@ -178,9 +199,9 @@ int	main(int argc, char **argv){
 			}
 			if ((line.find("error_page")) != std::string::npos){
 				if (server_setup_mode == true){
-					Server->location.error_codes.insert( std::pair<int, std::string>
+					current_server_block.error_codes.insert( std::pair<int, std::string>
 					(atoi(line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') - 2).c_str()), line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)));
-					for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it){
+					for (std::map<int, std::string>::iterator it = current_server_block.error_codes.lower_bound(0); it != current_server_block.error_codes.upper_bound(1000); ++it){
 						if (it->first <= 0 || it->second.empty())
 							throw ParserException("Your error code or coresponding page is invalid/nonexistent.");
 					}
@@ -192,9 +213,9 @@ int	main(int argc, char **argv){
 			if ((line.find("autoindex")) != std::string::npos){
 				if (domain_setup_mode == true){
 					if (line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2) == "on")
-						Server->location.domain.autoindex = true;
+						current_domain_block.autoindex = true;
 					else if (line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2) == "off")
-						Server->location.domain.autoindex = false;
+						current_domain_block.autoindex = false;
 					else
 						throw ParserException("Invalid autoindexing options, please set it to on or off.");
 				}
@@ -212,8 +233,8 @@ int	main(int argc, char **argv){
 			}
 			if ((line.find("root")) != std::string::npos){
 				if (domain_setup_mode == true){
-					Server->location.domain.root_directory = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
-					if (Server->location.domain.root_directory.empty())
+					current_domain_block.root_directory = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+					if (current_domain_block.root_directory.empty())
 						throw ParserException("Your root directory is empty.");
 				}
 				else
@@ -222,7 +243,7 @@ int	main(int argc, char **argv){
 			newline += line;
 			newline += '\n';
 		}
-		std::cout << newline << std::endl; //EXPERIMENTAL: print the entire file. (WORKING)
+		/* std::cout << newline << std::endl; //EXPERIMENTAL: print the entire file. (WORKING)
 		std::cout << acquired_max_body_size << std::endl; //correct;
 		std::cout << Server->location.domain_port << std::endl; //correct, figure out how to send to corresponding server;
 		std::cout << Server->location.server_name << std::endl; //correct, need to cover "server_name;"? (YES)
@@ -231,7 +252,7 @@ int	main(int argc, char **argv){
 		std::cout << Server->location.redirect_directory << std::endl; //correct
 		for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it) {
 			std::cout << "Error " << it->first << ": " << it->second << std::endl;
-	}
+	} */
 		parserOKChecker(Server, acquired_services, acquired_max_body_size);
 	}
 	catch(std::exception &e){

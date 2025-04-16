@@ -8,7 +8,7 @@ x_block start;
 #ends a block;
 x_block end;
 
-#sets the size limit of incoming client requests; the only sizes it will accept are 'b' (bytes), 'Kb' (kilobytes), 'Mb' (megabytes) and 'Gb' (gigabytes)
+#sets the size limit of incoming client requests; the only sizes it will accept are 'b' (bytes), 'Kb' (kilobytes), 'Mb' (megabytes)
 client_max_body_size 10Mb;
 
 #sets the port of our domain
