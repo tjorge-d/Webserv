@@ -4,6 +4,7 @@
 # include <netinet/in.h>
 # include <stdexcept>
 # include <unistd.h>
+# include <string.h>
 
 class Socket
 {
@@ -33,13 +34,13 @@ class Socket
 		
 	public:
 		// GETTERS
-		int					getFD();
-		int					getDomain();
-		int					getType();
-		int					getProtocol();
-		u_long				getInterface();
-		int					getPort();
-		struct sockaddr_in	getAddress();
+		int const					&getFD()const;
+		int const					&getDomain()const;
+		int const					&getType()const;
+		int const					&getProtocol()const;
+		u_long const				&getInterface()const;
+		int const 					&getPort()const;
+		struct sockaddr_in const	&getAddress()const;
 
 	// EXCEPTIONS
 	class	SocketException : public std::runtime_error

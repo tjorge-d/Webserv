@@ -1,4 +1,4 @@
-#include "../includes/Webserv.h"
+#include "../includes/Socket.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
 
@@ -25,37 +25,37 @@ Socket::~Socket()
 
 // GETTERS
 
-int	Socket::getFD()
+int const	&Socket::getFD() const
 {
 	return(_fd);
 }
 
-int	Socket::getDomain()
+int const	&Socket::getDomain() const
 {
 	return(_domain);
 }
 
-int Socket::getType()
+int const	&Socket::getType() const
 {
 	return(_type);
 }
 
-int	Socket::getProtocol()
+int const	&Socket::getProtocol() const
 {
 	return(_protocol);
 }
 
-u_long	Socket::getInterface()
+u_long const	&Socket::getInterface() const
 {
 	return(_interface);
 }
 
-int	Socket::getPort()
+int const	&Socket::getPort() const
 {
 	return(_port);
 }
 
-struct sockaddr_in	Socket::getAddress()
+struct sockaddr_in const	&Socket::getAddress() const
 {
 	return(_address);
 }

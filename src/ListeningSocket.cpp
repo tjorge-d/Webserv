@@ -1,9 +1,9 @@
-#include "../includes/Webserv.h"
+#include "../includes/ListeningSocket.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
 
 ListeningSocket::ListeningSocket(int domain, int type, int protocol, u_long interface, int port, int backlog) :
-BindingSocket(domain, type, protocol, interface, port),
+Socket(domain, type, protocol, interface, port),
 _backlog(backlog)
 {
 	//std::cout << "ListeningSocket custom constructor called\n";
@@ -11,7 +11,7 @@ _backlog(backlog)
 }
 
 ListeningSocket::ListeningSocket(u_long interface, int port, int backlog) :
-BindingSocket(AF_INET, SOCK_STREAM, 0, interface, port),
+Socket(AF_INET, SOCK_STREAM, 0, interface, port),
 _backlog(backlog)
 {
 	//std::cout << "ListeningSocket custom constructor called\n";
@@ -36,9 +36,20 @@ int		ListeningSocket::getBacklog()
 
 void	ListeningSocket::configureSocket()
 {
+	int opt = 1;
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) != 0)
+		throw ListeningSocketException("Failed to set the socket options");
+
+	// Initializes the address structure
+	_address = IPv4AddressConvertion(_domain, _interface, _port);
+
+	// Binds the socket to an address
+	if(bind(_fd, (struct sockaddr *)&_address, sizeof(_address)) != 0)
+		throw ListeningSocketException("Failed to bind a socket");
+
 	// Makes the socket passive and ready to accept incoming connection requests
-    if(listen(_fd, _backlog) != 0)
-        throw ListeningSocketException("Failed to make the socket listen");
+	if(listen(_fd, _backlog) != 0)
+		throw ListeningSocketException("Failed to make the socket listen");
 }
 
 // EXCEPTIONS

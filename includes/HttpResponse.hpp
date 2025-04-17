@@ -6,7 +6,7 @@
 # include <sstream>
 # include <stdexcept>
 # include <sys/stat.h>
-
+# include <iostream>
 
 class HttpResponse
 {

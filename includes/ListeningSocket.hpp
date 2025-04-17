@@ -1,8 +1,9 @@
 #ifndef LISTENINGSOCKET_HPP
 # define LISTENINGSOCKET_HPP
-# include "BindingSocket.hpp"
+# include <string.h>
+# include "Socket.hpp"
 
-class ListeningSocket : public BindingSocket
+class ListeningSocket : public Socket
 {
 	private:
 		// ATTRIBUTES

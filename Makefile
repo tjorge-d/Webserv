@@ -1,16 +1,16 @@
 NAME= webserv
 
 CXX= c++
-CXXFLAGS= -Wall -Werror -Wextra -g
+CXXFLAGS=-Wall -Werror -Wextra -g
 
 SRC_A= $(addprefix src/, $(SOURCES_A))
 SOURCES_A= main.cpp	\
 EventHandler.cpp	\
-BindingSocket.cpp	\
 ListeningSocket.cpp	\
 ConnectingSocket.cpp	\
 Socket.cpp	\
 Client.cpp	\
+ServerBlock.cpp	\
 HttpResponse.cpp	\
 HttpRequest.cpp	\
 Parser.cpp

@@ -8,16 +8,18 @@
 # include <unistd.h>
 # include <algorithm>
 # include <sys/socket.h>
-# include "HttpResponse.hpp"
-# include "HttpRequest.hpp"
 # include "EventHandler.hpp"
+# include "ServerBlock.hpp"
+# include "HttpRequest.hpp"
+# include "HttpResponse.hpp"
+
 
 # define CHUNK_SIZE 4096
 # define MAX_BODY 1048576
 
-class	EventHandler;
+class EventHandler;
 
-enum state
+enum client_state
 {
 	WAITING_TO_RECIEVE,
 	RECIEVING_REQUEST,
@@ -31,19 +33,20 @@ class Client
 	private:
 		// ATTRIBUTES
 		// Client data
-		int				_fd;
-		EventHandler	&_events;
+		int				fd;
+		EventHandler	&events;
+		ServerBlock		&serverBlock;
 
 		// HTTP data
-		HttpRequest			_request;		
-		HttpResponse		_response;
-		std::fstream		_postFile;
+		HttpRequest			request;		
+		HttpResponse		response;
+		std::fstream		postFile;
 
 		// Flags
-		bool	_connected;
-		bool	_recievingHeader;
-		bool	_recievingBody;
-		state	_state;
+		bool			connected;
+		bool			recievingHeader;
+		bool			recievingBody;
+		client_state	state;
 
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)
@@ -57,16 +60,16 @@ class Client
 
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
-		Client(int fd, EventHandler &events);
+		Client(int fd, EventHandler &events, ServerBlock &serverBlockInfo);
 		~Client();
 
 		// GETTERS
 		int					getFD() const;
-		state				getState() const;
+		client_state		getState() const;
 		HttpResponse const	&getResponse() const;
 
 		// SETTERS
-		void	setState(state state);
+		void	setState(client_state state);
 
 		// MEMBER FUNCTIONS
 		// Tells if the client has a regular connection

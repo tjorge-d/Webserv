@@ -10,25 +10,26 @@
 # include <netinet/in.h>
 # include "ListeningSocket.hpp"
 # include "Client.hpp"
+# include "ServerBlock.hpp"
 
-//class Client;
+class Client;
 
 class EventHandler
 {
 	private:
 		// ATTRIBUTES
-		std::map<int, ListeningSocket*>	&_servers;
-		std::map<int, Client*>			&_clients;
-		int								_connections;
-		int								_maxConnections;
-		int								_epollFd;
-		int								_eventsNumber;
-		std::vector<epoll_event>		_events;
+		std::map<int, ServerBlock*>	&serverBlocks;
+		std::map<int, Client*>		&clients;
+		int							connections;
+		int							maxConnections;
+		int							epollFd;
+		int							eventsNumber;
+		std::vector<epoll_event>	events;
 
 	public:
 		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler(std::map<int, ListeningSocket*> &servers, std::map<int, Client*> &clients, int maxConnections);
-		~EventHandler() ;
+		EventHandler(std::map<int, ServerBlock*> &server_blocks, std::map<int, Client*> &clients, int maxConnections);
+		~EventHandler();
 		
 		// GETTERS
 		std::vector<epoll_event>	getEvents();

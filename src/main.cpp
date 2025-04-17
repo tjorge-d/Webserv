@@ -1,5 +1,7 @@
 #include "../includes/Webserv.h"
+#include "../includes/Client.hpp"
 #include <arpa/inet.h>
+
 bool running = true;
 bool freeze = false;
 bool print = false;
@@ -31,13 +33,26 @@ void delete_clients(std::map<int, Client *> &clients)
 		delete i->second;
 }
 
-void delete_servers(std::map<int, ListeningSocket *> &servers)
+void delete_server_blocks(std::map<int, ServerBlock*> &server_blocks)
 {
-	for (std::map<int, ListeningSocket *>::iterator i = servers.begin(); i != servers.end(); i++)
+	for (std::map<int, ServerBlock*>::iterator i = server_blocks.begin(); i != server_blocks.end(); i++)
 		delete i->second;
 }
 
-void pending_clients(std::map<int, Client *> &clients, EventHandler &events)
+std::map<int, ServerBlock*> create_server_blocks(HttpInfo &server_info)
+{
+	std::map<int, ServerBlock*> server_blocks;
+
+	for (std::vector<ServerBlockInfo>::iterator i = server_info.server_blocks.begin(); \
+	i != server_info.server_blocks.end(); ++i)
+	{
+		ServerBlock *new_server_block = new ServerBlock(*(i), server_info);
+		server_blocks[new_server_block->getListenerFD()] = new_server_block;
+	}
+	return (server_blocks);
+}
+
+void pending_clients(std::map<int, Client*> &clients, EventHandler &events)
 {
 	for (std::map<int, Client *>::iterator i = clients.begin(); i != clients.end(); i++)
 	{
@@ -76,19 +91,6 @@ void pending_clients(std::map<int, Client *> &clients, EventHandler &events)
 	}
 }
 
-std::map<int, ListeningSocket *> create_servers(std::vector<ServerBlock> &servers_info)
-{
-	std::map<int, ListeningSocket *> servers;
-	std::cout << "Domain: " << servers_info.back().port << "\n";
-	std::cout << "Domain: " << servers_info.front().port << "\n";
-	for (std::vector<ServerBlock>::iterator i = servers_info.begin(); i != servers_info.end(); ++i)
-	{
-		ListeningSocket *new_server = new ListeningSocket(INADDR_ANY, i->port, SOCKET_BACKLOG);
-		servers[new_server->getFD()] = new_server;
-	}
-	return (servers);
-}
-
 int main(int argc, char **argv)
 {
 	try
@@ -96,7 +98,7 @@ int main(int argc, char **argv)
 		// Parsing the arguments (expecting a config_file)
 		if (argc != 2)
 			throw ParserException("Invalid number of arguments.");
-		ServerInfo	*config = config_parser(argv[1]);
+		HttpInfo	*config = config_parser(argv[1]);
 		(void)argv;
 		(void)argc;
 
@@ -105,11 +107,14 @@ int main(int argc, char **argv)
 		signal(SIGQUIT, freeze_signal);
 		signal(SIGTSTP, print_signal);
 
-		// Initializing servers
-		std::cout << "domain: " << config->servers.back().port << "\n";
-		std::map<int, ListeningSocket *>	servers = create_servers(config->servers);
-		std::map<int, Client *> 			clients;
-		EventHandler 						events(servers, clients, MAX_CONNECTIONS);
+		// Creating a map of server blocks identified by the FD of their listening socket
+		std::map<int, ServerBlock*>	server_blocks = create_server_blocks(*config);
+		
+		// Creating a map of clients identified by their FD 
+		std::map<int, Client*>	clients;
+
+		// Creating the server event handler 
+		EventHandler	events(server_blocks, clients, MAX_CONNECTIONS);
 
 		// Server loop
 		while (running)
@@ -142,7 +147,7 @@ int main(int argc, char **argv)
 			}
 		}
 		delete_clients(clients);
-		delete_servers(servers);
+		delete_server_blocks(server_blocks);
 		delete config;
 	}
 	catch (const std::exception &e)

@@ -1,4 +1,4 @@
-#include "../includes/Webserv.h"
+#include "../includes/HttpRequest.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
 

@@ -40,7 +40,7 @@
 
 } */
 
-static void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize)
+static void parserOKChecker(HttpInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize)
 {
 
 	// This function will check if everything is gucci, AKA:
@@ -62,7 +62,6 @@ static void parserOKChecker(ServerInfo *webserver, std::string acquired_services
 	// check valid methods (also stringstream practice)
 	while (stream >> current_method)
 	{
-		std::cout << current_method << std::endl;
 		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
 			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
 		methods.push_back(current_method);
@@ -91,31 +90,29 @@ static void parserOKChecker(ServerInfo *webserver, std::string acquired_services
 		unconverted_maxbodysize = unconverted_maxbodysize * 1024;
 	else
 		throw ParserException("Invalid client request body size storage unit, please use Mb/mb or Kb/kb as the storage unit.");
-	std::cout << "size: " << unconverted_maxbodysize << "\n";
 	if (unconverted_maxbodysize <= 0 || unconverted_maxbodysize > INT_MAX)
 		throw ParserException("Invalid maximum client request body size.");
 	webserver->client_max_body_size = unconverted_maxbodysize;
-	std::cout << webserver->client_max_body_size << std::endl;
 };
 
-ServerInfo *config_parser(char *file_path)
+HttpInfo *config_parser(char *file_path)
 {
 	bool max_size_acquired = false;
 	bool server_setup_mode = false;
 	bool domain_setup_mode = false;
 	// int							server_block_num = 1;
 	// int							domain_block_num = 1;
-	ServerBlock current_server_block;
-	DomainBlock current_domain_block;
-	std::string start;
-	std::string line;
-	std::string newline;
-	std::string current_start;
-	std::string acquired_services;
-	std::string acquired_max_body_size;
-	std::ifstream config_file;
+	ServerBlockInfo	current_server_block;
+	DomainBlockInfo	current_domain_block;
+	std::string		start;
+	std::string		line;
+	std::string		newline;
+	std::string		current_start;
+	std::string		acquired_services;
+	std::string		acquired_max_body_size;
+	std::ifstream	config_file;
 
-	ServerInfo *Server = new ServerInfo();
+	HttpInfo *Server = new HttpInfo();
 	config_file.open(file_path);
 	if (!config_file.is_open()) // if the config file cannot be opened/doesn't exist, throw this error.
 		throw ParserException("Invalid config file.");
@@ -158,8 +155,7 @@ ServerInfo *config_parser(char *file_path)
 			if (server_setup_mode == true)
 			{
 				server_setup_mode = false;
-				Server->servers.push_back(current_server_block);
-				std::cout << "domain: " << Server->servers.back().port << "\n";
+				Server->server_blocks.push_back(current_server_block);
 			}
 			else
 				throw ParserException("Attempt to finish nonexistent server block.");

@@ -1,5 +1,6 @@
 #ifndef CONNECTINGSOCKET_HPP
 # define CONNECTINGSOCKET_HPP
+# include <string.h>
 # include "Socket.hpp"
 
 class ConnectingSocket : public Socket
