@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/16 15:25:30 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/17 16:05:57 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,23 @@
 {
 
 } */
-
-static void parserOKChecker(HttpInfo *webserver, std::string acquired_services, std::string acquired_maxbodysize)
+static void setupServices(DomainBlockInfo *domainBlock, std::string acquired_services)
 {
+	std::string						current_method;
+	std::stringstream				stream(acquired_services);
+	
 
+	// check valid methods (also stringstream practice)
+	while (stream >> current_method)
+	{
+		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
+			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
+		domainBlock->allowed_services.push_back(current_method);
+	}
+}
+
+static void setupClientmaxbodysize(HttpInfo *webserver, std::string acquired_maxbodysize)
+{
 	// This function will check if everything is gucci, AKA:
 
 	// Is the client_max_body_size different from 0? if not, convert to 1 Mb, or 1024^2 (Client max size will always be in bytes to make things easier)
@@ -51,37 +64,19 @@ static void parserOKChecker(HttpInfo *webserver, std::string acquired_services, 
 
 	// Practice using stringstream for things with more than one string, such as all the methods and the client max size. (methods done)
 
-	std::stringstream stream(acquired_services);
-	std::string current_method;
-	std::string body_size;
-	std::string unit;
-	std::vector<std::string> methods;
-	std::map<int, std::string> client_max_body_size;
-	int unconverted_maxbodysize;
+	int								unconverted_maxbodysize;
+	std::string						body_size;
+	std::string						unit;
+	std::stringstream				stream(acquired_maxbodysize);
 
-	// check valid methods (also stringstream practice)
-	while (stream >> current_method)
-	{
-		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
-			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
-		methods.push_back(current_method);
-	}
-	/* webserver->location.domain.allowed_services = methods; */
-
-	// reset the stream, clear any error codes and set it to the acquired_maxbodysize variable to begin the conversion to bytes
-	stream.clear();
-	stream.str("");
-	stream.str(acquired_maxbodysize);
-	current_method = "";
-	// check for valid client_max_body_size and convert it to Bytes, if necessary
 	/*
-
 		BYTE CONVERSION
 
 		n Kb = n x (1024) Bytes
 		n Mb = n x (1024^2) Bytes
 		n Gb = n x (1024^3) Bytes
 	 */
+
 	stream >> body_size >> unit;
 	unconverted_maxbodysize = atoi(body_size.c_str());
 	if (unit == "Mb" || unit == "mb")
@@ -93,7 +88,7 @@ static void parserOKChecker(HttpInfo *webserver, std::string acquired_services, 
 	if (unconverted_maxbodysize <= 0 || unconverted_maxbodysize > INT_MAX)
 		throw ParserException("Invalid maximum client request body size.");
 	webserver->client_max_body_size = unconverted_maxbodysize;
-};
+}
 
 HttpInfo *config_parser(char *file_path)
 {
@@ -126,7 +121,7 @@ HttpInfo *config_parser(char *file_path)
 
 	while (std::getline(config_file, line))
 	{ // main loop, continue until text ends
-		if (line.size() > 0 && line[line.size() - 1] != ';')
+		if (line.size() > 0 && line.back() != ';')
 			throw ParserException("All lines must end in the ';' character.");
 		//----------------------------SERVER SPECIFIC INFO, DOES NOT REQUIRE A SERVERBLOCK TO EXIST----------------------------
 		if ((line.find("client_max_body_size")) != std::string::npos)
@@ -156,6 +151,7 @@ HttpInfo *config_parser(char *file_path)
 			{
 				server_setup_mode = false;
 				Server->server_blocks.push_back(current_server_block);
+				current_server_block = ServerBlockInfo();
 			}
 			else
 				throw ParserException("Attempt to finish nonexistent server block.");
@@ -176,6 +172,7 @@ HttpInfo *config_parser(char *file_path)
 			{
 				domain_setup_mode = false;
 				current_server_block.domain.push_back(current_domain_block);
+				current_domain_block = DomainBlockInfo();
 			}
 			else
 				throw ParserException("Attempt to finish nonexistent domain block.");
@@ -245,9 +242,32 @@ HttpInfo *config_parser(char *file_path)
 				acquired_services = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
 				if (acquired_services.empty())
 					throw ParserException("Your allowed services are empty.");
+				setupServices(&current_domain_block, acquired_services);
 			}
 			else
 				throw ParserException("Attempting to set up allowed services on nonexistent domain block.");
+		}
+		if ((line.find("index_file")) != std::string::npos)
+		{
+			if (domain_setup_mode == true)
+			{
+				current_domain_block.index_file = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+				if (current_domain_block.index_file.empty())
+					throw ParserException("Your domain index file is invalid/empty.");
+			}
+			else
+				throw ParserException("Attempting to set up domain index file on nonexistent domain block.");
+		}
+		if ((line.find("default_location")) != std::string::npos)
+		{
+			if (domain_setup_mode == true)
+			{
+				current_domain_block.domain_location = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+				if (current_domain_block.domain_location.empty())
+					throw ParserException("Your domain location is empty.");
+			}
+			else
+				throw ParserException("Attempting to set up domain location on nonexistent domain block.");
 		}
 		if ((line.find("root")) != std::string::npos)
 		{
@@ -263,17 +283,30 @@ HttpInfo *config_parser(char *file_path)
 		newline += line;
 		newline += '\n';
 	}
-	/* std::cout << newline << std::endl; //EXPERIMENTAL: print the entire file. (WORKING)
-	std::cout << acquired_max_body_size << std::endl; //correct;
-	std::cout << Server->location.domain_port << std::endl; //correct, figure out how to send to corresponding server;
-	std::cout << Server->location.server_name << std::endl; //correct, need to cover "server_name;"? (YES)
-	std::cout << Server->location.domain.autoindex << std::endl; //correct, perfect as it is.
-	std::cout << acquired_services << std::endl; //correct, further checking in the parserOKChecker function.
-	std::cout << Server->location.redirect_directory << std::endl; //correct
-	for (std::map<int, std::string>::iterator it = Server->location.error_codes.lower_bound(0); it != Server->location.error_codes.upper_bound(1000); ++it) {
-		std::cout << "Error " << it->first << ": " << it->second << std::endl;
-} */
-	parserOKChecker(Server, acquired_services, acquired_max_body_size);
+	setupClientmaxbodysize(Server, acquired_max_body_size);
+	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
+	for (std::vector<ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
+		i != Server->server_blocks.end(); i++)
+	{
+		std::cout << "Server Block : " << i->server_name << std::endl;
+		std::cout << "Server Port : " << i->port << std::endl;
+		std::cout << "Redirect Directory : " << i->redirect_directory << std::endl;
+		for (std::map<int, std::string>::iterator k = i->error_codes.begin(); \
+		k != i->error_codes.end(); k++)
+			std::cout << "Error code : " << k->first << " Error index file : " << k->second << std::endl;
+		for (std::vector<DomainBlockInfo>::iterator j = i->domain.begin(); \
+			j != i->domain.end(); j++)
+		{
+			std::cout << "Domain Block : " << j->domain_location << std::endl;
+			std::cout << "Domain Autoindex State : " << j->autoindex << std::endl;
+			std::cout << "Root Directory : " << j->root_directory << std::endl;
+			std::cout << "Index File : " << j->index_file << std::endl;
+			std::cout << "Allowed Services : " << std::endl;
+			for (std::vector<std::string>::iterator m = j->allowed_services.begin(); \
+			m != j->allowed_services.end(); m++)
+				std::cout << *m << std::endl;
+		}
+	}
 	config_file.close();
 	return (Server);
 }

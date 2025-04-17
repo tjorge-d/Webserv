@@ -23,6 +23,7 @@ struct DomainBlockInfo{
 	
 	bool							autoindex;
 	std::vector<std::string>		allowed_services;
+	std::string						domain_location;
 	std::string						root_directory;
 	std::string						index_file;
 };
@@ -33,7 +34,7 @@ struct ServerBlockInfo{
 	std::string						server_name;
 	std::string						redirect_directory;
 	std::map<int, std::string>		error_codes;
-	std::vector<DomainBlockInfo>		domain;
+	std::vector<DomainBlockInfo>	domain;
 };
 
 struct HttpInfo{
