@@ -78,10 +78,12 @@ static void setupClientmaxbodysize(HttpInfo *webserver, std::string acquired_max
 	 */
 
 	stream >> body_size >> unit;
+	std::cout << "SIZE: " << body_size <<std::endl;
+	std::cout << "UNIT: " << unit <<std::endl;
 	unconverted_maxbodysize = atoi(body_size.c_str());
-	if (unit == "Mb" || unit == "mb")
+	if (unit == "Mb" || unit == "mb" || unit == "mb;" || unit == "Mb;")
 		unconverted_maxbodysize = unconverted_maxbodysize * 1024 * 1024;
-	else if (unit == "Kb" || unit == "kb")
+	else if (unit == "Kb" || unit == "kb" || unit == "kb;" || unit == "Kb;")
 		unconverted_maxbodysize = unconverted_maxbodysize * 1024;
 	else
 		throw ParserException("Invalid client request body size storage unit, please use Mb/mb or Kb/kb as the storage unit.");
@@ -121,14 +123,14 @@ HttpInfo *config_parser(char *file_path)
 
 	while (std::getline(config_file, line))
 	{ // main loop, continue until text ends
-		if (line.size() > 0 && line.back() != ';')
+		if (line.size() > 0 && line[line.size() - 1] != ';')
 			throw ParserException("All lines must end in the ';' character.");
 		//----------------------------SERVER SPECIFIC INFO, DOES NOT REQUIRE A SERVERBLOCK TO EXIST----------------------------
 		if ((line.find("client_max_body_size")) != std::string::npos)
 		{
 			if (max_size_acquired == false)
 			{
-				acquired_max_body_size = line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') + 1);
+				acquired_max_body_size = line.substr((line.find(' ') + 1), line.rfind(' '));
 				if (atoi(acquired_max_body_size.c_str()) <= 0)
 					throw ParserException("Your client_max_body_size is invalid.");
 				max_size_acquired = true;

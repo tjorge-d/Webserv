@@ -4,22 +4,21 @@
 
 HttpResponse::HttpResponse()
 {
-	supportedContentType = {
-	{".html", "text/html"}, 
-	{".txt", "text/plain"},
-	{".css", "text/css"},
-	{".jpg", "image/jpeg"},
-	{".jpeg", "image/jpeg"},
-	{".png", "image/png"},
-	{".gif", "image/gif"},
-	{".svg", "image/svg+xml"},
-	{".ico", "image/x-icon"},
-	{".xml", "application/xml"},
-	{".pdf", "application/pdf"},
-	{".zip", "application/zip"},
-	{".json", "application/json"},
-	{".js", "application/javascript"},
-	{".bin", "application/octet-stream"} };
+	supportedContentType[".html"] = "text/html"; 
+	supportedContentType[".txt"] = "text/plain";
+	supportedContentType[".css"] = "text/css";
+	supportedContentType[".jpg"] = "image/jpeg";
+	supportedContentType[".jpeg"] = "image/jpeg";
+	supportedContentType[".png"] = "image/png";
+	supportedContentType[".gif"] = "image/gif";
+	supportedContentType[".svg"] = "image/svg+xml";
+	supportedContentType[".ico"] = "image/x-icon";
+	supportedContentType[".xml"] = "application/xml";
+	supportedContentType[".pdf"] = "application/pdf";
+	supportedContentType[".zip"] = "application/zip";
+	supportedContentType[".json"] = "application/json";
+	supportedContentType[".js"] = "application/javascript";
+	supportedContentType[".bin"] = "application/octet-stream";
 }
 
 HttpResponse::~HttpResponse()

@@ -146,8 +146,7 @@ void	EventHandler::checkEvents()
 			std::cerr << e.what() << std::endl;
 			if (!serverBlocks.count(events[i].data.fd))
 				deleteClient(events[i].data.fd);
-		}
-		
+		}	
 	}
 }
 

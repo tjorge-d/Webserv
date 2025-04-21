@@ -28,7 +28,6 @@ void	HttpRequest::appendToBuffer(char* ar, int size)
 void	HttpRequest::eraseBufferRange(std::vector<char>::iterator begin, std::vector<char>::iterator end)
 {
 	buffer.erase(begin, end);
-	buffer.shrink_to_fit();
 }
 
 void	HttpRequest::reset()

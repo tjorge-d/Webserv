@@ -21,7 +21,8 @@ class ServerBlock
 		~ServerBlock();
 
 		// GETTERS
-		int	const &getListenerFD()const;
+		int	const	&getListenerFD()const;
+		int const	&getMaxBodySize()const;
 };
 
 #endif

@@ -168,8 +168,10 @@ int	Client::recieveRequestChunk()
 	{
 		postFile.write(buffer, bytes);
 		request.bodySize += bytes;
-		if(request.bodySize > MAX_BODY)
+		if(request.bodySize > serverBlock.getMaxBodySize())
 		{
+
+			// ErrorResponse((int)error, (string)msg);
 			// maxBodySizeResponse();
 			throw ClientException("The request body has reached the maximum size", fd);
 		}

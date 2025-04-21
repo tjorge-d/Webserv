@@ -1,7 +1,7 @@
 NAME= webserv
 
 CXX= c++
-CXXFLAGS=-Wall -Werror -Wextra -g
+CXXFLAGS=-Wall -Werror -Wextra -std=c++98 -g
 
 SRC_A= $(addprefix src/, $(SOURCES_A))
 SOURCES_A= main.cpp	\

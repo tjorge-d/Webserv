@@ -25,3 +25,11 @@ int	const &ServerBlock::getListenerFD()const
 	return(listener.getFD());
 }
 
+int	const &ServerBlock::getMaxBodySize()const
+{
+	(void)info;
+	(void)httpInfo;
+	return(httpInfo.client_max_body_size);
+}
+
+

@@ -5,6 +5,7 @@
 # include <stdexcept>
 # include <unistd.h>
 # include <string.h>
+# include <errno.h>
 
 class Socket
 {
