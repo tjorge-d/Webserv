@@ -1,82 +1,37 @@
-client_max_body_size 100    kb;
+client_max_body_size 100 kb;
 
 	server_block start;
 
-	domain_port 8080;
+		domain_port 8080;
 
-	server_name gofas;
+		server_name gofas;
 
-		location_block start;
+			location_block start;
 
-		default_location /;
+				default_location /;
 
-		services_available GET POST DELETE;
+				services_available GET POST DELETE;
 
-		root /var/www/dev;
+				root /var/www/dev;
 
-		index_file /index.html;
+				index_file /index.html;
 
-		autoindex off;
+				autoindex off;
 
-		location_block end;
+			location_block end;
 
-	error_page 404 /404.html;
+		error_page 404 /404.html;
 
-	error_page 413 /413.html;
+		error_page 413 /413.html;
 
-	error_page 500 /500.html;
+		error_page 500 /500.html;
 
-	error_page 502 /502.html;
+		error_page 502 /502.html;
 
-	error_page 503 /503.html;
+		error_page 503 /503.html;
 
-	error_page 504 /504.html;
+		error_page 504 /504.html;
 
-	directory_request_redirect /var/www/dev/sideye.jpg;
-
-	server_block end;
-
-
-	server_block start;
-
-	domain_port 4020;
-
-	server_name tiagod;
-
-	error_page 410 /410.html;
-
-	error_page 42 /42.html;
-
-	error_page 400048 /400048.html;
-
-	directory_request_redirect /var/www/dev/milos.jpg;
-
-		location_block start;
-
-		default_location southern;
-
-		services_available GET;
-
-		root /var/www/hm;
-
-		index_file /tiagodji.html;
-
-		autoindex off;
-
-		location_block end;
-
-		location_block start;
-
-		default_location cross;
-
-		services_available GET POST DELETE HEAD;
-
-		root /var/www/tiagod;
-
-		index_file /tiagod.html;
-
-		autoindex on;
-
-		location_block end;
+		directory_request_redirect /var/www/dev/sideye.jpg;
 
 	server_block end;
