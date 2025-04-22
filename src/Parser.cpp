@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/17 16:05:57 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/22 15:57:03 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,26 @@
 
 	THINGS TO PASS DOWN:
 
-	SERVER BLOCKS
-	CLIENT REQUEST SIZE LIMIT
-	DOMAIN PORTS
-	DOMAIN ADDRESS
-	WEBSERVER DEFAULT LOCATION
-	AVAILABLE SERVICES
-	ROOT DIRECTORY
-	AUTOINDEX STATE
-	ERROR CODES AND CORRESPONDING ERROR PAGES
-	DEFAULT FILE FOR DIRECTORY REQUESTS
+	SERVER BLOCKS done
+	CLIENT REQUEST SIZE LIMIT done
+	DOMAIN PORTS done
+	DOMAIN ADDRESS done
+	WEBSERVER DEFAULT LOCATION done
+	AVAILABLE SERVICES done
+	ROOT DIRECTORY done
+	AUTOINDEX STATE done
+	ERROR CODES AND CORRESPONDING ERROR PAGES done
+	DEFAULT FILE FOR DIRECTORY REQUESTS done
 */
 
 #include "../includes/Webserv.h"
-/* bool locationBlockSolver()
+/* 
+bool locationBlockSolver()
 {
-
+	
 } */
+
+
 static void setupServices(LocationBlockInfo *locationBlock, std::string acquired_services)
 {
 	std::string						current_method;
@@ -97,9 +100,7 @@ HttpInfo *config_parser(char *file_path)
 	bool max_size_acquired = false;
 	bool server_setup_mode = false;
 	bool location_setup_mode = false;
-	// int							server_block_num = 1;
-	// int							location_block_num = 1;
-	ServerBlockInfo	current_server_block;
+	ServerBlockInfo		current_server_block;
 	LocationBlockInfo	current_location_block;
 	std::string		start;
 	std::string		line;
