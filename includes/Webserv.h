@@ -49,6 +49,6 @@ class ParserException : public std::runtime_error{
 	ParserException (std::string error);
 };
 
-HttpInfo *config_parser(char *file_path);
+HttpInfo *config_parser(char *file_path, int argc);
 
 #endif

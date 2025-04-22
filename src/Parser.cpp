@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/22 15:57:03 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/22 17:33:34 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ static void setupClientmaxbodysize(HttpInfo *webserver, std::string acquired_max
 	webserver->client_max_body_size = unconverted_maxbodysize;
 }
 
-HttpInfo *config_parser(char *file_path)
+HttpInfo *config_parser(char *file_path, int argc)
 {
 	bool max_size_acquired = false;
 	bool server_setup_mode = false;
@@ -111,7 +111,10 @@ HttpInfo *config_parser(char *file_path)
 	std::ifstream	config_file;
 
 	HttpInfo *Server = new HttpInfo();
-	config_file.open(file_path);
+	if (argc == 1)
+		config_file.open("config_file_default.txt");
+	else
+		config_file.open(file_path);
 	if (!config_file.is_open()) // if the config file cannot be opened/doesn't exist, throw this error.
 		throw ParserException("Invalid config file.");
 	if (!config_file.good())
