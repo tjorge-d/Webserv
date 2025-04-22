@@ -35,11 +35,11 @@
 */
 
 #include "../includes/Webserv.h"
-/* bool domainBlockSolver()
+/* bool locationBlockSolver()
 {
 
 } */
-static void setupServices(DomainBlockInfo *domainBlock, std::string acquired_services)
+static void setupServices(LocationBlockInfo *locationBlock, std::string acquired_services)
 {
 	std::string						current_method;
 	std::stringstream				stream(acquired_services);
@@ -50,7 +50,7 @@ static void setupServices(DomainBlockInfo *domainBlock, std::string acquired_ser
 	{
 		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
 			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
-		domainBlock->allowed_services.push_back(current_method);
+		locationBlock->allowed_services.push_back(current_method);
 	}
 }
 
@@ -96,11 +96,11 @@ HttpInfo *config_parser(char *file_path)
 {
 	bool max_size_acquired = false;
 	bool server_setup_mode = false;
-	bool domain_setup_mode = false;
+	bool location_setup_mode = false;
 	// int							server_block_num = 1;
-	// int							domain_block_num = 1;
+	// int							location_block_num = 1;
 	ServerBlockInfo	current_server_block;
-	DomainBlockInfo	current_domain_block;
+	LocationBlockInfo	current_location_block;
 	std::string		start;
 	std::string		line;
 	std::string		newline;
@@ -159,25 +159,25 @@ HttpInfo *config_parser(char *file_path)
 				throw ParserException("Attempt to finish nonexistent server block.");
 		}
 		//----------------------------SERVERBLOCK SPECIFIC INFO, REQUIRES A SERVERBLOCK TO EXIST----------------------------
-		if ((line.find("domain_block start;")) != std::string::npos)
+		if ((line.find("location_block start;")) != std::string::npos)
 		{
-			if (server_setup_mode == true && domain_setup_mode == false)
-				domain_setup_mode = true;
-			else if (domain_setup_mode == true)
-				throw ParserException("Attempt to create domain block inside another domain block.");
+			if (server_setup_mode == true && location_setup_mode == false)
+				location_setup_mode = true;
+			else if (location_setup_mode == true)
+				throw ParserException("Attempt to create location block inside another location block.");
 			else
-				throw ParserException("Attempt to create domain block outside of server block.");
+				throw ParserException("Attempt to create location block outside of server block.");
 		}
-		if ((line.find("domain_block end;")) != std::string::npos)
+		if ((line.find("location_block end;")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
-				domain_setup_mode = false;
-				current_server_block.domain.push_back(current_domain_block);
-				current_domain_block = DomainBlockInfo();
+				location_setup_mode = false;
+				current_server_block.locations.push_back(current_location_block);
+				current_location_block = LocationBlockInfo();
 			}
 			else
-				throw ParserException("Attempt to finish nonexistent domain block.");
+				throw ParserException("Attempt to finish nonexistent location block.");
 		}
 		if ((line.find("domain_port")) != std::string::npos)
 		{
@@ -222,65 +222,65 @@ HttpInfo *config_parser(char *file_path)
 			else
 				throw ParserException("Attempting to set up error codes and error pages on nonexistent server block.");
 		}
-		//----------------------------DOMAINBLOCK SPECIFIC INFO, REQUIRES A DOMAINBLOCK TO EXIST (REMEMBER DOMAINBLOCKS REQUIRE SERVERBLOCKS TO EXIST)----------------------------
+		//----------------------------LOCATION BLOCK SPECIFIC INFO, REQUIRES A LOCATION BLOCK TO EXIST (REMEMBER LOCATION BLOCKS REQUIRE SERVERBLOCKS TO EXIST)----------------------------
 		if ((line.find("autoindex")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
 				if (line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2) == "on")
-					current_domain_block.autoindex = true;
+					current_location_block.autoindex = true;
 				else if (line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2) == "off")
-					current_domain_block.autoindex = false;
+					current_location_block.autoindex = false;
 				else
 					throw ParserException("Invalid autoindexing options, please set it to on or off.");
 			}
 			else
-				throw ParserException("Attempting to set up autoindexing on nonexistent domain block.");
+				throw ParserException("Attempting to set up autoindexing on nonexistent location block.");
 		}
 		if ((line.find("services_available")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
 				acquired_services = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
 				if (acquired_services.empty())
 					throw ParserException("Your allowed services are empty.");
-				setupServices(&current_domain_block, acquired_services);
+				setupServices(&current_location_block, acquired_services);
 			}
 			else
 				throw ParserException("Attempting to set up allowed services on nonexistent domain block.");
 		}
 		if ((line.find("index_file")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
-				current_domain_block.index_file = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
-				if (current_domain_block.index_file.empty())
-					throw ParserException("Your domain index file is invalid/empty.");
+				current_location_block.index_file = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+				if (current_location_block.index_file.empty())
+					throw ParserException("Your location index file is invalid/empty.");
 			}
 			else
-				throw ParserException("Attempting to set up domain index file on nonexistent domain block.");
+				throw ParserException("Attempting to set up location index file on nonexistent location block.");
 		}
 		if ((line.find("default_location")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
-				current_domain_block.domain_location = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
-				if (current_domain_block.domain_location.empty())
-					throw ParserException("Your domain location is empty.");
+				current_location_block.location = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+				if (current_location_block.location.empty())
+					throw ParserException("Your location location is empty.");
 			}
 			else
-				throw ParserException("Attempting to set up domain location on nonexistent domain block.");
+				throw ParserException("Attempting to set up a location on nonexistent location block.");
 		}
 		if ((line.find("root")) != std::string::npos)
 		{
-			if (domain_setup_mode == true)
+			if (location_setup_mode == true)
 			{
-				current_domain_block.root_directory = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
-				if (current_domain_block.root_directory.empty())
+				current_location_block.root_directory = line.substr((line.find(' ') + 1), line.size() - line.find(' ') - 2);
+				if (current_location_block.root_directory.empty())
 					throw ParserException("Your root directory is empty.");
 			}
 			else
-				throw ParserException("Attempting to set up root directory on nonexistent domain block.");
+				throw ParserException("Attempting to set up root directory on nonexistent location block.");
 		}
 		newline += line;
 		newline += '\n';
@@ -296,11 +296,11 @@ HttpInfo *config_parser(char *file_path)
 		for (std::map<int, std::string>::iterator k = i->error_codes.begin(); \
 		k != i->error_codes.end(); k++)
 			std::cout << "Error code : " << k->first << " Error index file : " << k->second << std::endl;
-		for (std::vector<DomainBlockInfo>::iterator j = i->domain.begin(); \
-			j != i->domain.end(); j++)
+		for (std::vector<LocationBlockInfo>::iterator j = i->locations.begin(); \
+			j != i->locations.end(); j++)
 		{
-			std::cout << "Domain Block : " << j->domain_location << std::endl;
-			std::cout << "Domain Autoindex State : " << j->autoindex << std::endl;
+			std::cout << "location Block : " << j->location << std::endl;
+			std::cout << "location Autoindex State : " << j->autoindex << std::endl;
 			std::cout << "Root Directory : " << j->root_directory << std::endl;
 			std::cout << "Index File : " << j->index_file << std::endl;
 			std::cout << "Allowed Services : " << std::endl;
