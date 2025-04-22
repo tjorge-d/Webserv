@@ -32,10 +32,7 @@ class EventHandler
 		~EventHandler();
 		
 		// GETTERS
-		std::vector<epoll_event>	getEvents();
-		epoll_event					getEvent(int index);
-		int							getEventNumber();
-		int							getConnections();
+		int	getConnections();
 
 		// MEMBER FUNCTIONS
 		// Safely closes the epoll fd

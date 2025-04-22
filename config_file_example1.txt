@@ -6,7 +6,7 @@ client_max_body_size 100    kb;
 
 	server_name gofas;
 
-		domain_block start;
+		location_block start;
 
 		default_location /;
 
@@ -18,7 +18,7 @@ client_max_body_size 100    kb;
 
 		autoindex off;
 
-		domain_block end;
+		location_block end;
 
 	error_page 404 /404.html;
 
@@ -51,7 +51,7 @@ client_max_body_size 100    kb;
 
 	directory_request_redirect /var/www/dev/milos.jpg;
 
-		domain_block start;
+		location_block start;
 
 		default_location southern;
 
@@ -63,9 +63,9 @@ client_max_body_size 100    kb;
 
 		autoindex off;
 
-		domain_block end;
+		location_block end;
 
-		domain_block start;
+		location_block start;
 
 		default_location cross;
 
@@ -77,6 +77,6 @@ client_max_body_size 100    kb;
 
 		autoindex on;
 
-		domain_block end;
+		location_block end;
 
 	server_block end;

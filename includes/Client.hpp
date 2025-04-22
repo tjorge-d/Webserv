@@ -70,6 +70,7 @@ class Client
 
 		// SETTERS
 		void	setState(client_state state);
+		void	setConnection(bool connection);
 
 		// MEMBER FUNCTIONS
 		// Tells if the client has a regular connection
@@ -91,7 +92,7 @@ class Client
 		void	setContentType();
 
 		// Tells the Client to Send a max clients response
-		void	maxClientsResponse();
+		void	basicClientResponse(std::string msg, std::string status);
 
 		// Opens a file from the desired path
 		void	openRequestedFile(std::string path);

@@ -13,7 +13,7 @@ maxConnections(maxConnections)
 	if(epollFd == -1)
 		throw EPollErrorException("Failed to create an epoll instance in the kernel");
 	
-	// Configures the ports of each server
+	// Adds the ports of each server block to events in order to accept client connections
 	for(std::map<int, ServerBlock*>::iterator i = serverBlocks.begin(); i != serverBlocks.end(); i++)
 	{
 		// Fills an epoll_event struct to configure the event of the port
@@ -36,19 +36,6 @@ EventHandler::~EventHandler()
 
 
 // GETTERS
-
-std::vector<epoll_event>	EventHandler::getEvents()
-{ return (events); }
-
-epoll_event	EventHandler::getEvent(int index)
-{
-	if(index >= eventsNumber || index < 0)
-		throw EPollException("Index Out of bounds");
-	return (events.at(index));
-}
-
-int	EventHandler::getEventNumber()
-{ return (eventsNumber); }
 
 int	EventHandler::getConnections()
 { return(connections); }
@@ -85,7 +72,10 @@ void	EventHandler::addClient(int client_fd)
 
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
-		clients[client_fd]->maxClientsResponse();
+	{
+		clients[client_fd]->basicClientResponse("Por favor tente mais tarde", "503 Service Unavailable");
+		clients[client_fd]->setConnection(false);
+	}
 	else
 		connections++;
 	
