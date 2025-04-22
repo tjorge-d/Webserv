@@ -62,11 +62,17 @@ void	Client::closeClient()
 
 void	Client::recieveMode()
 {
+	// When an unconnected client finishes its loop prevents him from starting a new one
+	if (!connected)
+	{
+		state = DONE;
+		return;
+	}
+
+	// Resets the client attributes to a recieving starting point
 	state = WAITING_TO_RECIEVE;
-	
 	recievingHeader = 1;
 	recievingBody = 0;
-
 	request.reset();
 	response.reset();
 

@@ -25,7 +25,8 @@ enum client_state
 	RECIEVING_REQUEST,
 	WAITING_TO_SEND,
 	SENDING_HEADER,
-	SENDING_BODY
+	SENDING_BODY,
+	DONE
 };
 
 class Client

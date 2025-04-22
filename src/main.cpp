@@ -75,18 +75,20 @@ void pending_clients(std::map<int, Client*> &clients, EventHandler &events)
 				i->second->sendBodyChunk();
 				break;
 
+			case DONE:{
+				std::map<int, Client *>::iterator delete_i = i--;
+				events.deleteClient(delete_i->second->getFD());
+				break;}
+
 			default:;
 			};
 		}
 		catch (const std::exception &e)
 		{
-			std::map<int, Client *>::iterator delete_i = i;
-			i++;
+			std::map<int, Client *>::iterator delete_i = i--;
 			std::cerr << "Error : " << e.what() << std::endl;
 			std::cout << "Deleting client " << delete_i->second->getFD() << "..." << std::endl;
 			events.deleteClient(delete_i->second->getFD());
-			if (i == clients.end())
-				break;
 		};
 	}
 }
@@ -138,6 +140,7 @@ int main(int argc, char **argv)
 				if (print)
 				{
 					std::cout << "Clients connected: " << events.getConnections() << std::endl;
+					std::cout << "Clients map size: " << clients.size() << std::endl;
 					print = false;
 				}
 			}
