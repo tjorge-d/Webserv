@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/22 17:33:34 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/04/23 14:40:07 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,12 @@
 */
 
 #include "../includes/Webserv.h"
+
 /* 
-bool locationBlockSolver()
+bool	errorCodeChecker()
 {
 	
 } */
-
 
 static void setupServices(LocationBlockInfo *locationBlock, std::string acquired_services)
 {
@@ -221,6 +221,10 @@ HttpInfo *config_parser(char *file_path, int argc)
 				{
 					if (it->first <= 0 || it->second.empty())
 						throw ParserException("Your error code or coresponding page is invalid/nonexistent.");
+					std::string blame98 = "./var/www/dev" + it->second;
+					std::ifstream error_file(blame98.c_str());
+					if (!error_file.good())
+						throw ParserException("One of your provided HTML code error pages does not exist or is invalid.");
 				}
 			}
 			else
@@ -292,7 +296,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 	setupClientmaxbodysize(Server, acquired_max_body_size);
 	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
 	for (std::vector<ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
-		i != Server->server_blocks.end(); i++)
+		i != Server->server_blocks.end(); ++i)
 	{
 		std::cout << "Server Block : " << i->server_name << std::endl;
 		std::cout << "Server Port : " << i->port << std::endl;

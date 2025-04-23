@@ -6,11 +6,11 @@ http {
 		listen 80; #the port of our domain;
 		server_name localhost; #the address of our domain;
 
-		location / { #the default location;
+		location /dev { #the default location, also the place where connecting to a localhost should lead to;
 
 			limit_except GET POST DELETE; #determines which services are available in the domain;
 
-			root /var/www/dev; #our domain directory;
+			root /var/www; #our domain directory, where every request is going to be appended to. ex: request = /dev/index.html becomes var/www/dev/index.html;
 			index localhost_index.html; #our index file, loaded whenever we access the domain;
 			autoindex off; #if no index file exists, shows everything on the directory instead of a 404 error;
 		}
