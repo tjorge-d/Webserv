@@ -46,7 +46,7 @@ struct HttpInfo{
 class ParserException : public std::runtime_error{
 
 	public:
-	ParserException (std::string error);
+	ParserException (HttpInfo *server, std::string error);
 };
 
 HttpInfo *config_parser(char *file_path, int argc);

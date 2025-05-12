@@ -96,8 +96,6 @@ int main(int argc, char **argv)
 	try
 	{
 		// Parsing the arguments (expecting a config_file)
-		if (argc > 2)
-			throw ParserException("Invalid number of arguments.");
 		HttpInfo *config = config_parser(argv[1], argc);
 		(void)argv;
 		(void)argc;

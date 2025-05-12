@@ -20,17 +20,39 @@ client_max_body_size 100 kb;
 
 			location_block end;
 
+			location_block start;
+
+				default_location /huh;
+
+				services_available GET POST DELETE;
+
+				root /var/www/dev;
+
+				index_file /index.html;
+
+				autoindex off;
+
+			location_block end;
+
+			location_block start;
+
+				default_location /woah;
+
+				services_available GET POST DELETE;
+
+				root /var/www/dev;
+
+				index_file /index.html;
+
+				autoindex tiago;
+
+			location_block end;
+
 		error_page 404 /404.html;
 
-		error_page 413 /413.html;
+		error_page 409 /409.html;
 
 		error_page 500 /500.html;
-
-		error_page 502 /502.html;
-
-		error_page 503 /503.html;
-
-		error_page 504 /504.html;
 
 		directory_request_redirect /var/www/dev/sideye.jpg;
 
