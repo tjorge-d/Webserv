@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/23 14:40:07 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/05/12 14:04:36 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,10 @@ HttpInfo *config_parser(char *file_path, int argc)
 	while (std::getline(config_file, line))
 	{ // main loop, continue until text ends
 		if (line.size() > 0 && line[line.size() - 1] != ';')
+		{
+			std::cout << line << std::endl;
 			throw ParserException("All lines must end in the ';' character.");
+		}
 		//----------------------------SERVER SPECIFIC INFO, DOES NOT REQUIRE A SERVERBLOCK TO EXIST----------------------------
 		if ((line.find("client_max_body_size")) != std::string::npos)
 		{
@@ -177,7 +180,8 @@ HttpInfo *config_parser(char *file_path, int argc)
 			if (location_setup_mode == true)
 			{
 				location_setup_mode = false;
-				current_server_block.locations.push_back(current_location_block);
+				//current_server_block.locations.push_back(current_location_block);
+				current_server_block.locations[current_location_block.location] = current_location_block;
 				current_location_block = LocationBlockInfo();
 			}
 			else
@@ -304,16 +308,16 @@ HttpInfo *config_parser(char *file_path, int argc)
 		for (std::map<int, std::string>::iterator k = i->error_codes.begin(); \
 		k != i->error_codes.end(); k++)
 			std::cout << "Error code : " << k->first << " Error index file : " << k->second << std::endl;
-		for (std::vector<LocationBlockInfo>::iterator j = i->locations.begin(); \
+		for (std::map<std::string, LocationBlockInfo>::iterator j = i->locations.begin(); \
 			j != i->locations.end(); j++)
 		{
-			std::cout << "location Block : " << j->location << std::endl;
-			std::cout << "location Autoindex State : " << j->autoindex << std::endl;
-			std::cout << "Root Directory : " << j->root_directory << std::endl;
-			std::cout << "Index File : " << j->index_file << std::endl;
+			std::cout << "location Block : " << j->first << std::endl;
+			std::cout << "location Autoindex State : " << j->second.autoindex << std::endl;
+			std::cout << "Root Directory : " << j->second.root_directory << std::endl;
+			std::cout << "Index File : " << j->second.index_file << std::endl;
 			std::cout << "Allowed Services : " << std::endl;
-			for (std::vector<std::string>::iterator m = j->allowed_services.begin(); \
-			m != j->allowed_services.end(); m++)
+			for (std::vector<std::string>::iterator m = j->second.allowed_services.begin(); \
+			m != j->second.allowed_services.end(); m++)
 				std::cout << *m << std::endl;
 		}
 	}

@@ -21,26 +21,26 @@
 
 struct LocationBlockInfo{
 	
-	bool							autoindex;
-	std::vector<std::string>		allowed_services;
-	std::string						location;
-	std::string						root_directory;
-	std::string						index_file;
+	bool										autoindex;
+	std::vector<std::string>					allowed_services;
+	std::string									location;
+	std::string									root_directory;
+	std::string									index_file;
 };
 
 struct ServerBlockInfo{
 	
-	int								port;
-	std::string						server_name;
-	std::string						redirect_directory;
-	std::map<int, std::string>		error_codes;
-	std::vector<LocationBlockInfo>	locations;
+	int											port;
+	std::string									server_name;
+	std::string									redirect_directory;
+	std::map<int, std::string>					error_codes;
+	std::map<std::string, LocationBlockInfo>	locations;
 };
 
 struct HttpInfo{
 
-	int								client_max_body_size;
-	std::vector<ServerBlockInfo>	server_blocks;
+	int											client_max_body_size;
+	std::vector<ServerBlockInfo>				server_blocks;
 };
 
 class ParserException : public std::runtime_error{

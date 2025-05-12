@@ -20,7 +20,7 @@ client_max_body_size 10 Mb;
 
 			location_block end;
 
-		error_page 301 /301.html
+		error_page 301 /301.html;
 
 		error_page 403 /403.html;
 
