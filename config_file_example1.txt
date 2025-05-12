@@ -44,7 +44,7 @@ client_max_body_size 100 kb;
 
 				index_file /index.html;
 
-				autoindex tiago;
+				autoindex off;
 
 			location_block end;
 
