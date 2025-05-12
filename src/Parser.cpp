@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/23 14:40:07 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/05/12 02:34:48 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,24 +212,24 @@ HttpInfo *config_parser(char *file_path, int argc)
 			else
 				throw ParserException("Attempting to set up directory request redirection file on nonexistent server block.");
 		}
-		if ((line.find("error_page")) != std::string::npos)
-		{
-			if (server_setup_mode == true)
-			{
-				current_server_block.error_codes.insert(std::pair<int, std::string>(atoi(line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') - 2).c_str()), line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)));
-				for (std::map<int, std::string>::iterator it = current_server_block.error_codes.lower_bound(0); it != current_server_block.error_codes.upper_bound(1000); ++it)
-				{
-					if (it->first <= 0 || it->second.empty())
-						throw ParserException("Your error code or coresponding page is invalid/nonexistent.");
-					std::string blame98 = "./var/www/dev" + it->second;
-					std::ifstream error_file(blame98.c_str());
-					if (!error_file.good())
-						throw ParserException("One of your provided HTML code error pages does not exist or is invalid.");
-				}
-			}
-			else
-				throw ParserException("Attempting to set up error codes and error pages on nonexistent server block.");
-		}
+		//if ((line.find("error_page")) != std::string::npos)
+		//{
+		//	if (server_setup_mode == true)
+		//	{
+		//		current_server_block.error_codes.insert(std::pair<int, std::string>(atoi(line.substr((line.find(' ') + 1), line.size() - line.rfind(' ') - 2).c_str()), line.substr((line.rfind(' ') + 1), line.size() - line.rfind(' ') - 2)));
+		//		for (std::map<int, std::string>::iterator it = current_server_block.error_codes.lower_bound(0); it != current_server_block.error_codes.upper_bound(1000); ++it)
+		//		{
+		//			if (it->first <= 0 || it->second.empty())
+		//				throw ParserException("Your error code or coresponding page is invalid/nonexistent.");
+		//			std::string blame98 = "./var/www/dev" + it->second;
+		//			std::ifstream error_file(blame98.c_str());
+		//			if (!error_file.good())
+		//				throw ParserException("One of your provided HTML code error pages does not exist or is invalid.");
+		//		}
+		//	}
+		//	else
+		//		throw ParserException("Attempting to set up error codes and error pages on nonexistent server block.");
+		//}
 		//----------------------------LOCATION BLOCK SPECIFIC INFO, REQUIRES A LOCATION BLOCK TO EXIST (REMEMBER LOCATION BLOCKS REQUIRE SERVERBLOCKS TO EXIST)----------------------------
 		if ((line.find("autoindex")) != std::string::npos)
 		{
@@ -319,6 +319,20 @@ HttpInfo *config_parser(char *file_path, int argc)
 	}
 	config_file.close();
 	return (Server);
+}
+
+std::string trim(const std::string &s) {
+	size_t start = 0;
+	while (start < s.size() && std::isspace(s[start])){
+		++start;
+	}
+
+	size_t end = s.size();
+	while (end > start && std::isspace(s[end - 1])){
+		--end;
+	}
+
+	return (s.substr(start, end - start));
 }
 
 ParserException::ParserException(std::string error) :

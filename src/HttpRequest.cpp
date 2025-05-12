@@ -35,6 +35,12 @@ void	HttpRequest::reset()
 	buffer.clear();
 	method.clear();
 	path.clear();
+	version.clear();
+	body.clear();
+	headerInfo.clear();
+	chunkBuffer.clear();
+	isChunked = false;
+	chunkedComplete = false;
 	contentLenght = 0;
 	bodySize = 0;
 }

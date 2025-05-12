@@ -110,43 +110,104 @@ void	Client::maxClientsResponse()
 
 void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 {
-	//PARSES THE REQUEST -> todo
-	//	Information needed:
-	//		_request.method
-	//		_request.path
-	//		_request.contentLenght
-	//		_response.status
-	//		_response.contentType
-	//		_response.contentLenght;
-	//		_response.connection;
-	//		_response.headerSize; >> After building the header to be sent
-	//		_response.filePath;
-	//		_response.fileStats;
-	//		_response.fileStream;
-	
-	// INVALID HEADER CONDITION -> todo
-	if(0)
-	{
-		
-	}
 	recievingHeader = false;
+
+	// Convert the request vector to a string
+    std::string requestString(request.buffer.begin(), request.buffer.end());
+
+    // Find the first line (request line)
+    std::istringstream requestStream(requestString);
+    std::string requestLine;
+    if (!std::getline(requestStream, requestLine) || requestLine.empty()){
+		throw ClientErrorException("Malformed request line", fd);
+	}
+
+    // Split the request line into components
+    std::istringstream lineStream(requestLine);
+    lineStream >> request.method >> request.path >> request.version;
+
+	std::cout << requestString << std::endl;
+
+	if (request.version != "HTTP/1.1"){
+		throw ClientErrorException("Unsupported HTTP version", fd);
+	}
 
 	std::cout << "The request header is valid" << std::endl;
 
-	// Fetches the header information and cleans the parsed header from the buffer
-	fetchRequestInfo();
+	// Parse header into a comprehensible map with all its information, might be annoying because
+	// all the inforamtion is not clearly declared in a variable in the class but this way any kind
+	// of header with any kind of information can be parsed all the same
+	while (std::getline(requestStream, requestLine) && requestLine != "\r") {
+		if (!requestLine.empty() && requestLine[requestLine.size() - 1] == '\r'){
+			requestLine.erase(requestLine.size() - 1);
+		}
+
+		std::cout << "Testing -> " <<requestLine << std::endl;
+
+		std::size_t colon = requestLine.find(':');
+		if (colon == std::string::npos)
+			continue;
+
+		std::string key = requestLine.substr(0, colon);
+		std::string value = requestLine.substr(colon + 1);
+
+		key = trim(key);
+		value = trim(value);
+
+		request.headerInfo[key] = value;
+
+		if (key == "Content-Length")
+			request.contentLenght = std::atoi(value.c_str());
+		else if (key == "Transfer-Encoding" && value == "chunked")
+			request.isChunked = true;
+	}
+
+	// Should replace setConnection function called in simpleHTTP
+	if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
+		response.connection = "close";
+	else
+		response.connection = "keep-alive";
+
+	// Clean request buffer
 	request.eraseBufferRange(request.buffer.begin(), header_end);
 
-	if (request.method == "GET")
+	std::cout << "Parsed method: " << request.method << std::endl;
+	std::cout << "Parsed path: " << request.path << std::endl;
+
+	handleMethod();
+}
+
+void	Client::handleMethod()
+{
+    if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		response.simpleHTTP("./var/www/dev" + request.path);
-	else if(request.method == "POST")
+	}
+	else if(request.method == "POST" || request.method == "PUT")
 	{
 		recievingBody = true;
-		request.bodySize = request.buffer.size();
-		response.simpleHTTP("./var/www/dev/parabens.html");
-		// parsePost();
-		postFile.open("./var/www/sussy_files/file", std::ios::out);
-		postFile.write(request.buffer.data(), request.bodySize);
+		if (!request.isChunked){
+			request.bodySize = request.buffer.size();
+			postFile.open("./var/www/sussy_files/file", std::ios::out);
+			postFile.write(request.buffer.data(), request.bodySize);
+		}
+	}
+	else if (request.method == "DELETE") {
+		if (std::remove(("./var/www/dev" + request.path).c_str()) == 0){
+			response.status = "200 OK";
+			//Need to revise simpleHTTP function because of response status
+			response.simpleHTTP("./var/www/dev/delete_success.html");
+		}
+		else{
+			response.status = "404 Not Found";
+			//Need specific html for delete fail
+		}
+	}
+	else if (request.method == "HEAD") {
+		response.simpleHTTP("./var/www/dev" + request.path);
+		response.contentLenght = 0;
+	}
+	else {
+		throw ClientErrorException("Unsupported HTTP method: " + request.method, fd);
 	}
 	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
@@ -163,60 +224,84 @@ int	Client::recieveRequestChunk()
 	if(bytes == -1)
 		throw ClientException("Failed to recieve a request", fd);
 
-	// Writes the buffer content onto the POST method path
-	if (recievingBody)
-	{
-		postFile.write(buffer, bytes);
-		request.bodySize += bytes;
-		if(request.bodySize > serverBlock.getMaxBodySize())
-		{
-
-			// ErrorResponse((int)error, (string)msg);
-			// maxBodySizeResponse();
-			throw ClientException("The request body has reached the maximum size", fd);
-		}
-	}
-
 	// Apppends the filled buffer to _request
 	if(recievingHeader)
 		appendToRequest(buffer, bytes);
+
+	// Writes the buffer content onto the POST method path
+	if (recievingBody)
+	{
+		if (request.isChunked){
+			request.chunkBuffer.append(buffer, bytes);
+			resolveChunkedBody();
+		}
+		else{
+			postFile.write(buffer, bytes);
+			request.bodySize += bytes;
+			if(request.bodySize > serverBlock.getMaxBodySize()){
+				throw ClientException("The request body has reached the maximum size", fd);
+			}
+			if (request.bodySize >= request.contentLenght){
+				recievingBody = false;
+				postFile.close();
+				response.simpleHTTP("./var/www/dev/parabens.html");
+			}
+		}
+	}
 
 	// Behaves accordingly in case of not having anything else to read
 	if(bytes < CHUNK_SIZE || !bytes)
 	{
 		if(recievingHeader)
 			throw ClientException("Incomplete request header", fd);
-		if(recievingBody)
-		{
-			postFile.close();
-			if (request.bodySize < request.contentLenght)
+		if(recievingBody && !request.isChunked && request.bodySize < request.contentLenght){
 				throw ClientException("Incomplete request body", fd);
 		}
-		sendMode();
+		if (!recievingBody || request.chunkedComplete)
+			sendMode();
 	}
 
 	return (bytes);
 }
 
-// ERASE LATER (FOR TESTING)
-void	Client::fetchRequestInfo()
-{
-    // Convert the request vector to a string
-    std::string requestString(request.buffer.begin(), request.buffer.end());
+void	Client::resolveChunkedBody(){
+	while (true)
+	{
+		std::size_t pos = request.chunkBuffer.find("\r\n");
+		if (pos == std::string::npos)
+			break;
 
-    // Find the first line (request line)
-    std::istringstream requestStream(requestString);
-    std::string requestLine;
-    std::getline(requestStream, requestLine);
+		std::string sizeLine = request.chunkBuffer.substr(0, pos);
+		int chunkSize = 0;
 
-    // Split the request line into components
-    std::istringstream lineStream(requestLine);
-    std::string method, path, version;
-    lineStream >> method >> path >> version;
+		std::istringstream ss(sizeLine);
+		ss >> std::hex >> chunkSize;
+		if (ss.fail())
+			throw ClientException("Malformed chunk size", fd);
 
-	request.method = method;
-	request.path = path;
-	std::cout << requestString << std::endl;
+		if (chunkSize == 0)
+		{
+			if (request.chunkBuffer.size() < pos + 4)
+				break; // need more data
+			request.chunkedComplete = true;
+			break;
+		}
+
+		if (request.chunkBuffer.size() < pos + 2 + chunkSize + 2)
+			break; // full chunk not yet received
+
+		request.body += request.chunkBuffer.substr(pos + 2, chunkSize);
+
+		request.chunkBuffer.erase(0, pos + 2 + chunkSize + 2);
+	}
+
+	if (request.chunkedComplete)
+	{
+		recievingBody = false;
+		postFile.open("./var/www/sussy_files/file", std::ios::out);
+		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
+		response.simpleHTTP("./var/www/dev/parabens.html");
+	}
 }
 
 void	Client::appendToRequest(char* buffer, int size)
