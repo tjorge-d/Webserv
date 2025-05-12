@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/05/12 14:40:52 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/05/12 18:05:16 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,25 @@ bool	errorCodeChecker()
 	
 } */
 
+static void setupFailsafes(HttpInfo *Server)
+{
+	Server->failsafe_error_codes["200"] = "OK";
+	Server->failsafe_error_codes["204"] = "No Content";
+	Server->failsafe_error_codes["301"] = "Moved Permanently";
+	Server->failsafe_error_codes["403"] = "Forbidden";
+	Server->failsafe_error_codes["409"] = "Conflict";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	/*
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error";
+	Server->failsafe_error_codes["500"] = "Internal Server Error"; 
+	*/
+}
+
 static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, std::string acquired_services)
 {
 	std::string						current_method;
@@ -51,8 +70,9 @@ static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, st
 	// check valid methods (also stringstream practice)
 	while (stream >> current_method)
 	{
-		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
-			throw ParserException(Server, "Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
+		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD" &&
+			current_method != "OPTION" && current_method != "PUT" && current_method != "TRACE" && current_method != "CONNECT")
+			throw ParserException(Server, "Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD OPTION PUT TRACE CONNECT");
 		locationBlock->allowed_services.push_back(current_method);
 	}
 }
@@ -126,6 +146,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 	}
 	if (config_file.is_open() && config_file.peek() == EOF)
 	throw ParserException(Server, "Your config file is empty.");
+	setupFailsafes(Server);
 	while (std::getline(config_file, line))
 	{ // main loop, continue until text ends
 		if (line.size() > 0 && line[line.size() - 1] != ';')
@@ -160,7 +181,8 @@ HttpInfo *config_parser(char *file_path, int argc)
 			if (server_setup_mode == true)
 			{
 				server_setup_mode = false;
-				Server->server_blocks.push_back(current_server_block);
+				//Server->server_blocks.push_back(current_server_block);
+				Server->server_blocks[current_server_block.server_name] = current_server_block;
 				current_server_block = ServerBlockInfo();
 			}
 			else
@@ -302,17 +324,17 @@ HttpInfo *config_parser(char *file_path, int argc)
 	}
 	setupClientmaxbodysize(Server, acquired_max_body_size);
 	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
-	for (std::vector<ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
+	for (std::map<std::string, ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
 		i != Server->server_blocks.end(); ++i)
 	{
-		std::cout << "Server Block : " << i->server_name << std::endl;
-		std::cout << "Server Port : " << i->port << std::endl;
-		std::cout << "Redirect Directory : " << i->redirect_directory << std::endl;
-		for (std::map<int, std::string>::iterator k = i->error_codes.begin(); \
-		k != i->error_codes.end(); k++)
+		std::cout << "Server Block : " << i->second.server_name << std::endl;
+		std::cout << "Server Port : " << i->second.port << std::endl;
+		std::cout << "Redirect Directory : " << i->second.redirect_directory << std::endl;
+		for (std::map<int, std::string>::iterator k = i->second.error_codes.begin(); \
+		k != i->second.error_codes.end(); k++)
 			std::cout << "Error code : " << k->first << " Error index file : " << k->second << std::endl;
-		for (std::map<std::string, LocationBlockInfo>::iterator j = i->locations.begin(); \
-			j != i->locations.end(); j++)
+		for (std::map<std::string, LocationBlockInfo>::iterator j = i->second.locations.begin(); \
+			j != i->second.locations.end(); j++)
 		{
 			std::cout << "location Block : " << j->first << std::endl;
 			std::cout << "location Autoindex State : " << j->second.autoindex << std::endl;
@@ -324,6 +346,13 @@ HttpInfo *config_parser(char *file_path, int argc)
 				std::cout << *m << std::endl;
 		}
 	}
+	for (std::map<std::string, std::string>::iterator i = Server->failsafe_error_codes.begin();
+		i != Server->failsafe_error_codes.end(); ++i)
+	{
+		std::cout << "Error code : " << i->first << std::endl;
+		std::cout << "Error message : " << i->second << std::endl;
+	}
+	
 	config_file.close();
 	return (Server);
 }
