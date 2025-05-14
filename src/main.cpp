@@ -43,10 +43,10 @@ std::map<int, ServerBlock*> create_server_blocks(HttpInfo &server_info)
 {
 	std::map<int, ServerBlock*> server_blocks;
 
-	for (std::vector<ServerBlockInfo>::iterator i = server_info.server_blocks.begin(); \
+	for (std::map<std::string, ServerBlockInfo>::iterator i = server_info.server_blocks.begin(); \
 	i != server_info.server_blocks.end(); ++i)
 	{
-		ServerBlock *new_server_block = new ServerBlock(*(i), server_info);
+		ServerBlock *new_server_block = new ServerBlock(i->second, server_info);
 		server_blocks[new_server_block->getListenerFD()] = new_server_block;
 	}
 	return (server_blocks);
