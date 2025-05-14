@@ -6,7 +6,7 @@
 /*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/05/12 18:05:16 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/05/14 15:50:16 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -371,5 +371,7 @@ std::string trim(const std::string &s) {
 	return (s.substr(start, end - start));
 }
 
-ParserException::ParserException(std::string error) :
-std::runtime_error("The parser ran into a problem: " + error){};
+ParserException::ParserException(HttpInfo *server, std::string error) :
+std::runtime_error("The parser ran into a problem: " + error){
+	delete server;
+};
