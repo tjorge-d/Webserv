@@ -59,9 +59,9 @@ void	HttpResponse::openRequestedFile()
 		throw ResponseException("Failed to retrieve the stats of the file \"" + filePath + "\"");
 }
 
-void	HttpResponse::setStatus()
+void	HttpResponse::setStatus(std::string status)
 {
-	status = "200 OK";
+	this->status = status;
 }
 
 void	HttpResponse::setContentType()

@@ -37,6 +37,9 @@ HttpResponse const	&Client::getResponse() const
 
 // SETTERS
 
+void	Client::setConnection(bool connection)
+{this->connected = connection;}
+
 void	Client::setState(client_state state)
 {this->state = state;}
 
@@ -59,11 +62,17 @@ void	Client::closeClient()
 
 void	Client::recieveMode()
 {
+	// When an unconnected client finishes its loop prevents him from starting a new one
+	if (!connected)
+	{
+		state = DONE;
+		return;
+	}
+
+	// Resets the client attributes to a recieving starting point
 	state = WAITING_TO_RECIEVE;
-	
 	recievingHeader = 1;
 	recievingBody = 0;
-
 	request.reset();
 	response.reset();
 
@@ -80,10 +89,9 @@ void	Client::sendMode()
 	events.modifyClient(fd, EPOLLOUT | EPOLLRDHUP | EPOLLET);
 }
 
-void	Client::maxClientsResponse()
+void	Client::basicClientResponse(std::string msg, std::string status)
 {
-	std::string str = "Por favor tente mais tarde.";
-	int			size = str.size();
+	int			size = msg.size();
 	std::stringstream s;
 	s << size;
 	std::string n = s.str();
@@ -93,18 +101,17 @@ void	Client::maxClientsResponse()
 	sec << seconds;
 
 	std::string response_str;
-	response_str += "HTTP/1.1 503 Service Unavailable\r\n"
+	response_str += "HTTP/1.1 " + status + "\r\n"
 	"Content-Type: text/plain\r\n"
 	"Content-Length: " + n + "\r\n"
 	"Retry-After: " + sec.str() + "\r\n"
 	"Connection: close\r\n"
-	"\r\n" + str;
+	"\r\n" + msg;
 
     // Convert the string to a vector<char>
     response.header = std::vector<char>(response_str.begin(), response_str.end());
 	response.headerSize = response.header.size();
 	response.contentLenght = 0;
-	connected = false;
 	sendMode();
 }
 

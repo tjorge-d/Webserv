@@ -25,7 +25,8 @@ enum client_state
 	RECIEVING_REQUEST,
 	WAITING_TO_SEND,
 	SENDING_HEADER,
-	SENDING_BODY
+	SENDING_BODY,
+	DONE
 };
 
 class Client
@@ -70,6 +71,7 @@ class Client
 
 		// SETTERS
 		void	setState(client_state state);
+		void	setConnection(bool connection);
 
 		// MEMBER FUNCTIONS
 		// Tells if the client has a regular connection
@@ -91,7 +93,7 @@ class Client
 		void	setContentType();
 
 		// Tells the Client to Send a max clients response
-		void	maxClientsResponse();
+		void	basicClientResponse(std::string msg, std::string status);
 
 		// Opens a file from the desired path
 		void	openRequestedFile(std::string path);

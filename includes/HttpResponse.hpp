@@ -33,8 +33,8 @@ class HttpResponse
 		
 		// MEMBER FUNCTIONS
 		void	simpleHTTP(std::string path);
-		void	setStatus();
 		void	openRequestedFile();
+		void	setStatus(std::string status);
 		void	setContentType();
 		void	setContentLength();
 		void	setConnection();
