@@ -50,5 +50,6 @@ class ParserException : public std::runtime_error{
 };
 
 HttpInfo *config_parser(char *file_path, int argc);
+std::string trim(const std::string &s);
 
 #endif

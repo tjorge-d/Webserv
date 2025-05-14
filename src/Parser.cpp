@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/05/12 14:40:52 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/05/12 02:34:48 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -328,7 +328,19 @@ HttpInfo *config_parser(char *file_path, int argc)
 	return (Server);
 }
 
-ParserException::ParserException(HttpInfo *server, std::string error) :
-std::runtime_error("The parser ran into a problem: " + error){
-	delete server;
-};
+std::string trim(const std::string &s) {
+	size_t start = 0;
+	while (start < s.size() && std::isspace(s[start])){
+		++start;
+	}
+
+	size_t end = s.size();
+	while (end > start && std::isspace(s[end - 1])){
+		--end;
+	}
+
+	return (s.substr(start, end - start));
+}
+
+ParserException::ParserException(std::string error) :
+std::runtime_error("The parser ran into a problem: " + error){};

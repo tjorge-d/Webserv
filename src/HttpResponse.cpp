@@ -32,10 +32,11 @@ void	HttpResponse::simpleHTTP(std::string path)
 {
 	filePath = path;
 	openRequestedFile();
-	setStatus();
+	//setStatus();
+	status = "200 OK";
 	setContentType();
 	setContentLength();
-	setConnection();
+	//setConnection();
 	buildHeader();
 }
 

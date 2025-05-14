@@ -97,16 +97,19 @@ class Client
 		void	openRequestedFile(std::string path);
 
 		// Recieves from his _fd in a chunk
-		int	recieveRequestChunk();
+		int		recieveRequestChunk();
+
+		// Executes the necessary actions in accordance to the request method
+		void 	handleMethod();
+
+		// Called when a request body is sent in chunks
+		void	resolveChunkedBody();
 
 		// Sends the response header in a chunk
 		void	sendHeaderChunk();
 
 		// Sends the response body in a chunk 
 		void	sendBodyChunk();
-
-		// ERASE LATER
-		void fetchRequestInfo();
 
 	class	ClientException : public std::runtime_error
 	{

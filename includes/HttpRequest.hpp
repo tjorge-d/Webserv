@@ -12,11 +12,17 @@ class HttpRequest
 {
 	public:
 		// ATTRIBUTES
-		std::vector<char>	buffer;
-		std::string 		method;
-		std::string 		path;
-		int					contentLenght;
-		int					bodySize;
+		std::vector<char>					buffer;
+		std::string 						chunkBuffer;
+		std::string 						method;
+		std::string 						path;
+		std::string							version;
+		std::string							body;
+		std::map<std::string, std::string>	headerInfo;
+		int									contentLenght;
+		int									bodySize;
+		bool 								isChunked;
+		bool 								chunkedComplete;
 
 		// CONSTRUCTORS/DESTRUCTORS
 		HttpRequest();
