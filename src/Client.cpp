@@ -71,8 +71,8 @@ void	Client::recieveMode()
 
 	// Resets the client attributes to a recieving starting point
 	state = WAITING_TO_RECIEVE;
-	recievingHeader = 1;
-	recievingBody = 0;
+	recievingHeader = true;
+	recievingBody = false;
 	request.reset();
 	response.reset();
 
@@ -133,8 +133,13 @@ void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
     std::istringstream lineStream(requestLine);
     lineStream >> request.method >> request.path >> request.version;
 
+	std::cout << "HERE" << std::endl;
+
 	std::cout << requestString << std::endl;
 
+	std::cout << "HERE AGAIN" << std::endl;
+
+	std::cout << request.version << std::endl;
 	if (request.version != "HTTP/1.1"){
 		throw ClientErrorException("Unsupported HTTP version", fd);
 	}
@@ -165,8 +170,9 @@ void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
 
 		if (key == "Content-Length")
 			request.contentLenght = std::atoi(value.c_str());
-		else if (key == "Transfer-Encoding" && value == "chunked")
+		else if (key == "Transfer-Encoding" && value == "chunked"){
 			request.isChunked = true;
+		}
 	}
 
 	// Should replace setConnection function called in simpleHTTP
@@ -228,25 +234,34 @@ int	Client::recieveRequestChunk()
 	// Stores the data from the client fd in a buffer
 	char	buffer[CHUNK_SIZE];
 	int		bytes = recv(fd, buffer, CHUNK_SIZE, 0);
-	if(bytes == -1)
+	if(bytes == -1){
+		std::cout << "On recv" << std::endl;
 		throw ClientException("Failed to recieve a request", fd);
+	}
 
 	// Apppends the filled buffer to _request
 	if(recievingHeader)
 		appendToRequest(buffer, bytes);
 
 	// Writes the buffer content onto the POST method path
-	if (recievingBody)
+	else if (recievingBody)
 	{
+
 		if (request.isChunked){
 			request.chunkBuffer.append(buffer, bytes);
 			resolveChunkedBody();
 		}
 		else{
+			std::cout << "Started writing the body into the file" << std::endl;
 			postFile.write(buffer, bytes);
 			request.bodySize += bytes;
+			std::cout << "Body Size -> " << request.bodySize << " Content Length -> " << request.contentLenght << std::endl;
 			if(request.bodySize > serverBlock.getMaxBodySize()){
-				throw ClientException("The request body has reached the maximum size", fd);
+				recievingBody = false;
+				postFile.close();
+				response.simpleHTTP("./var/www/dev/failed_upload.html");
+				//recieveMode();
+				//throw ClientException("The request body has reached the maximum size", fd);
 			}
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
@@ -257,13 +272,14 @@ int	Client::recieveRequestChunk()
 	}
 
 	// Behaves accordingly in case of not having anything else to read
+	std::cout << "Bytes -> " << bytes << " Chunk Size -> " << CHUNK_SIZE << std::endl;
 	if(bytes < CHUNK_SIZE || !bytes)
 	{
 		if(recievingHeader)
 			throw ClientException("Incomplete request header", fd);
-		if(recievingBody && !request.isChunked && request.bodySize < request.contentLenght){
-				throw ClientException("Incomplete request body", fd);
-		}
+		// if(recievingBody && !request.isChunked && request.bodySize < request.contentLenght){
+		// 		throw ClientException("Incomplete request body", fd);
+		// }
 		if (!recievingBody || request.chunkedComplete)
 			sendMode();
 	}
@@ -348,8 +364,10 @@ void	Client::sendHeaderChunk()
 	response.bytesSent += bytes;
 
 	// Changes the state of the client when necessary
-	if (response.bytesSent == response.headerSize)
+	if (response.bytesSent == response.headerSize){
+		std::cout << std::endl << "Client " << getFD() << " (Sending Body)" << std::endl;
 		state = SENDING_BODY;
+	}
 	if (!response.contentLenght)
 		recieveMode();
 }

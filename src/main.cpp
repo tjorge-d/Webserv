@@ -61,17 +61,17 @@ void pending_clients(std::map<int, Client*> &clients, EventHandler &events)
 			switch (i->second->getState())
 			{
 			case RECIEVING_REQUEST:
-				std::cout << std::endl << "Client " << i->second->getFD() << " (Recieving)" << std::endl;
+				// std::cout << std::endl << "Client " << i->second->getFD() << " (Recieving)" << std::endl;
 				i->second->recieveRequestChunk();
 				break;
 
 			case SENDING_HEADER:
-				std::cout << std::endl << "Client " << i->second->getFD() << " (Sending Header)" << std::endl;
+				// std::cout << std::endl << "Client " << i->second->getFD() << " (Sending Header)" << std::endl;
 				i->second->sendHeaderChunk();
 				break;
 
 			case SENDING_BODY:
-				std::cout << std::endl << "Client " << i->second->getFD() << " (Sending Body)" << std::endl;
+				// std::cout << std::endl << "Client " << i->second->getFD() << " (Sending Body)" << std::endl;
 				i->second->sendBodyChunk();
 				break;
 

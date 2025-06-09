@@ -13,7 +13,7 @@ class HttpRequest
 	public:
 		// ATTRIBUTES
 		std::vector<char>					buffer;
-		std::string 						chunkBuffer;
+		std::string		 					chunkBuffer;
 		std::string 						method;
 		std::string 						path;
 		std::string							version;

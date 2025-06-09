@@ -176,12 +176,14 @@ void	EventHandler::handleClientEvent(epoll_event& event)
 	// Checks if the client is ready to be read from
 	else if (event.events & EPOLLIN)
 	{
+		std::cout << std::endl << "Client " << event.data.fd << " (Recieving)" << std::endl;
 		clients[event.data.fd]->setState(RECIEVING_REQUEST);
 		std::cout << "The client " << event.data.fd << " is ready to be read from" << std::endl;
 	}
 	// Checks if the client is ready to write to
 	else if (event.events & EPOLLOUT)
 	{
+		std::cout << std::endl << "Client " << event.data.fd << " (Sending Header)" << std::endl;
 		clients[event.data.fd]->setState(SENDING_HEADER);
 		std::cout << "The client " << event.data.fd << " is ready to write to" << std::endl;
 	}
