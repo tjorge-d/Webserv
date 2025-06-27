@@ -107,6 +107,9 @@ class Client
 		// Called when a request body is sent in chunks
 		void	resolveChunkedBody();
 
+		//	Prepare the data to be written on a POST file
+		void	parsePostBody();
+
 		// Sends the response header in a chunk
 		void	sendHeaderChunk();
 

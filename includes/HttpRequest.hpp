@@ -18,6 +18,9 @@ class HttpRequest
 		std::string 						path;
 		std::string							version;
 		std::string							body;
+		std::string							boundary;
+		std::string							postFileName;
+		std::string							contentType;
 		std::map<std::string, std::string>	headerInfo;
 		int									contentLenght;
 		int									bodySize;
