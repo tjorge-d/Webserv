@@ -37,33 +37,34 @@ class Client
 		int				fd;
 		EventHandler	&events;
 		ServerBlock		&serverBlock;
-
+		std::map<std::string, std::string>		failsafe_error_codes;
+		
 		// HTTP data
 		HttpRequest			request;		
 		HttpResponse		response;
 		std::fstream		postFile;
-
+		
 		// Flags
 		bool			connected;
 		bool			recievingHeader;
 		bool			recievingBody;
 		client_state	state;
-
+		
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)
 		void	appendToRequest(char* str, int size);
-
+		
 		// Parses a request header
 		void	parseRequestHeader(std::vector<char>::iterator header_end);
-
+		
 		// Parses a request body
 		void	parseRequestBody(std::vector<char>::iterator body_end);
-
-	public:
+		
+		public:
 		// CONSTRUCTORS/DESTRUCTORS
 		Client(int fd, EventHandler &events, ServerBlock &serverBlockInfo);
 		~Client();
-
+		
 		// GETTERS
 		int					getFD() const;
 		client_state		getState() const;
@@ -72,17 +73,17 @@ class Client
 		// SETTERS
 		void	setState(client_state state);
 		void	setConnection(bool connection);
-
+		
 		// MEMBER FUNCTIONS
 		// Tells if the client has a regular connection
 		bool	isConnected() const;
-
+		
 		// Safely closes the Client
 		void	closeClient();
 
 		// Activates send mode
 		void	sendMode();
-
+		
 		// Activates send mode
 		void	recieveMode();
 

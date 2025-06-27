@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/06/20 17:41:22 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/06/27 15:59:07 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,26 +44,27 @@ bool	errorCodeChecker()
 
 static void setupFailsafes(HttpInfo *Server)
 {
-	Server->failsafe_error_codes["200"] = "OK"; //The request succeeded.
-	Server->failsafe_error_codes["204"] = "No Content"; //There is no content to send for this request, but the headers are useful. 
-	Server->failsafe_error_codes["301"] = "Moved Permanently"; //The URL of the requested resource has been changed permanently. The new URL is given in the response (necessary?)
-	Server->failsafe_error_codes["303"] = "See Other"; //The server sent this response to direct the client to get the requested resource at another URI with a GET request.
-	Server->failsafe_error_codes["308"] = "Permanent Redirect"; //This means that the resource is now permanently located at another URI, specified by the Location response header.
+	Server->failsafe_error_codes["200"] = "200 OK"; //The request succeeded.
+	Server->failsafe_error_codes["204"] = "204 No Content"; //There is no content to send for this request, but the headers are useful. 
+	Server->failsafe_error_codes["301"] = "301 Moved Permanently"; //The URL of the requested resource has been changed permanently. The new URL is given in the response (necessary?)
+	Server->failsafe_error_codes["303"] = "303 See Other"; //The server sent this response to direct the client to get the requested resource at another URI with a GET request.
+	Server->failsafe_error_codes["308"] = "308 Permanent Redirect"; //This means that the resource is now permanently located at another URI, specified by the Location response header.
 	//This has the same semantics as the 301 Moved Permanently HTTP response code, with the exception that the user agent must not change the HTTP method used: if a POST was used in the first request, a POST must be used in the second request.
-	Server->failsafe_error_codes["400"] = "Bad Request"; //The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
-	Server->failsafe_error_codes["403"] = "Forbidden"; //The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource. Unlike 401 Unauthorized, the client's identity is known to the server.
-	Server->failsafe_error_codes["404"] = "Not Found"; //The server cannot find the requested resource. In the browser, this means the URL is not recognized. In an API, this can also mean that the endpoint is valid but the resource itself does not exist.
-	Server->failsafe_error_codes["405"] = "Method Not Allowed"; //The request method is known by the server but is not supported by the target resource. For example, an API may not allow DELETE on a resource, or the TRACE method entirely.
-	Server->failsafe_error_codes["408"] = "Request Timeout"; //This response is sent on an idle connection by some servers, even without any previous request by the client. It means that the server would like to shut down this unused connection.
-	Server->failsafe_error_codes["409"] = "Conflict"; //This response is sent when a request conflicts with the current state of the server. 
-	Server->failsafe_error_codes["411"] = "Length Required"; //Server rejected the request because the Content-Length header field is not defined and the server requires it.
-	Server->failsafe_error_codes["413"] = "Content Too Large"; //The request body is larger than limits defined by server. The server might close the connection or return an Retry-After header field.
-	Server->failsafe_error_codes["414"] = "URI Too Large"; //The URI requested by the client is longer than the server is willing to interpret.
-	Server->failsafe_error_codes["429"] = "Too Many Requests"; //The user has sent too many requests in a given amount of time (rate limiting).
-	Server->failsafe_error_codes["500"] = "Internal Server Error"; //The server has encountered a situation it does not know how to handle. This error is generic, indicating that the server cannot find a more appropriate 5XX status code to respond with.
-	Server->failsafe_error_codes["503"] = "Service Unavailable"; //The server is not ready to handle the request.
-	Server->failsafe_error_codes["504"] = "Gateway Timeout"; //This error response is given when the server is acting as a gateway and cannot get a response in time.
-	Server->failsafe_error_codes["505"] = "HTTP Version Not Supported"; //The HTTP version used in the request is not supported by the server.
+	Server->failsafe_error_codes["400"] = "400 Bad Request"; //The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).
+	Server->failsafe_error_codes["403"] = "403 Forbidden"; //The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource. Unlike 401 Unauthorized, the client's identity is known to the server.
+	Server->failsafe_error_codes["404"] = "404 Not Found"; //The server cannot find the requested resource. In the browser, this means the URL is not recognized. In an API, this can also mean that the endpoint is valid but the resource itself does not exist.
+	Server->failsafe_error_codes["405"] = "405 Method Not Allowed"; //The request method is known by the server but is not supported by the target resource. For example, an API may not allow DELETE on a resource, or the TRACE method entirely.
+	Server->failsafe_error_codes["408"] = "408 Request Timeout"; //This response is sent on an idle connection by some servers, even without any previous request by the client. It means that the server would like to shut down this unused connection.
+	Server->failsafe_error_codes["409"] = "409 Conflict"; //This response is sent when a request conflicts with the current state of the server. 
+	Server->failsafe_error_codes["411"] = "411 Length Required"; //Server rejected the request because the Content-Length header field is not defined and the server requires it.
+	Server->failsafe_error_codes["413"] = "413 Content Too Large"; //The request body is larger than limits defined by server. The server might close the connection or return an Retry-After header field.
+	Server->failsafe_error_codes["414"] = "141 URI Too Large"; //The URI requested by the client is longer than the server is willing to interpret.
+	Server->failsafe_error_codes["429"] = "429 Too Many Requests"; //The user has sent too many requests in a given amount of time (rate limiting).
+	Server->failsafe_error_codes["431"] = "431 Request Header Fields Too Large"; //The server is unwilling to process the request because its header fields are too large.
+	Server->failsafe_error_codes["500"] = "500 Internal Server Error"; //The server has encountered a situation it does not know how to handle. This error is generic, indicating that the server cannot find a more appropriate 5XX status code to respond with.
+	Server->failsafe_error_codes["503"] = "503 Service Unavailable"; //The server is not ready to handle the request.
+	Server->failsafe_error_codes["504"] = "504 Gateway Timeout"; //This error response is given when the server is acting as a gateway and cannot get a response in time.
+	Server->failsafe_error_codes["505"] = "505 HTTP Version Not Supported"; //The HTTP version used in the request is not supported by the server.
 }
 
 static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, std::string acquired_services)
@@ -328,7 +329,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 		newline += '\n';
 	}
 	setupClientmaxbodysize(Server, acquired_max_body_size);
-	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
+/* 	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
 	for (std::map<std::string, ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
 		i != Server->server_blocks.end(); ++i)
 	{
@@ -357,7 +358,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 		std::cout << "Error code : " << i->first << std::endl;
 		std::cout << "Error message : " << i->second << std::endl;
 	}
-	
+	 */
 	config_file.close();
 	return (Server);
 }
