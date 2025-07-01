@@ -245,15 +245,16 @@ int	Client::recieveRequestChunk()
 				request.bodySize += bytes;
 			}
 			if(request.bodySize > serverBlock.getMaxBodySize()){
+				std::cout << "TOO HUGE, GOT FUCKED\n" << std::endl;
 				recievingBody = false;
-				postFile.close();
 				response.simpleHTTP("./var/www/dev/failed_upload.html");
 			}
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
-				// parsePostBody();
-				postFile.open("./var/www/sussy_files/file", std::ios::out);
-				postFile.write(request.buffer.data(), bytes);
+				parsePostBody();
+				std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
+				postFile.open(request.postFileName.c_str(), std::ios::out);
+				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
 				response.simpleHTTP("./var/www/dev/parabens.html");
 			}
@@ -277,58 +278,59 @@ int	Client::recieveRequestChunk()
 
 void	Client::parsePostBody(){
 	std::string	boundaryKey = "boundary=";
-	size_t		pos = request.headerInfo["Content-Type"].find(boundaryKey);
+	size_t		pos = request.headerInfo["Content-Type"].find(boundaryKey), nextPart;
+	std::string	boundary = request.headerInfo["Content-Type"].substr(pos + boundaryKey.size());
+	std::string delimiter = "--" + boundary, endDelimiter = delimiter + "--";
+	std::string	requestBody(request.buffer.begin(), request.buffer.end());
 
-	request.boundary = request.headerInfo["Content-Type"].substr(pos + boundaryKey.size());
+	pos = 0;
 
-	std::string			requestBody(request.buffer.begin(), request.buffer.end());
-	std::istringstream	requestBodyStream(requestBody);
-	std::string			requestBodyLine;
-	bool				insideBoundary = 0;
+	while ((nextPart = requestBody.find(delimiter, pos)) != std::string::npos){
+		if (!requestBody.compare(nextPart, endDelimiter.size(), endDelimiter)) break;
 
-	request.buffer.clear();
+		size_t		partStart = nextPart + delimiter.size() + 2, partEnd = requestBody.find(delimiter, partStart), partHeaderEnd;
+		std::string	part = requestBody.substr(partStart, partEnd - partStart);
+		if ((partHeaderEnd = part.find("\r\n\r\n")) == std::string::npos) continue;
 
-	if (!std::getline(requestBodyStream, requestBodyLine) || requestBodyLine.empty()){
-		throw ClientErrorException("Malformed request body line", fd);
-	}
+		std::string headerStr = part.substr(0, partHeaderEnd), content = part.substr(partHeaderEnd + 4);
 
-	if (requestBodyLine == "--" + request.boundary)
-		insideBoundary = 1;
+		std::istringstream					requestBodyStream(headerStr);
+		std::string							requestBodyLine;
+		std::map<std::string, std::string>	headers;
 
-	while (std::getline(requestBodyStream, requestBodyLine) && requestBodyLine != "\r" && insideBoundary) {
-		if (!requestBodyLine.empty() && requestBodyLine[requestBodyLine.size() - 1] == '\r'){
-			requestBodyLine.erase(requestBodyLine.size() - 1);
+		while (std::getline(requestBodyStream, requestBodyLine)){
+			size_t colon = requestBodyLine.find(":");
+
+			if (colon != std::string::npos){
+				std::string name = trim(requestBodyLine.substr(0, colon)), value = trim(requestBodyLine.substr(colon + 1));
+
+				headers[name] = value;
+			}
 		}
 
-		std::size_t colon = requestBodyLine.find(':');
-		if (colon == std::string::npos)
-			continue;
+		MultiFormData	tmpStruct;
 
-		std::string key = requestBodyLine.substr(0, colon);
-		std::string value = requestBodyLine.substr(colon + 1);
+		tmpStruct.headers = headers;
+		tmpStruct.content = content;
 
-		key = trim(key);
-		value = trim(value);
+		request.formParts.push_back(tmpStruct);
+        pos = partEnd;
+	}
 
-		if (key == "Content-Disposition"){
+	for (std::vector<MultiFormData>::iterator it = request.formParts.begin(); it != request.formParts.end(); ++it){
+		MultiFormData &part = *it;
+
+		if (part.headers.count("Content-Disposition")){
 			std::string	fileNameKey = "filename=";
-			pos = value.find(fileNameKey);
-			request.postFileName = value.substr(pos + fileNameKey.size());
+			pos = part.headers["Content-Disposition"].find(fileNameKey);
+	 		request.postFileName = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
+			request.postFileName = "./var/www/sussy_files/" + request.postFileName.substr(1,  request.postFileName.size() - 2);
 		}
-		else if (key == "Content-Type"){
-			request.contentType = value;
-		}
+		if (part.headers.count("Content-Type"))
+	 		request.bodyContentType = part.headers["Content-Type"];
+
+		request.body.append(part.content.c_str(), part.content.size());
 	}
-
-	while (std::getline(requestBodyStream, requestBodyLine) && requestBodyLine != "\r" && insideBoundary) {
-		if (!requestBodyLine.empty() && requestBodyLine[requestBodyLine.size() - 1] == '\r'){
-			requestBodyLine.erase(requestBodyLine.size() - 1);
-		}
-
-		request.buffer.insert(request.buffer.end(), requestBodyLine.c_str(), requestBodyLine.c_str() + requestBodyLine.size());
-	}
-
-	if (std::getline(requestBodyStream, requestBodyLine) && requestBodyLine)
 }
 
 void	Client::resolveChunkedBody(){
@@ -378,7 +380,6 @@ void	Client::appendToRequest(char* buffer, int size)
 
 	if (recievingHeader)
 	{
-		std::cout << "HEADER\n" << buffer << std::endl;
 		// Checks if the read data contains the end of a request header
 		std::vector<char>::iterator it = request.findHeader(size);
 

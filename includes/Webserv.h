@@ -44,6 +44,11 @@ struct HttpInfo{
 	std::map<std::string, ServerBlockInfo>				server_blocks;
 };
 
+struct MultiFormData{
+	std::map<std::string, std::string>					headers;
+	std::string											content;
+};
+
 class ParserException : public std::runtime_error{
 
 	public:
