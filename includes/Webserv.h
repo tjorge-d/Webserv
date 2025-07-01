@@ -37,12 +37,30 @@ struct ServerBlockInfo{
 	std::map<std::string, LocationBlockInfo>			locations;
 };
 
+struct ParserInfo{
+
+	ServerBlockInfo						current_server_block;
+	LocationBlockInfo					current_location_block;
+	std::string							start;
+	std::string							line;
+	std::string							newline;
+	std::string							current_start;
+	std::string							acquired_services;
+	std::string							acquired_max_body_size;
+	std::ifstream						config_file;
+	bool 								max_size_acquired;
+	bool 								server_setup_mode;
+	bool 								location_setup_mode;
+};
+
 struct HttpInfo{
 
 	int													client_max_body_size;
 	std::map<std::string, std::string>					failsafe_error_codes;
 	std::map<std::string, ServerBlockInfo>				server_blocks;
+	ParserInfo											parser_info;
 };
+
 
 class ParserException : public std::runtime_error{
 
@@ -51,6 +69,9 @@ class ParserException : public std::runtime_error{
 };
 
 HttpInfo *config_parser(char *file_path, int argc);
+void parseLocationBlock(HttpInfo *Server);
+void parseServerBlock(HttpInfo *Server);
+void parseServerInfo(HttpInfo *Server);
 std::string trim(const std::string &s);
 
 #endif

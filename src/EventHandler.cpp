@@ -94,6 +94,8 @@ void	EventHandler::addClient(int client_fd)
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
 	{
+		//HttpResponse response = clients[client_fd]->getResponse(); a horrible attempt at trying to return an error html
+		//response.simpleHTTP("./var/www/dev/500.html");
 		clients[client_fd]->basicClientResponse("Please try again later.", failsafe_error_codes["503"]);
 		clients[client_fd]->setConnection(false);
 	}

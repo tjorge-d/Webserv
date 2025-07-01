@@ -66,6 +66,7 @@ class Client
 		~Client();
 		
 		// GETTERS
+		
 		int					getFD() const;
 		client_state		getState() const;
 		HttpResponse const	&getResponse() const;

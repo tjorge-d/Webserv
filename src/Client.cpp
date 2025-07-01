@@ -27,7 +27,6 @@ state(WAITING_TO_RECIEVE)
 	failsafe_error_codes["409"] = "409 Conflict"; //This response is sent when a request conflicts with the current state of the server. 
 	failsafe_error_codes["411"] = "411 Length Required"; //Server rejected the request because the Content-Length header field is not defined and the server requires it.
 	failsafe_error_codes["413"] = "413 Content Too Large"; //The request body is larger than limits defined by server. The server might close the connection or return an Retry-After header field.
-	failsafe_error_codes["414"] = "414 URI Too Large"; //The URI requested by the client is longer than the server is willing to interpret.
 	failsafe_error_codes["429"] = "429 Too Many Requests"; //The user has sent too many requests in a given amount of time (rate limiting).
 	failsafe_error_codes["431"] = "431 Request Header Fields Too Large"; //The server is unwilling to process the request because its header fields are too large.
 	failsafe_error_codes["500"] = "500 Internal Server Error"; //The server has encountered a situation it does not know how to handle. This error is generic, indicating that the server cannot find a more appropriate 5XX status code to respond with.
@@ -351,9 +350,9 @@ void	Client::appendToRequest(char* buffer, int size)
 			std::cout << "Request header found" << std::endl;
 			parseRequestHeader(it + 4);
 		}
-		//make exception for error 431 "Request Header Fields Too Large" (I gotchu)
-		basicClientResponse("Request header fields too large.", failsafe_error_codes["431"]);
-		setConnection(false);
+		//make exception for error 431 "Request Header Fields Too Large"
+		/* basicClientResponse("Request header fields too large.", failsafe_error_codes["431"]);
+		setConnection(false); */
 	}
 }
 
