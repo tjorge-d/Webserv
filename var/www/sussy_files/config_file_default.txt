@@ -1,0 +1,35 @@
+client_max_body_size 10 Mb;
+
+	server_block start;
+
+		domain_port 8080;
+
+		server_name gofas;
+
+			location_block start;
+
+				default_location /dev;
+
+				services_available GET POST DELETE;
+
+				root /var/www;
+
+				index_file /index.html;
+
+				autoindex off;
+
+			location_block end;
+
+		error_page 301 /301.html;
+
+		error_page 403 /403.html;
+
+		error_page 404 /404.html;
+
+		error_page 409 /409.html;
+
+		error_page 500 /500.html;
+
+		directory_request_redirect /var/www/dev/sideye.jpg;
+
+	server_block end;

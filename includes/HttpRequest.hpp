@@ -7,17 +7,21 @@
 # include <stdexcept>
 # include <sys/stat.h>
 # include <algorithm>
+# include "Webserv.h"
 
 class HttpRequest
 {
 	public:
 		// ATTRIBUTES
 		std::vector<char>					buffer;
-		std::string 						chunkBuffer;
+		std::vector<MultiFormData>			formParts;
+		std::string		 					chunkBuffer;
 		std::string 						method;
 		std::string 						path;
 		std::string							version;
 		std::string							body;
+		std::string							postFileName;
+		std::string							bodyContentType;
 		std::map<std::string, std::string>	headerInfo;
 		int									contentLenght;
 		int									bodySize;
