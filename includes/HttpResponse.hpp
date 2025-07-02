@@ -12,7 +12,8 @@ class HttpResponse
 {
 	public:
 		// ATTRIBUTES
-		std::map<std::string, std::string>    supportedContentType;
+		std::map<std::string, std::string>		supportedContentType;
+		std::map<std::string, std::string>		failsafe_error_codes;
 		
 		std::string 	status;
 		std::string 	contentType;
