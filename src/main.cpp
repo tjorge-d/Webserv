@@ -46,8 +46,10 @@ std::map<int, ServerBlock*> create_server_blocks(HttpInfo &server_info)
 	for (std::map<std::string, ServerBlockInfo>::iterator i = server_info.server_blocks.begin(); \
 	i != server_info.server_blocks.end(); ++i)
 	{
+		std::map<int, std::string> error_codes_old = i->second.error_codes;
 		ServerBlock *new_server_block = new ServerBlock(i->second, server_info);
 		server_blocks[new_server_block->getListenerFD()] = new_server_block;
+		new_server_block->error_codes = error_codes_old;
 	}
 	return (server_blocks);
 }
@@ -114,7 +116,7 @@ int main(int argc, char **argv)
 		std::map<int, Client*>	clients;
 
 		// Creating the server event handler 
-		EventHandler	events(server_blocks, clients, MAX_CONNECTIONS);
+		EventHandler	events(clients, server_blocks, MAX_CONNECTIONS);
 
 		// Server loop
 		while (running)

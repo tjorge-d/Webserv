@@ -30,6 +30,8 @@ client_max_body_size 10 Mb;
 
 		error_page 500 /500.html;
 
+		error_page 503 /503.html;
+
 		directory_request_redirect /var/www/dev/sideye.jpg;
 
 	server_block end;

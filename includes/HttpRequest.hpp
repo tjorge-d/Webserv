@@ -28,6 +28,9 @@ class HttpRequest
 		bool 								isChunked;
 		bool 								chunkedComplete;
 
+		//will need to add sections for cookies, at least a private attribute to store sessionId
+
+		
 		// CONSTRUCTORS/DESTRUCTORS
 		HttpRequest();
 		~HttpRequest();

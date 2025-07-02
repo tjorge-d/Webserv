@@ -19,7 +19,7 @@ class HttpResponse
 		std::string 	contentType;
 		int				contentLenght;
 		std::string 	connection;
-		
+
 		std::vector<char>	header;
 		int					headerSize;
 		int 				bytesSent;
@@ -31,9 +31,10 @@ class HttpResponse
 		// CONSTRUCTORS/DESTRUCTORS
 		HttpResponse();
 		~HttpResponse();
-		
+
 		// MEMBER FUNCTIONS
 		void	simpleHTTP(std::string path);
+		void	simpleHTTPerror(std::string path, std::string error_response);
 		void	openRequestedFile();
 		void	setStatus(std::string status);
 		void	setContentType();

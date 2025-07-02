@@ -51,6 +51,7 @@ struct ParserInfo{
 	bool 								max_size_acquired;
 	bool 								server_setup_mode;
 	bool 								location_setup_mode;
+	bool								error_page_detected;
 };
 
 struct HttpInfo{

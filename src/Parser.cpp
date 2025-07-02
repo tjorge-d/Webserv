@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/07/01 14:07:31 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/07/02 16:28:06 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 	Server->parser_info.max_size_acquired = false;
 	Server->parser_info.server_setup_mode = false;
 	Server->parser_info.location_setup_mode = false;
+	Server->parser_info.error_page_detected = false;
 	if (argc > 2)
 		throw ParserException(Server, "Invalid number of arguments.");
 	if (argc == 1)
@@ -164,7 +165,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 
 	//----------------------------IF ANYTHING GOES WRONG, UNCOMMENT THIS AND FIGURE OUT WHERE THE PARSING GOES WRONG----------------------------
 
-	/* 
+/* 	
 	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
 	for (std::map<std::string, ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
 		i != Server->server_blocks.end(); ++i)
@@ -194,7 +195,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 		std::cout << "Error code : " << i->first << std::endl;
 		std::cout << "Error message : " << i->second << std::endl;
 	}
-	*/
+	 */
 
 	//----------------------------PARSER TROUBLESHOOTER ENDS HERE----------------------------
 
@@ -299,6 +300,7 @@ void	parseServerBlock(HttpInfo *Server){
 		{
 			if (Server->parser_info.server_setup_mode == true)
 			{
+				Server->parser_info.error_page_detected = true;
 				Server->parser_info.current_server_block.error_codes.insert(std::pair<int, std::string>(atoi(Server->parser_info.line.substr((Server->parser_info.line.find(' ') + 1),
 					Server->parser_info.line.size() - Server->parser_info.line.rfind(' ') - 2).c_str()),
 					Server->parser_info.line.substr((Server->parser_info.line.rfind(' ') + 1), Server->parser_info.line.size() - Server->parser_info.line.rfind(' ') - 2)));

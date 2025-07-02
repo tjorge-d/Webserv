@@ -1,11 +1,15 @@
 #include "../includes/EventHandler.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
-EventHandler::EventHandler(std::map<int, ServerBlock*> &server_blocks, std::map<int, Client*> &clients, int maxConnections) :
-serverBlocks(server_blocks),
+EventHandler::EventHandler(std::map<int, Client*> &clients, std::map<int, ServerBlock*> &server_blocks, int maxConnections) :
 clients(clients),
 connections(0),
-maxConnections(maxConnections)
+maxConnections(maxConnections),
+epollFd(-1),
+eventsNumber(0),
+failsafe_error_codes(),
+events(),
+serverBlocks(server_blocks) 
 {
 	//std::cout << "EventHandler custom constructor called" << std::endl;
 	// Creates an epoll instance in the kernel
@@ -93,12 +97,8 @@ void	EventHandler::addClient(int client_fd)
 
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
-	{
-		//HttpResponse response = clients[client_fd]->getResponse(); a horrible attempt at trying to return an error html
-		//response.simpleHTTP("./var/www/dev/500.html");
-		clients[client_fd]->basicClientResponse("Please try again later.", failsafe_error_codes["503"]);
-		clients[client_fd]->setConnection(false);
-	}
+		clients[client_fd]->sendError(503, "Service unavailable, please try again later.", "503");
+		//clients[client_fd]->setConnection(false); potential bug if connection is not set to false, if the connection is set to false, keep as is.
 	else
 		connections++;
 	

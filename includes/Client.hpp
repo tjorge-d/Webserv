@@ -36,12 +36,10 @@ class Client
 		// Client data
 		int				fd;
 		EventHandler	&events;
-		ServerBlock		&serverBlock;
 		std::map<std::string, std::string>		failsafe_error_codes;
 		
 		// HTTP data
 		HttpRequest			request;		
-		HttpResponse		response;
 		std::fstream		postFile;
 		
 		// Flags
@@ -62,6 +60,8 @@ class Client
 		
 		public:
 		// CONSTRUCTORS/DESTRUCTORS
+		ServerBlock		&serverBlock;
+		HttpResponse		response;
 		Client(int fd, EventHandler &events, ServerBlock &serverBlockInfo);
 		~Client();
 		
@@ -117,6 +117,9 @@ class Client
 
 		// Sends the response body in a chunk 
 		void	sendBodyChunk();
+
+		// Scans the serverBlock for error pages to send, defaulting to failsafes if none correspond with the error encountered
+		void	sendError(int errorCode, std::string errorMsg, std::string statusCode);
 
 	class	ClientException : public std::runtime_error
 	{

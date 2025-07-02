@@ -48,17 +48,18 @@ HttpResponse::~HttpResponse()
 		fileStream.close();
 }
 
-/* void	HttpResponse::simpleHTTPerror(std::string path)
+void	HttpResponse::simpleHTTPerror(std::string path, std::string error_response)
 {
 	filePath = path;
 	openRequestedFile();
 	//setStatus();
-	status = "200 OK";
+	status = error_response;
 	setContentType();
 	setContentLength();
 	//setConnection();
+	connection = "close";
 	buildHeader();
-} */
+}
 
 // MEMBER FUNCTIONS
 void	HttpResponse::simpleHTTP(std::string path)
@@ -80,6 +81,7 @@ void	HttpResponse::openRequestedFile()
 		throw ResponseException("A file is already opened");
 	
 	// Opens the file and retrieves the necessary information
+	std::cout << "FILE OPENED -> " << filePath.c_str() << std::endl;
 	fileStream.open(filePath.c_str(), std::ios::in);
 	if (!fileStream.is_open())
 		throw ResponseException("Failed to open the file \"" + filePath + "\"");

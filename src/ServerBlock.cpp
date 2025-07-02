@@ -31,5 +31,3 @@ int	const &ServerBlock::getMaxBodySize()const
 	(void)httpInfo;
 	return(httpInfo.client_max_body_size);
 }
-
-

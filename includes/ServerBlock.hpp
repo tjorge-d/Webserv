@@ -16,6 +16,7 @@ class ServerBlock
 		
 		public:
 		// CONSTRUCTORS/DESTRUCTORS
+		std::map<int, std::string> error_codes;
 		HttpInfo		&httpInfo;
 		ServerBlock(ServerBlockInfo &info, HttpInfo &httpInfo);
 		~ServerBlock();

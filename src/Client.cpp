@@ -3,15 +3,17 @@
 // CONSTRUCTORS & DESTRUCTORS
 
 Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock): 
-fd(fd),
+ fd(fd),
 events(events),
-serverBlock(serverBlock),
+failsafe_error_codes(),
 request(),
-response(),
-connected(1),
-recievingHeader(1),
-recievingBody(0),
-state(WAITING_TO_RECIEVE)
+postFile(),
+connected(true),
+recievingHeader(true),
+recievingBody(false),
+state(WAITING_TO_RECIEVE),
+serverBlock(serverBlock),
+response()
 {
 	failsafe_error_codes["200"] = "200 OK"; //The request succeeded.
 	failsafe_error_codes["204"] = "204 No Content"; //There is no content to send for this request, but the headers are useful.
@@ -145,19 +147,15 @@ void	Client::parseRequestHeader(std::vector<char>::iterator header_end)
     // Find the first line (request line)
     std::istringstream requestStream(requestString);
     std::string requestLine;
-    if (!std::getline(requestStream, requestLine) || requestLine.empty()){
-		basicClientResponse("Bad request.", failsafe_error_codes["400"]);
-		setConnection(false);
-	}
+    if (!std::getline(requestStream, requestLine) || requestLine.empty())
+		sendError(400, "Bad request", "400");
 
     // Split the request line into components
     std::istringstream lineStream(requestLine);
     lineStream >> request.method >> request.path >> request.version;
 
-	if (request.version != "HTTP/1.1"){
-		basicClientResponse("Unsupported HTTP version.", failsafe_error_codes["505"]);
-		setConnection(false);
-	}
+	if (request.version != "HTTP/1.1")
+		sendError(505 ,"Unsupported HTTP version.", "505");
 
 	std::cout << "The request header is valid" << std::endl;
 
@@ -229,10 +227,8 @@ void	Client::handleMethod()
 		response.simpleHTTP("./var/www/dev" + request.path);
 		response.contentLenght = 0;
 	}
-	else {
-		basicClientResponse("Method not allowed.", failsafe_error_codes["405"]);
-		setConnection(false);
-	}
+	else 
+		sendError(405, "Method not allowed.", "405");
 	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
 
@@ -265,10 +261,8 @@ int	Client::recieveRequestChunk()
 				request.appendToBuffer(buffer, bytes);
 				request.bodySize += bytes;
 			}
-			if(request.bodySize > serverBlock.getMaxBodySize()){
-				basicClientResponse("Content body too large.", failsafe_error_codes["413"]);
-				setConnection(false);
-			}
+			if(request.bodySize > serverBlock.getMaxBodySize())
+				sendError(413, "Content body too large.", "413");
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
 				parsePostBody();
@@ -410,8 +404,10 @@ void	Client::appendToRequest(char* buffer, int size)
 			parseRequestHeader(it + 4);
 		}
 		//make exception for error 431 "Request Header Fields Too Large"
-		/* basicClientResponse("Request header fields too large.", failsafe_error_codes["431"]);
-		setConnection(false); */
+		/*
+			//insert exception parameters here
+			sendError(431, "Request header fields too large., "431");
+		*/
 	}
 }
 
@@ -465,6 +461,17 @@ void	Client::sendBodyChunk()
 		recieveMode();
 }
 
+void Client::sendError(int errorCode, std::string errorMsg, std::string statusCode){
+
+	// statusCode is simply a string version of errorCode because we can't use itoa or std::to_str
+	if (serverBlock.error_codes.find(errorCode) != serverBlock.error_codes.end()){
+		response.simpleHTTPerror("./var/www/dev" + serverBlock.error_codes[errorCode], failsafe_error_codes[statusCode]);
+		sendMode();
+	}
+	else 
+		basicClientResponse(errorMsg, failsafe_error_codes[statusCode]);
+	setConnection(false);
+}
 
 // EXCEPTIONS
 Client::ClientException::ClientException(std::string info, int fd) :

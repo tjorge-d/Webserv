@@ -18,7 +18,6 @@ class EventHandler
 {
 	private:
 		// ATTRIBUTES
-		std::map<int, ServerBlock*>	&serverBlocks;
 		std::map<int, Client*>		&clients;
 		int							connections;
 		int							maxConnections;
@@ -26,10 +25,11 @@ class EventHandler
 		int							eventsNumber;
 		std::map<std::string, std::string>		failsafe_error_codes;
 		std::vector<epoll_event>	events;
-
-	public:
+		
+		public:
 		// CONSTRUCTORS/DESTRUCTORS
-		EventHandler(std::map<int, ServerBlock*> &server_blocks, std::map<int, Client*> &clients, int maxConnections);
+		std::map<int, ServerBlock*>	&serverBlocks;
+		EventHandler(std::map<int, Client*> &clients, std::map<int, ServerBlock*> &server_blocks, int maxConnections);
 		~EventHandler();
 		
 		// GETTERS
