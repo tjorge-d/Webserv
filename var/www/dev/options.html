@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>OPTIONS Test</title>
+</head>
+<body>
+    <h1>OPTIONS Request</h1>
+    <form id="optionsForm">
+        <label for="path">Target Path:</label>
+        <input type="text" id="path" required placeholder="/upload">
+        <button type="submit">Send OPTIONS</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('optionsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const path = document.getElementById('path').value;
+
+            fetch(path, {
+                method: 'OPTIONS'
+            }).then(res => {
+                document.getElementById('result').textContent =
+                    'Allowed Methods: ' + res.headers.get('Allow');
+            });
+        });
+    </script>
+</body>
+</html>

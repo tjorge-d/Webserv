@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Welcome to our Website</title>
+    <title>WebServer Method Test</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,34 +21,42 @@
             border: 1px solid #ccc;
         }
 
-        .upload-link {
+        .test-link {
             display: inline-block;
-            margin-top: 20px;
+            margin: 10px;
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #007BFF;
             color: white;
             text-decoration: none;
             border-radius: 5px;
         }
 
-        .upload-link:hover {
-            background-color: #45a049;
+        .test-link:hover {
+            background-color: #0056b3;
+        }
+
+        .link-group {
+            margin-top: 30px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Welcome to Our Website</h1>
+    <h1>Welcome to Our Webserver Test Page</h1>
+    <p>This is the development interface for testing HTTP methods.</p>
 
-	<p> THIS IS THE DEV BUILD </p>
     <div class="image-container">
-        <!--image goes here, something funny-->
         <img src="flick-esfand.gif" alt="sideye.jpg">
     </div>
 
-    <p>This is a simple page where you can upload images. Click below to go to the upload page.</p>
-
-    <a href="upload.html" class="upload-link">Go to Upload Page</a>
+    <div class="link-group">
+        <a href="upload.html" class="test-link">Test POST (Upload)</a>
+        <a href="put.html" class="test-link">Test PUT</a>
+        <a href="delete.html" class="test-link">Test DELETE</a>
+        <a href="head.html" class="test-link">Test HEAD</a>
+        <a href="options.html" class="test-link">Test OPTIONS</a>
+        <a href="trace.html" class="test-link">Test TRACE</a>
+    </div>
 
 </body>
 </html>

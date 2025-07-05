@@ -2,13 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Upload File (POST)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image</title>
-	<style>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
 
-		.homepage-link {
-            display: inline-block;
+        h1 {
+            color: #444;
+        }
+
+        form {
             margin-top: 20px;
+        }
+
+        label, input[type="file"], button {
+            margin: 10px 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-top: 30px;
             padding: 10px 20px;
             background-color: #6045aa;
             color: white;
@@ -16,17 +49,22 @@
             border-radius: 5px;
         }
 
-	</style>
+        .nav-link:hover {
+            background-color: #4b3692;
+        }
+    </style>
 </head>
 <body>
-    <h1>Upload Your Image</h1>
+
+    <h1>Upload a File (POST Method)</h1>
+
     <form action="/upload" method="POST" enctype="multipart/form-data">
-        <label for="image">Choose image to upload:</label>
-        <input type="file" name="image" id="image" required>
+        <label for="image">Select file to upload:</label>
+        <input type="file" id="image" name="image" required>
         <button type="submit">Upload</button>
     </form>
 
-	<a href="index.html" class="homepage-link">Return to Homepage</a>
+    <a href="index.html" class="nav-link">← Back to Home</a>
 
 </body>
 </html>

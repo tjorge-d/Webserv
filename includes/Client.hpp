@@ -109,8 +109,15 @@ class Client
 		// Called when a request body is sent in chunks
 		void	resolveChunkedBody();
 
-		//	Prepare the data to be written on a POST file
-		void	parsePostBody();
+		//	Function to parse body information based on request content type
+		void	parseBody();
+
+		//	Parse a body of content type multipart/form-data
+		void	parseMultiPart();
+
+		//	Parse a body of any text based content type
+
+		void	parseText();
 
 		// Sends the response header in a chunk
 		void	sendHeaderChunk();

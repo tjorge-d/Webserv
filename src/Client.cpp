@@ -209,14 +209,9 @@ void	Client::handleMethod()
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
-		//if (!request.isChunked){
-		//	request.bodySize = request.buffer.size();
-		//	postFile.open("./var/www/sussy_files/file", std::ios::out);
-		//	postFile.write(request.buffer.data(), request.bodySize);
-		//}
 	}
 	else if (request.method == "DELETE") {
-		if (std::remove(("./var/www/dev" + request.path).c_str()) == 0){
+		if (std::remove(("./var/www/sussy_files" + request.path).c_str()) == 0){
 			response.status = "200 OK";
 			//Need to revise simpleHTTP function because of response status
 			response.simpleHTTP("./var/www/dev/delete_success.html");
@@ -226,7 +221,7 @@ void	Client::handleMethod()
 		}
 	}
 	else if (request.method == "HEAD") {
-		response.simpleHTTP("./var/www/dev" + request.path);
+		response.simpleHTTP("./var/www/" + request.path);
 		response.contentLenght = 0;
 	}
 	else {
@@ -249,9 +244,12 @@ int	Client::recieveRequestChunk()
 		throw ClientException("Failed to recieve a request", fd);
 	}
 
+	
 	// Apppends the filled buffer to _request
-	if(recievingHeader)
+	if(recievingHeader){
+		std::cout << "HEADEEEEER\n" << buffer << std::endl; 
 		appendToRequest(buffer, bytes);
+	}
 
 	// Writes the buffer content onto the POST method path
 	else if (recievingBody)
@@ -271,8 +269,9 @@ int	Client::recieveRequestChunk()
 			}
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
-				parsePostBody();
+				parseBody();
 				std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
+				std::cout << "HERE IS THE FILE\n" << request.postFileName << std::endl;
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
@@ -296,7 +295,14 @@ int	Client::recieveRequestChunk()
 	return (bytes);
 }
 
-void	Client::parsePostBody(){
+void	Client::parseBody(){
+	if (request.headerInfo["Content-Type"].substr(0, request.headerInfo["Content-Type"].find(";")) == "multipart/form-data")
+		parseMultiPart();
+	else if (request.headerInfo["Content-Type"].substr(0, request.headerInfo["Content-Type"].find(";")).substr(0, request.headerInfo["Content-Type"].find("/")) == "text")
+		parseText();
+}
+
+void	Client::parseMultiPart(){
 	std::string	boundaryKey = "boundary=";
 	size_t		pos = request.headerInfo["Content-Type"].find(boundaryKey), nextPart;
 	std::string	boundary = request.headerInfo["Content-Type"].substr(pos + boundaryKey.size());
@@ -351,6 +357,13 @@ void	Client::parsePostBody(){
 
 		request.body.append(part.content.c_str(), part.content.size());
 	}
+}
+
+void	Client::parseText(){
+	std::string	requestBody(request.buffer.begin(), request.buffer.end());
+
+	request.postFileName = "./var/www/sussy_files/" + request.path.substr(1);
+	request.body = requestBody;
 }
 
 void	Client::resolveChunkedBody(){

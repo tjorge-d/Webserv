@@ -209,19 +209,15 @@ void	Client::handleMethod()
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
-		//if (!request.isChunked){
-		//	request.bodySize = request.buffer.size();
-		//	postFile.open("./var/www/sussy_files/file", std::ios::out);
-		//	postFile.write(request.buffer.data(), request.bodySize);
-		//}
 	}
 	else if (request.method == "DELETE") {
-		if (std::remove(("./var/www/dev" + request.path).c_str()) == 0){
+		if (std::remove(("./var/www/sussy_files" + request.path).c_str()) == 0){
 			response.status = "200 OK";
 			//Need to revise simpleHTTP function because of response status
 			response.simpleHTTP("./var/www/dev/delete_success.html");
 		}
 		else{
+			std::cout << "FUCKED -> " << std::string(std::strerror(errno)) << std::endl;
 			response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
 		}
 	}
@@ -249,9 +245,12 @@ int	Client::recieveRequestChunk()
 		throw ClientException("Failed to recieve a request", fd);
 	}
 
+	
 	// Apppends the filled buffer to _request
-	if(recievingHeader)
+	if(recievingHeader){
+		std::cout << "HEADEEEEER\n" << buffer << std::endl; 
 		appendToRequest(buffer, bytes);
+	}
 
 	// Writes the buffer content onto the POST method path
 	else if (recievingBody)
@@ -271,8 +270,8 @@ int	Client::recieveRequestChunk()
 			}
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
-				parsePostBody();
-				std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
+				parseMultiPart();
+				//std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
@@ -296,7 +295,7 @@ int	Client::recieveRequestChunk()
 	return (bytes);
 }
 
-void	Client::parsePostBody(){
+void	Client::parseMultiPart(){
 	std::string	boundaryKey = "boundary=";
 	size_t		pos = request.headerInfo["Content-Type"].find(boundaryKey), nextPart;
 	std::string	boundary = request.headerInfo["Content-Type"].substr(pos + boundaryKey.size());
