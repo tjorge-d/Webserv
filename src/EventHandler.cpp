@@ -98,7 +98,7 @@ void	EventHandler::addClient(int client_fd)
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
 		clients[client_fd]->sendError(503, "Service unavailable, please try again later.", "503");
-		//clients[client_fd]->setConnection(false); potential bug if connection is not set to false, if the connection is set to false, keep as is.
+		//clients[client_fd]->setConnection(false);
 	else
 		connections++;
 	

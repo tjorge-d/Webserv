@@ -16,6 +16,7 @@ class HttpRequest
 		std::vector<char>					buffer;
 		std::vector<MultiFormData>			formParts;
 		std::string		 					chunkBuffer;
+		std::string							cookie; //use istringstream instead?
 		std::string 						method;
 		std::string 						path;
 		std::string							version;

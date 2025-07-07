@@ -133,6 +133,7 @@ void	HttpResponse::buildHeader()
 
 	std::string header_str;
 	header_str += "HTTP/1.1 " + status + "\r\n";
+	header_str += "Cookie: session_id=abc123; theme=dark; lang=en; logged_in=true \r\n";
 	header_str += "Content-Type: " + contentType + "\r\n";
 	header_str += "Content-Length: " + lenght.str() + "\r\n";
 	header_str += "Connection: " + connection + "\r\n\r\n";
