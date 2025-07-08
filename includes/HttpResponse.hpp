@@ -12,9 +12,10 @@ class HttpResponse
 {
 	public:
 		// ATTRIBUTES
+		std::map<int, std::string>				statusMessages;
 		std::map<std::string, std::string>		supportedContentType;
-		std::map<std::string, std::string>		failsafe_error_codes;
 		
+		int				statusCode;
 		std::string 	status;
 		std::string 	contentType;
 		int				contentLenght;
@@ -33,6 +34,7 @@ class HttpResponse
 		~HttpResponse();
 		
 		// MEMBER FUNCTIONS
+		void	basicClientResponse(int statusCode);
 		void	simpleHTTP(std::string path);
 		void	openRequestedFile();
 		void	setStatus(std::string status);

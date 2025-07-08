@@ -56,7 +56,6 @@ struct ParserInfo{
 struct HttpInfo{
 
 	int													client_max_body_size;
-	std::map<std::string, std::string>					failsafe_error_codes;
 	std::map<std::string, ServerBlockInfo>				server_blocks;
 	ParserInfo											parser_info;
 };
@@ -76,6 +75,7 @@ HttpInfo *config_parser(char *file_path, int argc);
 void parseLocationBlock(HttpInfo *Server);
 void parseServerBlock(HttpInfo *Server);
 void parseServerInfo(HttpInfo *Server);
+std::string	getStatus(int code);
 std::string trim(const std::string &s);
 
 #endif
