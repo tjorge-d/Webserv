@@ -124,7 +124,7 @@ int	Client::recieveRequestChunk()
 				request.bodySize += bytes;
 			}
 			if(request.bodySize > serverBlock.getMaxBodySize()){
-				response.statusCode = 413;
+				response.statusCode = CONTENT_TOO_LARGE;
 				//response.basicClientResponse(413);
 				setConnection(false);
 			}
@@ -154,6 +154,76 @@ int	Client::recieveRequestChunk()
 	}
 
 	return (bytes);
+}
+
+void	Client::appendToRequest(char* buffer, int size)
+{
+	// Appends the buffer given as an argument to the request
+	request.appendToBuffer(buffer, size);
+
+	if (recievingHeader)
+	{
+		// Checks if the read data contains the end of a request header
+		std::vector<char>::iterator it = request.findHeader(size);
+
+		// Parses the header if found
+		if (it != request.buffer.end())
+		{
+			std::cout << "Request header found" << std::endl;
+			response.statusCode = request.parseRequestHeader(it + 4);
+			recievingHeader = false;
+			if (response.statusCode != OK){
+				response.basicClientResponse(response.statusCode);
+				setConnection(false);
+			}
+			// Should replace setConnection function called in simpleHTTP
+			if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
+				response.connection = "close";
+			else
+				response.connection = "keep-alive";
+			if (serverBlock.getInfo().locations.count(request.path))
+				request.path = serverBlock.getInfo().locations[request.path].index_file;
+			handleMethod();
+		}
+		//make exception for error 431 "Request Header Fields Too Large"
+		/* basicClientResponse("Request header fields too large.", getStatus(REQUEST_HEADER_FIELDS_TOO_LARGE));
+		setConnection(false); */
+	}
+}
+
+void	Client::handleMethod()
+{
+    if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
+		//response.simpleHTTP("./var/www/dev" + request.path);
+		response.filePath = "./var/www/dev" + request.path;
+	}
+	else if(request.method == "POST" || request.method == "PUT")
+	{
+		recievingBody = true;
+		request.bodySize = request.buffer.size();
+	}
+	else if (request.method == "DELETE") {
+		if (!std::remove(("./var/www/sussy_files" + request.path).c_str())){
+			//Need to revise simpleHTTP function because of response status
+			//response.simpleHTTP("./var/www/dev/delete_success.html");
+			response.filePath = "./var/www/dev/delete_success.html";
+		}
+		else{
+			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
+			response.statusCode = INTERNAL_SERVER_ERROR;
+		}
+	}
+	else if (request.method == "HEAD") {
+		//response.simpleHTTP("./var/www/" + request.path);
+		response.filePath = "./var/www/" + request.path;
+		response.contentLenght = 0;
+	}
+	else {
+		response.statusCode = METHOD_NOT_ALLOWED;
+		// response.basicClientResponse(405);
+		setConnection(false);
+	}
+	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
 
 void	Client::resolveChunkedBody(){
@@ -196,76 +266,13 @@ void	Client::resolveChunkedBody(){
 	}
 }
 
-void	Client::appendToRequest(char* buffer, int size)
-{
-	// Appends the buffer given as an argument to the request
-	request.appendToBuffer(buffer, size);
-
-	if (recievingHeader)
-	{
-		// Checks if the read data contains the end of a request header
-		std::vector<char>::iterator it = request.findHeader(size);
-
-		// Parses the header if found
-		if (it != request.buffer.end())
-		{
-			std::cout << "Request header found" << std::endl;
-			response.statusCode = request.parseRequestHeader(it + 4);
-			recievingHeader = false;
-			if (response.statusCode != 200){
-				response.basicClientResponse(response.statusCode);
-				setConnection(false);
-			}
-			// Should replace setConnection function called in simpleHTTP
-			if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
-				response.connection = "close";
-			else
-				response.connection = "keep-alive";
-			handleMethod();
-		}
-		//make exception for error 431 "Request Header Fields Too Large"
-		/* basicClientResponse("Request header fields too large.", getStatus(431));
-		setConnection(false); */
-	}
-}
-
-void	Client::handleMethod()
-{
-    if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
-		response.simpleHTTP("./var/www/dev" + request.path);
-	}
-	else if(request.method == "POST" || request.method == "PUT")
-	{
-		recievingBody = true;
-		request.bodySize = request.buffer.size();
-	}
-	else if (request.method == "DELETE") {
-		if (!std::remove(("./var/www/sussy_files" + request.path).c_str())){
-			//Need to revise simpleHTTP function because of response status
-			response.simpleHTTP("./var/www/dev/delete_success.html");
-		}
-		else{
-			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
-			response.status = 500;
-		}
-	}
-	else if (request.method == "HEAD") {
-		response.simpleHTTP("./var/www/" + request.path);
-		response.contentLenght = 0;
-	}
-	else {
-		response.statusCode = 405;
-		// response.basicClientResponse(405);
-		setConnection(false);
-	}
-	std::cout << "Body Size: " << request.bodySize << std::endl;
-}
-
 void	Client::sendHeaderChunk()
 {
 	// Protects the client from sending if not necessary
 	if (state != SENDING_HEADER)
 		throw ClientException("Invalid client state to call sendHeaderChunk()", fd);
+
+	// checkar erros e buildar o response header
 
 	// Protects the function from sending invalid memory
 	int	chunk_size = CHUNK_SIZE;

@@ -13,16 +13,18 @@ class ServerBlock
 		// ATTRIBUTES
 		ListeningSocket	listener;
 		ServerBlockInfo	&info;
+		int				maxBodySize;
+		// HttpInfo		&httpInfo;
 		
 		public:
 		// CONSTRUCTORS/DESTRUCTORS
-		HttpInfo		&httpInfo;
-		ServerBlock(ServerBlockInfo &info, HttpInfo &httpInfo);
+		ServerBlock(ServerBlockInfo &info, int &size);
 		~ServerBlock();
 
 		// GETTERS
-		int	const	&getListenerFD()const;
-		int const	&getMaxBodySize()const;
+		int	const		&getListenerFD()const;
+		int const		&getMaxBodySize()const;
+		ServerBlockInfo	&getInfo() const;
 		//make a getter for failsafes / error pages
 };
 

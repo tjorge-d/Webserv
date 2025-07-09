@@ -5,12 +5,6 @@
 
 HttpResponse::HttpResponse()
 {
-	statusMessages[400] = "Bad request.";
-	statusMessages[405] = "Method not allowed.";
-	statusMessages[413] = "Content body too large.";
-	statusMessages[431] = "Request header fields too large.";
-	statusMessages[503] = "Please try again later.";
-	statusMessages[505] = "Unsupported HTTP version.";
 	supportedContentType[".html"] = "text/html"; 
 	supportedContentType[".txt"] = "text/plain";
 	supportedContentType[".css"] = "text/css";
@@ -50,22 +44,20 @@ HttpResponse::~HttpResponse()
 
 void	HttpResponse::basicClientResponse(int code)
 {
-	int			size = statusMessages[code].size();
-	std::stringstream s;
-	s << size;
-	std::string n = s.str();
-
-	int	seconds = 10;
-	std::stringstream sec;
+	int					size = getStatus(code).size();
+	int					seconds = 10;
+	std::stringstream sizeStr, codeStr, sec;
+	sizeStr << size;
+	codeStr << code;
 	sec << seconds;
 
 	std::string response_str;
-	response_str += "HTTP/1.1 " + getStatus(code) + "\r\n"
+	response_str += "HTTP/1.1 " + codeStr.str() + " " + getStatus(code) + "\r\n"
 	"Content-Type: text/plain\r\n"
-	"Content-Length: " + n + "\r\n"
+	"Content-Length: " + sizeStr.str() + "\r\n"
 	"Retry-After: " + sec.str() + "\r\n"
 	"Connection: close\r\n"
-	"\r\n" + statusMessages[code];
+	"\r\n" + getStatus(code);
 
     // Convert the string to a vector<char>
     header = std::vector<char>(response_str.begin(), response_str.end());
@@ -76,16 +68,83 @@ void	HttpResponse::basicClientResponse(int code)
 void	HttpResponse::simpleHTTP(std::string path)
 {
 	filePath = path;
+	// std::cout << "Path -> " << filePath << std::endl;
+	// if (filePath == "./var/www/dev/")
+	// 	filePath += "index.html";
 	std::cout << "Path -> " << filePath << std::endl;
-	if (filePath == "./var/www/dev/")
-		filePath += "index.html";
 	openRequestedFile();
 	//setStatus();
-	status = getStatus(200);
+	//status = getStatus(OK);
 	setContentType();
 	setContentLength();
 	//setConnection();
 	buildHeader();
+}
+
+void	HttpResponse::buildHeader()
+{
+	// Builds the header
+	std::stringstream lenght, codeStr;
+	lenght << contentLenght;
+	codeStr << statusCode;
+
+	std::string header_str;
+	header_str += "HTTP/1.1 " + codeStr.str() + " " + status + "\r\n";
+	header_str += "Content-Type: " + contentType + "\r\n";
+	header_str += "Content-Length: " + lenght.str() + "\r\n";
+	header_str += "Connection: " + connection + "\r\n\r\n";
+
+	header = std::vector<char>(header_str.begin(), header_str.end());
+	headerSize = header_str.size();
+	std::cout << "Response:" << std::endl << header_str << std::endl;
+}
+
+void	HttpResponse::createResponse()
+{
+	std::string	headerStr;
+
+	std::stringstream lenght, codeStr;
+	codeStr << statusCode;
+
+	headerStr += std::string(HTTP_ACCEPTED_VERSION) + " " + codeStr.str() + " " + status + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(SERVER_TYPE_RESPONSE_HEADER) + " " + std::string(SERVER_VERSION) + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(DATE_TYPE_RESPONSE_HEADER) + " " + getHttpDateHeader() + std::string(RESPONSE_LINE_END);
+	if (statusCode == OK)
+		setContentType();
+	else
+		contentType = PLAIN_TEXT;
+	headerStr += std::string(CONTENT_TYPE_RESPONSE_HEADER) + " " + contentType + std::string(RESPONSE_LINE_END);
+	setContentLength();
+	lenght << contentLenght;
+	headerStr += std::string(CONTENT_LENGTH_RESPONSE_HEADER) + " " + lenght.str() + " " + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(DATE_TYPE_RESPONSE_HEADER) + " " + getLastModifiedHeader() + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
+	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
+	headerStr += std::string(RESPONSE_LINE_END);
+}
+
+std::string	HttpResponse::getHttpDateHeader()
+{
+	std::time_t date = std::time(nullptr);
+    std::tm gmt{};
+    gmtime_r(&date, &gmt);
+
+    std::ostringstream dateStr;
+    dateStr << std::put_time(&gmt, "%a, %d %b %Y %H:%M:%S GMT");
+    return dateStr.str();
+}
+
+std::string HttpResponse::getLastModifiedHeader()
+{
+    if (stat(filePath.c_str(), &fileStats) == -1)
+		return "";
+
+    std::tm gmt{};
+    gmtime_r(&fileStats.st_mtime, &gmt);
+
+    std::ostringstream oss;
+    oss << std::put_time(&gmt, "%a, %d %b %Y %H:%M:%S GMT");
+    return oss.str();    
 }
 
 void	HttpResponse::openRequestedFile()
@@ -136,23 +195,6 @@ void	HttpResponse::setContentLength()
 void	HttpResponse::setConnection()
 {
 	connection = "keep-alive";
-}
-
-void	HttpResponse::buildHeader()
-{
-	// Builds the header
-	std::stringstream lenght;
-	lenght << contentLenght;
-
-	std::string header_str;
-	header_str += "HTTP/1.1 " + status + "\r\n";
-	header_str += "Content-Type: " + contentType + "\r\n";
-	header_str += "Content-Length: " + lenght.str() + "\r\n";
-	header_str += "Connection: " + connection + "\r\n\r\n";
-
-	header = std::vector<char>(header_str.begin(), header_str.end());
-	headerSize = header_str.size();
-	std::cout << "Response:" << std::endl << header_str << std::endl;
 }
 
 void	HttpResponse::reset()

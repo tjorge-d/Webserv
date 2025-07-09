@@ -56,17 +56,17 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
     if (!std::getline(requestStream, requestLine) || requestLine.empty()){
 		//basicClientResponse("Bad request.", getStatus(400));
 		//setConnection(false);
-		return (400);
+		return (BAD_REQUEST);
 	}
 
     // Split the request line into components
     std::istringstream lineStream(requestLine);
     lineStream >> method >> path >> version;
 
-	if (version != "HTTP/1.1"){
+	if (version != HTTP_ACCEPTED_VERSION){
 		//basicClientResponse("Unsupported HTTP version.", getStatus(505));
 		//setConnection(false);
-		return (505);
+		return (HTTP_VERSION_NOT_SUPPORTED);
 	}
 
 	std::cout << "The request header is valid" << std::endl;
@@ -101,7 +101,7 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 	// Clean request buffer
 	eraseBufferRange(buffer.begin(), header_end);
 
-	return (200);
+	return (OK);
 }
 
 void	HttpRequest::parseRequestBody(){
