@@ -106,7 +106,7 @@ void	HttpResponse::createResponse()
 	std::stringstream lenght, codeStr;
 	codeStr << statusCode;
 
-	headerStr += std::string(HTTP_ACCEPTED_VERSION) + " " + codeStr.str() + " " + status + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(HTTP_ACCEPTED_VERSION) + " " + codeStr.str() + " " + getStatus(statusCode) + std::string(RESPONSE_LINE_END);
 	headerStr += std::string(SERVER_TYPE_RESPONSE_HEADER) + " " + std::string(SERVER_VERSION) + std::string(RESPONSE_LINE_END);
 	headerStr += std::string(DATE_TYPE_RESPONSE_HEADER) + " " + getHttpDateHeader() + std::string(RESPONSE_LINE_END);
 	if (statusCode == OK)
@@ -114,6 +114,8 @@ void	HttpResponse::createResponse()
 	else
 		contentType = PLAIN_TEXT;
 	headerStr += std::string(CONTENT_TYPE_RESPONSE_HEADER) + " " + contentType + std::string(RESPONSE_LINE_END);
+	if (!filePath.empty())
+		openRequestedFile();
 	setContentLength();
 	lenght << contentLenght;
 	headerStr += std::string(CONTENT_LENGTH_RESPONSE_HEADER) + " " + lenght.str() + " " + std::string(RESPONSE_LINE_END);
@@ -121,17 +123,22 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
+	headerStr += statusCode == OK ? "" : getStatus(statusCode);
+
+	header = std::vector<char>(headerStr.begin(), headerStr.end());
+	headerSize = headerStr.size();
+	std::cout << "Response:" << std::endl << headerStr << std::endl;
 }
 
 std::string	HttpResponse::getHttpDateHeader()
 {
-	std::time_t date = std::time(nullptr);
-    std::tm gmt{};
+	std::time_t date = std::time(NULL);
+    std::tm gmt;
     gmtime_r(&date, &gmt);
 
-    std::ostringstream dateStr;
-    dateStr << std::put_time(&gmt, "%a, %d %b %Y %H:%M:%S GMT");
-    return dateStr.str();
+	char	buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
+    return std::string(buffer);
 }
 
 std::string HttpResponse::getLastModifiedHeader()
@@ -139,12 +146,12 @@ std::string HttpResponse::getLastModifiedHeader()
     if (stat(filePath.c_str(), &fileStats) == -1)
 		return "";
 
-    std::tm gmt{};
+    std::tm gmt;
     gmtime_r(&fileStats.st_mtime, &gmt);
 
-    std::ostringstream oss;
-    oss << std::put_time(&gmt, "%a, %d %b %Y %H:%M:%S GMT");
-    return oss.str();    
+	char	buffer[100];
+    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
+    return std::string(buffer);    
 }
 
 void	HttpResponse::openRequestedFile()
@@ -188,6 +195,8 @@ void	HttpResponse::setContentLength()
 {
 	if (!fileStream.is_open())
 		contentLenght = 0;
+	else if (statusCode != OK)
+		contentLenght = getStatus(statusCode).size();
 	else
 		contentLenght = fileStats.st_size;
 }
