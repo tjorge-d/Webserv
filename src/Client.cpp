@@ -131,8 +131,8 @@ int	Client::recieveRequestChunk()
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
 				request.parseRequestBody();
-				std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
-				std::cout << "HERE IS THE FILE\n" << request.postFileName << std::endl;
+				//std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
+				//std::cout << "HERE IS THE FILE\n" << request.postFileName << std::endl;
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
@@ -152,8 +152,8 @@ int	Client::recieveRequestChunk()
 			std::cout << "SEND MODE\n" << std::endl;
 			response.createResponse();
 			std::cout << "STATUS CODE -> " << response.statusCode << std::endl;
-			if (response.statusCode != OK)
-				setConnection(false);
+			// if (response.statusCode != OK)
+			// 	setConnection(false);
 			sendMode();
 		}
 	}
@@ -267,7 +267,8 @@ void	Client::resolveChunkedBody(){
 		recievingBody = false;
 		postFile.open("./var/www/sussy_files/file", std::ios::out);
 		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
-		response.simpleHTTP("./var/www/dev/parabens.html");
+		//response.simpleHTTP("./var/www/dev/parabens.html");
+		response.filePath = "./var/www/dev/parabens.html";
 	}
 }
 
@@ -295,11 +296,12 @@ void	Client::sendHeaderChunk()
 	if (response.bytesSent == response.headerSize){
 		std::cout << std::endl << "Client " << getFD() << " (Sending Body)" << std::endl;
 		state = SENDING_BODY;
-	}
-	if (response.statusCode != OK){
-		if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
-			throw ClientException("Failed to send a response", fd);
-		recieveMode();
+		if (response.statusCode != OK){
+			if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
+				throw ClientException("Failed to send a response", fd);
+			//setConnection(false);
+			recieveMode();
+		}
 	}
 }
 

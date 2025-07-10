@@ -28,76 +28,7 @@ HttpResponse::~HttpResponse()
 		fileStream.close();
 }
 
-/* void	HttpResponse::simpleHTTPerror(std::string path)
-{
-	filePath = path;
-	openRequestedFile();
-	//setStatus();
-	status = "200 OK";
-	setContentType();
-	setContentLength();
-	//setConnection();
-	buildHeader();
-} */
-
 // MEMBER FUNCTIONS
-
-void	HttpResponse::basicClientResponse(int code)
-{
-	int					size = getStatus(code).size();
-	int					seconds = 10;
-	std::stringstream sizeStr, codeStr, sec;
-	sizeStr << size;
-	codeStr << code;
-	sec << seconds;
-
-	std::string response_str;
-	response_str += "HTTP/1.1 " + codeStr.str() + " " + getStatus(code) + "\r\n"
-	"Content-Type: text/plain\r\n"
-	"Content-Length: " + sizeStr.str() + "\r\n"
-	"Retry-After: " + sec.str() + "\r\n"
-	"Connection: close\r\n"
-	"\r\n" + getStatus(code);
-
-    // Convert the string to a vector<char>
-    header = std::vector<char>(response_str.begin(), response_str.end());
-	headerSize = header.size();
-	contentLenght = 0;
-}
-
-void	HttpResponse::simpleHTTP(std::string path)
-{
-	filePath = path;
-	// std::cout << "Path -> " << filePath << std::endl;
-	// if (filePath == "./var/www/dev/")
-	// 	filePath += "index.html";
-	std::cout << "Path -> " << filePath << std::endl;
-	openRequestedFile();
-	//setStatus();
-	//status = getStatus(OK);
-	setContentType();
-	setContentLength();
-	//setConnection();
-	buildHeader();
-}
-
-void	HttpResponse::buildHeader()
-{
-	// Builds the header
-	std::stringstream lenght, codeStr;
-	lenght << contentLenght;
-	codeStr << statusCode;
-
-	std::string header_str;
-	header_str += "HTTP/1.1 " + codeStr.str() + " " + status + "\r\n";
-	header_str += "Content-Type: " + contentType + "\r\n";
-	header_str += "Content-Length: " + lenght.str() + "\r\n";
-	header_str += "Connection: " + connection + "\r\n\r\n";
-
-	header = std::vector<char>(header_str.begin(), header_str.end());
-	headerSize = header_str.size();
-	std::cout << "Response:" << std::endl << header_str << std::endl;
-}
 
 void	HttpResponse::createResponse()
 {
@@ -119,11 +50,10 @@ void	HttpResponse::createResponse()
 	setContentLength();
 	lenght << contentLenght;
 	headerStr += std::string(CONTENT_LENGTH_RESPONSE_HEADER) + " " + lenght.str() + " " + std::string(RESPONSE_LINE_END);
-	headerStr += std::string(DATE_TYPE_RESPONSE_HEADER) + " " + getLastModifiedHeader() + std::string(RESPONSE_LINE_END);
+	headerStr += std::string(LAST_MODIFIED_RESPONSE_HEADER) + " " + getLastModifiedHeader() + std::string(RESPONSE_LINE_END);
 	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
-	//headerStr += statusCode == OK ? "" : getStatus(statusCode);
 	headerStr += std::string(RESPONSE_LINE_END);
 
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
@@ -174,11 +104,6 @@ void	HttpResponse::openRequestedFile()
 		throw ResponseException("Failed to retrieve the stats of the file \"" + filePath + "\"");
 }
 
-void	HttpResponse::setStatus(std::string status)
-{
-	this->status = status;
-}
-
 void	HttpResponse::setContentType()
 {
 	// Finds the extension of the file
@@ -200,11 +125,6 @@ void	HttpResponse::setContentLength()
 		contentLenght = getStatus(statusCode).size();
 	else
 		contentLenght = fileStats.st_size;
-}
-
-void	HttpResponse::setConnection()
-{
-	connection = "keep-alive";
 }
 
 void	HttpResponse::reset()

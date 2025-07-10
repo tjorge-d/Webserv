@@ -136,7 +136,8 @@ int	Client::recieveRequestChunk()
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
-				response.simpleHTTP("./var/www/dev/parabens.html");
+				//response.simpleHTTP("./var/www/dev/parabens.html");
+				response.filePath = "./var/www/dev/parabens.html";
 			}
 		}
 	}

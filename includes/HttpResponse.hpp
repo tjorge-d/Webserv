@@ -34,20 +34,14 @@ class HttpResponse
 		~HttpResponse();
 		
 		// MEMBER FUNCTIONS
-		void		basicClientResponse(int statusCode);
-		void		simpleHTTP(std::string path);
-
 		void		createResponse();
 
 		std::string	getHttpDateHeader();
 		std::string getLastModifiedHeader();
 
 		void		openRequestedFile();
-		void		setStatus(std::string status);
 		void		setContentType();
 		void		setContentLength();
-		void		setConnection();
-		void		buildHeader();
 		void		reset();
 
 	// EXCEPTIONS
