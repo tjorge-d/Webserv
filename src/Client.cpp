@@ -107,7 +107,7 @@ int	Client::recieveRequestChunk()
 	
 	// Apppends the filled buffer to _request
 	if(recievingHeader){
-		std::cout << "HEADEEEEER\n" << buffer << std::endl; 
+		// std::cout << "HEADEEEEER\n" << buffer << std::endl; 
 		appendToRequest(buffer, bytes);
 	}
 
@@ -136,7 +136,8 @@ int	Client::recieveRequestChunk()
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
-				response.simpleHTTP("./var/www/dev/parabens.html");
+				//response.simpleHTTP("./var/www/dev/parabens.html");
+				response.filePath = "./var/www/dev/parabens.html";
 			}
 		}
 	}
@@ -150,6 +151,7 @@ int	Client::recieveRequestChunk()
 		if (!recievingBody || request.chunkedComplete){
 			std::cout << "SEND MODE\n" << std::endl;
 			response.createResponse();
+			std::cout << "STATUS CODE -> " << response.statusCode << std::endl;
 			if (response.statusCode != OK)
 				setConnection(false);
 			sendMode();
@@ -282,6 +284,7 @@ void	Client::sendHeaderChunk()
 	if (CHUNK_SIZE + response.bytesSent > response.headerSize)
 		chunk_size = response.headerSize - response.bytesSent;
 
+	std::cout << "BYTES SENT -> " << response.bytesSent << std::endl;
 	// Sends the read chunk to the client
 	int	bytes = send(fd, &response.header[response.bytesSent], chunk_size, 0);
 	if (bytes == -1)
@@ -293,8 +296,11 @@ void	Client::sendHeaderChunk()
 		std::cout << std::endl << "Client " << getFD() << " (Sending Body)" << std::endl;
 		state = SENDING_BODY;
 	}
-	if (response.statusCode != OK)
+	if (response.statusCode != OK){
+		if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
+			throw ClientException("Failed to send a response", fd);
 		recieveMode();
+	}
 }
 
 void	Client::sendBodyChunk()

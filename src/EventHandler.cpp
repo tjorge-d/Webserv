@@ -76,6 +76,7 @@ void	EventHandler::addClient(int client_fd)
 		//HttpResponse response = clients[client_fd]->getResponse(); a horrible attempt at trying to return an error html
 		//response.simpleHTTP("./var/www/dev/500.html");
 		clients[client_fd]->setRequestStatus(SERVICE_UNAVAILABLE);
+		std::cout << "THIS GO FUCKED UP -> " << std::endl;
 		//clients[client_fd]->basicClientResponse(503);
 		//clients[client_fd]->setConnection(false);
 	}

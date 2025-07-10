@@ -123,7 +123,8 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
-	headerStr += statusCode == OK ? "" : getStatus(statusCode);
+	//headerStr += statusCode == OK ? "" : getStatus(statusCode);
+	headerStr += std::string(RESPONSE_LINE_END);
 
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
 	headerSize = headerStr.size();
