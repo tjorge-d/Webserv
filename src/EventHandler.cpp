@@ -1,11 +1,14 @@
 #include "../includes/EventHandler.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
-EventHandler::EventHandler(std::map<int, ServerBlock*> &server_blocks, std::map<int, Client*> &clients, int maxConnections) :
-serverBlocks(server_blocks),
+EventHandler::EventHandler(std::map<int, Client*> &clients, std::map<int, ServerBlock*> &server_blocks, int maxConnections) :
 clients(clients),
 connections(0),
-maxConnections(maxConnections)
+maxConnections(maxConnections),
+epollFd(-1),
+eventsNumber(0),
+events(),
+serverBlocks(server_blocks) 
 {
 	//std::cout << "EventHandler custom constructor called" << std::endl;
 	// Creates an epoll instance in the kernel

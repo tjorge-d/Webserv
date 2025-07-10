@@ -39,8 +39,8 @@ class Client
 		ServerBlock		&serverBlock;
 		
 		// HTTP data
-		HttpRequest			request;		
-		HttpResponse		response;
+		HttpRequest			request;
+        HttpResponse        response;		
 		std::fstream		postFile;
 		
 		// Flags

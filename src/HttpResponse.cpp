@@ -92,6 +92,7 @@ void	HttpResponse::openRequestedFile()
 		throw ResponseException("A file is already opened");
 	
 	// Opens the file and retrieves the necessary information
+	std::cout << "FILE OPENED -> " << filePath.c_str() << std::endl;
 	fileStream.open(filePath.c_str(), std::ios::in);
 	if (!fileStream.is_open())
 		throw ResponseException("Failed to open the file \"" + filePath + "\"");

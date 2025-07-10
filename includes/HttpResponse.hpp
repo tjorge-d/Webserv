@@ -20,7 +20,7 @@ class HttpResponse
 		std::string 	contentType;
 		int				contentLenght;
 		std::string 	connection;
-		
+
 		std::vector<char>	header;
 		int					headerSize;
 		int 				bytesSent;
@@ -32,7 +32,7 @@ class HttpResponse
 		// CONSTRUCTORS/DESTRUCTORS
 		HttpResponse();
 		~HttpResponse();
-		
+
 		// MEMBER FUNCTIONS
 		void		createResponse();
 

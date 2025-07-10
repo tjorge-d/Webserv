@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 		std::map<int, Client*>	clients;
 
 		// Creating the server event handler 
-		EventHandler	events(server_blocks, clients, MAX_CONNECTIONS);
+		EventHandler	events(clients, server_blocks, MAX_CONNECTIONS);
 
 		// Server loop
 		while (running)

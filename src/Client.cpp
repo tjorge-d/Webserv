@@ -3,8 +3,15 @@
 // CONSTRUCTORS & DESTRUCTORS
 
 Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock): 
-fd(fd),
+ fd(fd),
 events(events),
+failsafe_error_codes(),
+request(),
+postFile(),
+connected(true),
+recievingHeader(true),
+recievingBody(false),
+state(WAITING_TO_RECIEVE),
 serverBlock(serverBlock),
 request(),
 response(),
