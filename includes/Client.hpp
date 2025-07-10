@@ -37,7 +37,6 @@ class Client
 		int				fd;
 		EventHandler	&events;
 		ServerBlock		&serverBlock;
-		std::map<std::string, std::string>		failsafe_error_codes;
 		
 		// HTTP data
 		HttpRequest			request;		
@@ -53,12 +52,6 @@ class Client
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)
 		void	appendToRequest(char* str, int size);
-		
-		// Parses a request header
-		void	parseRequestHeader(std::vector<char>::iterator header_end);
-		
-		// Parses a request body
-		void	parseRequestBody(std::vector<char>::iterator body_end);
 		
 		public:
 		// CONSTRUCTORS/DESTRUCTORS
@@ -76,6 +69,8 @@ class Client
 		void	setConnection(bool connection);
 		
 		// MEMBER FUNCTIONS
+		void	setRequestStatus(int code);
+
 		// Tells if the client has a regular connection
 		bool	isConnected() const;
 		
@@ -94,9 +89,6 @@ class Client
 		// Sets the content type of the file to send
 		void	setContentType();
 
-		// Tells the Client to Send a max clients response
-		void	basicClientResponse(std::string msg, std::string status);
-
 		// Opens a file from the desired path
 		void	openRequestedFile(std::string path);
 
@@ -108,9 +100,6 @@ class Client
 
 		// Called when a request body is sent in chunks
 		void	resolveChunkedBody();
-
-		//	Prepare the data to be written on a POST file
-		void	parsePostBody();
 
 		// Sends the response header in a chunk
 		void	sendHeaderChunk();

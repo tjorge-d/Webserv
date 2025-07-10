@@ -45,6 +45,18 @@ class HttpRequest
 		// Resets the request info
 		void	reset();
 
+		// Parses a request header
+		int	parseRequestHeader(std::vector<char>::iterator header_end);
+
+		// Chooses the correct way to parse the body depending on the content type specified on the request
+		void	parseRequestBody(void);
+
+		// Parses body of type multipart/form-data
+		void	parseMultiPartFormData(void);
+
+		// Parses body of any text type
+		void	parseTextPlain(void);
+
 	// EXCEPTIONS
 	class	ResponseException : public std::runtime_error
 	{

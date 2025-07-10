@@ -24,7 +24,6 @@ class EventHandler
 		int							maxConnections;
 		int							epollFd;
 		int							eventsNumber;
-		std::map<std::string, std::string>		failsafe_error_codes;
 		std::vector<epoll_event>	events;
 
 	public:

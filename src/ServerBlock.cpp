@@ -2,13 +2,14 @@
 
 // CONSTRUCTORS & DESTRUCTORS
 
-ServerBlock::ServerBlock(ServerBlockInfo &info, HttpInfo &httpInfo) :
+ServerBlock::ServerBlock(ServerBlockInfo &info, int &size) :
 listener(INADDR_ANY, info.port, SOCKET_BACKLOG),
 info(info),
-httpInfo(httpInfo)
-{
-	//std::cout << "ServerBlock default constructor called\n";
-}
+maxBodySize(size){}
+// httpInfo(httpInfo)
+// {
+// 	//std::cout << "ServerBlock default constructor called\n";
+// }
 
 
 ServerBlock::~ServerBlock()
@@ -20,16 +21,15 @@ ServerBlock::~ServerBlock()
 
 int	const &ServerBlock::getListenerFD()const
 {
-	(void)info;
-	(void)httpInfo;
 	return(listener.getFD());
 }
 
 int	const &ServerBlock::getMaxBodySize()const
 {
-	(void)info;
-	(void)httpInfo;
-	return(httpInfo.client_max_body_size);
+	return(maxBodySize);
 }
 
-
+ServerBlockInfo	&ServerBlock::getInfo()const
+{
+	return(info);
+}

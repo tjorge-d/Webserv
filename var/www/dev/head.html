@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HEAD Test</title>
+</head>
+<body>
+    <h1>HEAD Request</h1>
+    <form id="headForm">
+        <label for="path">Resource Path:</label>
+        <input type="text" id="path" required placeholder="e.g. file.txt">
+        <button type="submit">Send HEAD Request</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('headForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const path = document.getElementById('path').value;
+
+            fetch('/' + path, {
+                method: 'HEAD'
+            }).then(res => {
+                document.getElementById('result').textContent =
+                    'Status: ' + res.status + ', Headers: ' + JSON.stringify([...res.headers]);
+            });
+        });
+    </script>
+</body>
+</html>

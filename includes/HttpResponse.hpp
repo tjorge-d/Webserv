@@ -7,14 +7,15 @@
 # include <stdexcept>
 # include <sys/stat.h>
 # include <iostream>
+# include <ctime>
 
 class HttpResponse
 {
 	public:
 		// ATTRIBUTES
 		std::map<std::string, std::string>		supportedContentType;
-		std::map<std::string, std::string>		failsafe_error_codes;
 		
+		int				statusCode;
 		std::string 	status;
 		std::string 	contentType;
 		int				contentLenght;
@@ -33,14 +34,15 @@ class HttpResponse
 		~HttpResponse();
 		
 		// MEMBER FUNCTIONS
-		void	simpleHTTP(std::string path);
-		void	openRequestedFile();
-		void	setStatus(std::string status);
-		void	setContentType();
-		void	setContentLength();
-		void	setConnection();
-		void	buildHeader();
-		void	reset();
+		void		createResponse();
+
+		std::string	getHttpDateHeader();
+		std::string getLastModifiedHeader();
+
+		void		openRequestedFile();
+		void		setContentType();
+		void		setContentLength();
+		void		reset();
 
 	// EXCEPTIONS
 	class	ResponseException : public std::runtime_error

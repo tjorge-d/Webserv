@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PUT File</title>
+</head>
+<body>
+    <h1>PUT File</h1>
+    <form id="putForm">
+        <label for="filename">Filename:</label>
+        <input type="text" id="filename" required placeholder="e.g. file.txt"><br><br>
+        <label for="fileContent">File Content:</label><br>
+        <textarea id="fileContent" rows="6" cols="40" placeholder="Enter file content..."></textarea><br>
+        <button type="submit">Send PUT Request</button>
+    </form>
+
+    <script>
+        document.getElementById('putForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const filename = document.getElementById('filename').value;
+            const content = document.getElementById('fileContent').value;
+
+            fetch('/' + filename, {
+                method: 'PUT',
+                body: content
+            }).then(res => res.text()).then(alert);
+        });
+    </script>
+</body>
+</html>
