@@ -3,22 +3,17 @@
 // CONSTRUCTORS & DESTRUCTORS
 
 Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock): 
- fd(fd),
+fd(fd),
 events(events),
-failsafe_error_codes(),
+serverBlock(serverBlock),
 request(),
+response(),
 postFile(),
 connected(true),
 recievingHeader(true),
 recievingBody(false),
-state(WAITING_TO_RECIEVE),
-serverBlock(serverBlock),
-request(),
-response(),
-connected(1),
-recievingHeader(1),
-recievingBody(0),
-state(WAITING_TO_RECIEVE){
+state(WAITING_TO_RECIEVE)
+{
 	std::cout << "Client constructor called\n";
 }
 
