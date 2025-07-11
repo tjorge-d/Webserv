@@ -109,7 +109,7 @@ int	Client::recieveRequestChunk()
 	
 	// Apppends the filled buffer to _request
 	if(recievingHeader){
-		// std::cout << "HEADEEEEER\n" << buffer << std::endl; 
+		std::cout << "HEADEEEEER\n" << buffer << std::endl; 
 		appendToRequest(buffer, bytes);
 	}
 
@@ -127,19 +127,20 @@ int	Client::recieveRequestChunk()
 			}
 			if(request.bodySize > serverBlock.getMaxBodySize()){
 				response.statusCode = CONTENT_TOO_LARGE;
-				//response.basicClientResponse(413);
-				//setConnection(false);
+				if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end()){
+					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[CONTENT_TOO_LARGE];
+				}
 			}
 			if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
 				request.parseRequestBody();
-				//std::cout << "HERE IS THE BODY\n" << request.body << std::endl;
-				//std::cout << "HERE IS THE FILE\n" << request.postFileName << std::endl;
+
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
 				//response.simpleHTTP("./var/www/dev/parabens.html");
-				response.filePath = "./var/www/dev/parabens.html";
+				response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "parabens.html";
+				std::cout << "response.filePath = " << response.filePath << std::endl;
 			}
 		}
 	}
@@ -165,6 +166,8 @@ int	Client::recieveRequestChunk()
 
 void	Client::appendToRequest(char* buffer, int size)
 {
+	std::string extracted_location;
+
 	// Appends the buffer given as an argument to the request
 	request.appendToBuffer(buffer, size);
 
@@ -188,8 +191,23 @@ void	Client::appendToRequest(char* buffer, int size)
 				response.connection = "close";
 			else
 				response.connection = "keep-alive";
-			if (serverBlock.getInfo().locations.count(request.path))
-				request.path = serverBlock.getInfo().locations[request.path].index_file;
+			// extract location, return extract, replace request.path locations /dev/flick_esfand.gif becomes /dev/, /upload.html becomes /
+			if (request.path.find("/") == request.path.rfind("/"))
+				extracted_location = "/";
+			else
+				extracted_location = request.path.substr(request.path.find('/'),
+					request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
+			if (serverBlock.getInfo().locations.count(extracted_location)){
+				//default_path = serverBlock.getInfo().locations[request.path].root_directory + request.path;
+/* 				std::cout << "root directory -> " << serverBlock.getInfo().locations[request.path].root_directory << std::endl;
+				std::cout << "request path -> " << request.path << std::endl;
+				std::cout << "index file -> " << serverBlock.getInfo().locations[request.path].index_file << std::endl; */
+				//std::cout << "location = " << serverBlock.getInfo().locations[request.path].location << std::endl;
+				//std::cout << "request path before =" << request.path << std::endl;
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_location].location 
+					+ serverBlock.getInfo().locations[extracted_location].index_file;
+				//std::cout << "request path after =" << request.path << std::endl;
+			}
 			handleMethod();
 		}
 		//make exception for error 431 "Request Header Fields Too Large"
@@ -200,9 +218,10 @@ void	Client::appendToRequest(char* buffer, int size)
 
 void	Client::handleMethod()
 {
+	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		//response.simpleHTTP("./var/www/dev" + request.path);
-		response.filePath = "./var/www/dev" + request.path;
+		response.filePath = request.path;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
 	{
@@ -210,10 +229,10 @@ void	Client::handleMethod()
 		request.bodySize = request.buffer.size();
 	}
 	else if (request.method == "DELETE") {
-		if (!std::remove(("./var/www/sussy_files" + request.path).c_str())){
+		if (!std::remove((serverBlock.getInfo().server_root + "sussy_files" + request.path).c_str())){
 			//Need to revise simpleHTTP function because of response status
 			//response.simpleHTTP("./var/www/dev/delete_success.html");
-			response.filePath = "./var/www/dev/delete_success.html";
+			response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "delete_success.html";
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
@@ -222,7 +241,7 @@ void	Client::handleMethod()
 	}
 	else if (request.method == "HEAD") {
 		//response.simpleHTTP("./var/www/" + request.path);
-		response.filePath = "./var/www/" + request.path;
+		response.filePath = serverBlock.getInfo().server_root + request.path;
 		response.contentLenght = 0;
 	}
 	else {
@@ -270,7 +289,7 @@ void	Client::resolveChunkedBody(){
 		postFile.open("./var/www/sussy_files/file", std::ios::out);
 		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
 		//response.simpleHTTP("./var/www/dev/parabens.html");
-		response.filePath = "./var/www/dev/parabens.html";
+		response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "parabens.html";
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/07/02 16:28:06 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/07/11 15:11:37 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,13 +140,14 @@ HttpInfo *config_parser(char *file_path, int argc)
 
 	//----------------------------IF ANYTHING GOES WRONG, UNCOMMENT THIS AND FIGURE OUT WHERE THE PARSING GOES WRONG----------------------------
 
-/* 	
+	
 	std::cout << "Client max body size : " << Server->client_max_body_size << std::endl;
 	for (std::map<std::string, ServerBlockInfo>::iterator i = Server->server_blocks.begin(); \
 		i != Server->server_blocks.end(); ++i)
 	{
 		std::cout << "Server Block : " << i->second.server_name << std::endl;
 		std::cout << "Server Port : " << i->second.port << std::endl;
+		std::cout << "Root Directory : " << i->second.server_root << std::endl;
 		std::cout << "Redirect Directory : " << i->second.redirect_directory << std::endl;
 		for (std::map<int, std::string>::iterator k = i->second.error_codes.begin(); \
 		k != i->second.error_codes.end(); k++)
@@ -156,7 +157,6 @@ HttpInfo *config_parser(char *file_path, int argc)
 		{
 			std::cout << "location Block : " << j->first << std::endl;
 			std::cout << "location Autoindex State : " << j->second.autoindex << std::endl;
-			std::cout << "Root Directory : " << j->second.root_directory << std::endl;
 			std::cout << "Index File : " << j->second.index_file << std::endl;
 			std::cout << "Allowed Services : " << std::endl;
 			for (std::vector<std::string>::iterator m = j->second.allowed_services.begin(); \
@@ -164,13 +164,7 @@ HttpInfo *config_parser(char *file_path, int argc)
 				std::cout << *m << std::endl;
 		}
 	}
-	for (std::map<std::string, std::string>::iterator i = Server->failsafe_error_codes.begin();
-		i != Server->failsafe_error_codes.end(); ++i)
-	{
-		std::cout << "Error code : " << i->first << std::endl;
-		std::cout << "Error message : " << i->second << std::endl;
-	}
-	 */
+	
 
 	//----------------------------PARSER TROUBLESHOOTER ENDS HERE----------------------------
 
@@ -247,6 +241,18 @@ void	parseServerBlock(HttpInfo *Server){
 			else
 				throw ParserException(Server, "Attempting to set up ports on nonexistent server block.");
 		}
+		if ((Server->parser_info.line.find("root")) != std::string::npos)
+		{
+			if (Server->parser_info.server_setup_mode == true)
+			{
+				Server->parser_info.current_server_block.server_root = Server->parser_info.line.substr((Server->parser_info.line.find(' ') + 1),
+					Server->parser_info.line.size() - Server->parser_info.line.find(' ') - 2);
+				if (Server->parser_info.current_server_block.server_root.empty())
+					throw ParserException(Server, "Your server root directory is empty.");
+			}
+			else
+				throw ParserException(Server, "Attempting to set up root directory on nonexistent server block.");
+		}
 		if ((Server->parser_info.line.find("server_name")) != std::string::npos)
 		{
 			if (Server->parser_info.server_setup_mode == true)
@@ -283,7 +289,7 @@ void	parseServerBlock(HttpInfo *Server){
 				{
 					if (it->first <= 0 || it->second.empty())
 						throw ParserException(Server, "Your error code or coresponding page is invalid/nonexistent.");
-					std::string blame98 = "./var/www/dev" + it->second;
+					std::string blame98 = Server->parser_info.current_server_block.server_root + it->second;
 					std::ifstream error_file(blame98.c_str());
 					if (!error_file.good()){
 						//delete Server;
@@ -348,18 +354,6 @@ void parseLocationBlock(HttpInfo *Server){
 			}
 			else
 				throw ParserException(Server, "Attempting to set up a location on nonexistent location block.");
-		}
-		if ((Server->parser_info.line.find("root")) != std::string::npos)
-		{
-			if (Server->parser_info.location_setup_mode == true)
-			{
-				Server->parser_info.current_location_block.root_directory = Server->parser_info.line.substr((Server->parser_info.line.find(' ') + 1),
-					Server->parser_info.line.size() - Server->parser_info.line.find(' ') - 2);
-				if (Server->parser_info.current_location_block.root_directory.empty())
-					throw ParserException(Server, "Your root directory is empty.");
-			}
-			else
-				throw ParserException(Server, "Attempting to set up root directory on nonexistent location block.");
 		}
 }
 

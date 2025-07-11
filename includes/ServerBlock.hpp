@@ -22,10 +22,10 @@ class ServerBlock
 		~ServerBlock();
 
 		// GETTERS
-		int	const		&getListenerFD()const;
-		int const		&getMaxBodySize()const;
-		ServerBlockInfo	&getInfo() const;
-		//make a getter for failsafes / error pages
+		int	const						&getListenerFD()const;
+		int const						&getMaxBodySize()const;
+		ServerBlockInfo					&getInfo() const;
+		std::map<int, std::string>		&getErrorPages() const;
 };
 
 #endif

@@ -59,7 +59,6 @@ struct LocationBlockInfo{
 	bool												autoindex;
 	std::vector<std::string>							allowed_services;
 	std::string											location;
-	std::string											root_directory;
 	std::string											index_file;
 };
 
@@ -67,6 +66,7 @@ struct ServerBlockInfo{
 	
 	int													port;
 	std::string											server_name;
+	std::string											server_root;
 	std::string											redirect_directory;
 	std::map<int, std::string>							error_codes;
 	std::map<std::string, LocationBlockInfo>			locations;

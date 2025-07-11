@@ -17,7 +17,7 @@ domain_port 80;
 #sets the address of our domain
 server_name localhost;
 
-#sets the default location for our webserver, AKA the place where all the #web pages and assets are stored
+#sets the default location for our webserver, AKA the place where all the #web pages and assets are stored THIS MUST BE SET BEFORE ANY OTHER SETTINGS
 default_location /;
 
 #determines which services are available in the domain (the most common ones are GET, POST and DELETE. Probably will be the only ones allowed alongside HEAD.)
