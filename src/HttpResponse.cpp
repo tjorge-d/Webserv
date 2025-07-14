@@ -95,12 +95,12 @@ void	HttpResponse::openRequestedFile()
 	fileStream.open(filePath.c_str(), std::ios::in);
 	if (!fileStream.is_open())
 		throw ResponseException("Failed to open the file \"" + filePath + "\"");
-	std::cout << "FILE OPENED -> " << filePath.c_str() << std::endl;
 	if (!fileStream.good())
-	{
-		fileStream.close();
-		throw ResponseException("Error while opening File");
-	}
+		{
+			fileStream.close();
+			throw ResponseException("Error while opening File");
+		}
+	std::cout << "FILE OPENED -> " << filePath.c_str() << std::endl;
 	if (stat(filePath.c_str(), &fileStats) == -1)
 		throw ResponseException("Failed to retrieve the stats of the file \"" + filePath + "\"");
 }

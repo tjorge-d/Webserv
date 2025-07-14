@@ -37,7 +37,7 @@ class Client
 		int				fd;
 		EventHandler	&events;
 		ServerBlock		&serverBlock;
-		std::string		default_path; //location block path
+		std::string		extracted_path; //location block path
 		
 		// HTTP data
 		HttpRequest			request;

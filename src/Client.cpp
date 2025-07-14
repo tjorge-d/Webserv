@@ -127,11 +127,10 @@ int	Client::recieveRequestChunk()
 			}
 			if(request.bodySize > serverBlock.getMaxBodySize()){
 				response.statusCode = CONTENT_TOO_LARGE;
-				if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end()){
+				if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end())
 					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[CONTENT_TOO_LARGE];
-				}
 			}
-			if (request.bodySize >= request.contentLenght){
+			else if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
 				request.parseRequestBody();
 
@@ -139,7 +138,7 @@ int	Client::recieveRequestChunk()
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
 				//response.simpleHTTP("./var/www/dev/parabens.html");
-				response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "parabens.html";
+				response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
 				std::cout << "response.filePath = " << response.filePath << std::endl;
 			}
 		}
@@ -166,7 +165,6 @@ int	Client::recieveRequestChunk()
 
 void	Client::appendToRequest(char* buffer, int size)
 {
-	std::string extracted_location;
 
 	// Appends the buffer given as an argument to the request
 	request.appendToBuffer(buffer, size);
@@ -186,28 +184,35 @@ void	Client::appendToRequest(char* buffer, int size)
 			// 	response.basicClientResponse(response.statusCode);
 			// 	setConnection(false);
 			// }
-			// Should replace setConnection function called in simpleHTTP
+			// Should replace setConnection function called in simpleHTTP (already done)
 			if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
 				response.connection = "close";
 			else
 				response.connection = "keep-alive";
+
+			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
 			// extract location, return extract, replace request.path locations /dev/flick_esfand.gif becomes /dev/, /upload.html becomes /
 			if (request.path.find("/") == request.path.rfind("/"))
-				extracted_location = "/";
+				extracted_path = "/";
 			else
-				extracted_location = request.path.substr(request.path.find('/'),
+				extracted_path = request.path.substr(request.path.find('/'),
 					request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
-			if (serverBlock.getInfo().locations.count(extracted_location)){
-				//default_path = serverBlock.getInfo().locations[request.path].root_directory + request.path;
-/* 				std::cout << "root directory -> " << serverBlock.getInfo().locations[request.path].root_directory << std::endl;
-				std::cout << "request path -> " << request.path << std::endl;
-				std::cout << "index file -> " << serverBlock.getInfo().locations[request.path].index_file << std::endl; */
-				//std::cout << "location = " << serverBlock.getInfo().locations[request.path].location << std::endl;
-				//std::cout << "request path before =" << request.path << std::endl;
-				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_location].location 
-					+ serverBlock.getInfo().locations[extracted_location].index_file;
-				//std::cout << "request path after =" << request.path << std::endl;
+			std::cout << "extracted location = " << extracted_path << std::endl;
+			// end of extraction, need to test special cases but overall should function correctly
+
+			if (serverBlock.getInfo().locations.count(extracted_path)){
+				std::cout << "request path before =" << request.path << std::endl;
+				if (*(request.path.end() - 1) == '/')
+					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
+						+ serverBlock.getInfo().locations[extracted_path].index_file;
+				else if (request.path.find('.') != std::string::npos)
+					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
+						+ "sussy_files" + request.path;
+				else
+					request.path = serverBlock.getInfo().server_root + request.path;
+				std::cout << "request path after =" << request.path << std::endl;
 			}
+			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
 			handleMethod();
 		}
 		//make exception for error 431 "Request Header Fields Too Large"
@@ -227,12 +232,14 @@ void	Client::handleMethod()
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
+		//response.filePath = serverBlock.getInfo().server_root + request.path;
 	}
 	else if (request.method == "DELETE") {
-		if (!std::remove((serverBlock.getInfo().server_root + "sussy_files" + request.path).c_str())){
+		std::cout << "to delete: " << request.path << std::endl;
+		if (!std::remove(request.path.c_str())){
 			//Need to revise simpleHTTP function because of response status
 			//response.simpleHTTP("./var/www/dev/delete_success.html");
-			response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "delete_success.html";
+			response.filePath = serverBlock.getInfo().server_root + extracted_path + "delete_success.html";
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
@@ -253,6 +260,9 @@ void	Client::handleMethod()
 }
 
 void	Client::resolveChunkedBody(){
+
+	std::string fileToPost;
+
 	while (true)
 	{
 		std::size_t pos = request.chunkBuffer.find("\r\n");
@@ -286,10 +296,12 @@ void	Client::resolveChunkedBody(){
 	if (request.chunkedComplete)
 	{
 		recievingBody = false;
-		postFile.open("./var/www/sussy_files/file", std::ios::out);
+
+		fileToPost = serverBlock.getInfo().server_root + "/sussy_files/file";
+		postFile.open(fileToPost.c_str(), std::ios::out);
 		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
 		//response.simpleHTTP("./var/www/dev/parabens.html");
-		response.filePath = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[request.path].location + "parabens.html";
+		response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
 	}
 }
 

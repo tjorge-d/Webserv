@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/07/11 15:11:37 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/07/14 13:23:54 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, st
 
 static void setupClientmaxbodysize(HttpInfo *webserver, std::string acquired_maxbodysize)
 {
-	// This function will check if everything is gucci, AKA:
+	// This function will check if everything is functional, AKA:
 
 	// Is the client_max_body_size different from 0? if not, convert to 1 Mb, or 1024^2 (Client max size will always be in bytes to make things easier)
 
