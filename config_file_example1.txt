@@ -2,7 +2,7 @@ client_max_body_size 100 kb;
 
 	server_block start;
 
-		domain_port 8080;
+		domain_port 8081;
 
 		root ./var/www;
 

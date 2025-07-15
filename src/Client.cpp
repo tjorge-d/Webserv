@@ -85,6 +85,11 @@ void	Client::recieveMode()
 
 void	Client::sendMode()
 {
+
+	if (response.statusCode != OK)
+		setConnection(false);
+	response.createResponse();
+
 	state = WAITING_TO_SEND;
 	response.bytesSent = 0;
 
@@ -129,6 +134,8 @@ int	Client::recieveRequestChunk()
 				response.statusCode = CONTENT_TOO_LARGE;
 				if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end())
 					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[CONTENT_TOO_LARGE];
+				recievingBody = false;
+				bytes = -1;
 			}
 			else if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
@@ -152,10 +159,6 @@ int	Client::recieveRequestChunk()
 			throw ClientException("Incomplete request header", fd);
 		if (!recievingBody || request.chunkedComplete){
 			std::cout << "SEND MODE\n" << std::endl;
-			response.createResponse();
-			std::cout << "STATUS CODE -> " << response.statusCode << std::endl;
-			// if (response.statusCode != OK)
-			// 	setConnection(false);
 			sendMode();
 		}
 	}
@@ -330,8 +333,10 @@ void	Client::sendHeaderChunk()
 		std::cout << std::endl << "Client " << getFD() << " (Sending Body)" << std::endl;
 		state = SENDING_BODY;
 		if (response.statusCode != OK){
+			std::cout << "Sending error message -> " << getStatus(response.statusCode).c_str() << std::endl;
 			if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
 				throw ClientException("Failed to send a response", fd);
+			std::cout << "Sent!" << std::endl;
 			//setConnection(false);
 			recieveMode();
 		}

@@ -106,6 +106,7 @@ void pending_clients(std::map<int, Client*> &clients, EventHandler &events)
 			case DONE:{
 				std::map<int, Client *>::iterator delete_i = i--;
 				events.deleteClient(delete_i->second->getFD());
+				i = clients.begin();
 				break;}
 
 			default:;

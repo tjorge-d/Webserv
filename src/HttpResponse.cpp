@@ -59,6 +59,7 @@ void	HttpResponse::createResponse()
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
 	headerSize = headerStr.size();
 	std::cout << "Response:" << std::endl << headerStr << std::endl;
+
 }
 
 std::string	HttpResponse::getHttpDateHeader()
@@ -120,10 +121,10 @@ void	HttpResponse::setContentType()
 
 void	HttpResponse::setContentLength()
 {
-	if (!fileStream.is_open())
-		contentLenght = 0;
-	else if (statusCode != OK)
+	if (statusCode != OK)
 		contentLenght = getStatus(statusCode).size();
+	else if (!fileStream.is_open())
+		contentLenght = 0;
 	else
 		contentLenght = fileStats.st_size;
 }

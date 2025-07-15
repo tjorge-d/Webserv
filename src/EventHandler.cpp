@@ -77,7 +77,9 @@ void	EventHandler::addClient(int client_fd)
 	if (connections == maxConnections)
 	{
 		clients[client_fd]->setRequestStatus(SERVICE_UNAVAILABLE);
-		std::cout << "THIS GO FUCKED UP -> " << std::endl;
+		clients[client_fd]->sendMode();
+		//clients[client_fd]->basicClientResponse(503);
+		//clients[client_fd]->setConnection(false);
 	}
 	else
 		connections++;
@@ -95,7 +97,7 @@ void	EventHandler::removeClient(int client_fd)
 void	EventHandler::deleteClient(int	client_fd)
 {
 	if (clients[client_fd]->isConnected())
-			connections--;
+		connections--;
 
 	delete clients[client_fd];
 	clients.erase(client_fd);
