@@ -37,10 +37,11 @@ class Client
 		int				fd;
 		EventHandler	&events;
 		ServerBlock		&serverBlock;
+		std::string		extracted_path; //location block path
 		
 		// HTTP data
 		HttpRequest			request;
-        HttpResponse        response;		
+        HttpResponse        response;
 		std::fstream		postFile;
 		
 		// Flags

@@ -20,7 +20,7 @@
             const filename = document.getElementById('filename').value;
             const content = document.getElementById('fileContent').value;
 
-            fetch('/' + filename, {
+            fetch('/sussy_files/' + filename, {
                 method: 'PUT',
                 body: content
             }).then(res => res.text()).then(alert);

@@ -4,6 +4,8 @@ client_max_body_size 100 kb;
 
 		domain_port 8080;
 
+		root ./var/www;
+
 		server_name gofas;
 
 			location_block start;
@@ -12,9 +14,7 @@ client_max_body_size 100 kb;
 
 				services_available GET POST DELETE;
 
-				root /var/www/dev;
-
-				index_file /index.html;
+				index_file index.html;
 
 				autoindex off;
 
@@ -22,13 +22,11 @@ client_max_body_size 100 kb;
 
 			location_block start;
 
-				default_location /huh;
+				default_location /dev/;
 
 				services_available GET POST DELETE;
 
-				root /var/www/dev;
-
-				index_file /index.html;
+				index_file index.html;
 
 				autoindex off;
 
@@ -36,25 +34,51 @@ client_max_body_size 100 kb;
 
 			location_block start;
 
-				default_location /woah;
+				default_location /huh/;
 
 				services_available GET POST DELETE;
 
-				root /var/www/dev;
-
-				index_file /index.html;
+				index_file index.html;
 
 				autoindex off;
 
 			location_block end;
 
-		error_page 404 /404.html;
+			location_block start;
 
-		error_page 409 /409.html;
+				default_location /woah/;
 
-		error_page 500 /500.html;
+				services_available GET POST DELETE;
 
-		error_page 413 /503.html;
+				index_file index.html;
+
+				autoindex off;
+
+			location_block end;
+
+			location_block start;
+
+				default_location /cgi-bin/;
+
+				services_available GET POST DELETE;
+
+				index_file index.html;
+
+				cgi_available .py .php;
+
+				autoindex off;
+
+			location_block end;
+
+		error_page 404 /errors/404.html;
+
+		error_page 413 /errors/413.html;
+
+		error_page 409 /errors/409.html;
+
+		error_page 500 /errors/500.html;
+
+		error_page 503 /errors/503.html;
 
 		directory_request_redirect /var/www/dev/sideye.jpg;
 

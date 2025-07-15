@@ -6,15 +6,15 @@ client_max_body_size 10 Mb;
 
 		server_name gofas;
 
+		root ./var/www
+
 			location_block start;
 
-				default_location /dev;
+				default_location /qwertyui/;
 
 				services_available GET POST DELETE;
 
-				root /var/www;
-
-				index_file /index.html;
+				index_file index.html;
 
 				autoindex off;
 

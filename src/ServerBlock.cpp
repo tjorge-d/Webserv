@@ -33,3 +33,8 @@ ServerBlockInfo	&ServerBlock::getInfo()const
 {
 	return(info);
 }
+
+std::map<int, std::string>	&ServerBlock::getErrorPages()const
+{
+	return(this->info.error_codes);
+}
