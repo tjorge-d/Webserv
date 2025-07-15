@@ -6,6 +6,7 @@ Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock):
 fd(fd),
 events(events),
 serverBlock(serverBlock),
+sessionId(),
 request(),
 response(),
 postFile(),
@@ -15,6 +16,7 @@ recievingBody(false),
 state(WAITING_TO_RECIEVE)
 {
 	std::cout << "Client constructor called\n";
+	generateSessionId();
 }
 
 Client::~Client()
@@ -88,6 +90,7 @@ void	Client::sendMode()
 
 	if (response.statusCode != OK)
 		setConnection(false);
+	response.setSessionId(this->sessionId);
 	response.createResponse();
 
 	state = WAITING_TO_SEND;
@@ -367,6 +370,19 @@ void	Client::sendBodyChunk()
 		recieveMode();
 }
 
+void	Client::generateSessionId(){
+
+	static const char charset[] =
+        "0123456789"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    static const size_t charsetSize = sizeof(charset) - 1;
+	size_t length = 32;
+
+    for (size_t i = 0; i < length; ++i) {
+        this->sessionId += charset[std::rand() % charsetSize];
+    }
+}
 
 // EXCEPTIONS
 Client::ClientException::ClientException(std::string info, int fd) :

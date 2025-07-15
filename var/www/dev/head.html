@@ -19,7 +19,7 @@
             e.preventDefault();
             const path = document.getElementById('path').value;
 
-            fetch('/' + path, {
+            fetch('/dev/' + path, {
                 method: 'HEAD'
             }).then(res => {
                 document.getElementById('result').textContent =

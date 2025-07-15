@@ -54,6 +54,10 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
+	//COOKIES BEGIN HERE
+	headerStr += "Set-Cookie: sessionId=" + sessionId + "; Path=/; Max-Age=600; HttpOnly" + std::string(RESPONSE_LINE_END);
+	headerStr += "Set-Cookie: theme=dark; Path=/" + std::string(RESPONSE_LINE_END);
+	//COOKIES END HERE
 	headerStr += std::string(RESPONSE_LINE_END);
 
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
@@ -84,6 +88,11 @@ std::string HttpResponse::getLastModifiedHeader()
 	char	buffer[100];
     std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
     return std::string(buffer);    
+}
+
+void	HttpResponse::setSessionId(std::string clientSessionId){
+
+	this->sessionId = clientSessionId;
 }
 
 void	HttpResponse::openRequestedFile()

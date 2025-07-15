@@ -14,6 +14,7 @@
 # include <vector>
 # include <sstream>
 # include <climits>
+# include <ctime>
 
 # define SOCKET_BACKLOG		5 // Max queue size for listening sockets
 # define MAX_CONNECTIONS	2 // Max connections to the server
@@ -26,7 +27,7 @@
 # define CONTENT_TYPE_RESPONSE_HEADER "Content-Type:"
 # define CONTENT_LENGTH_RESPONSE_HEADER "Content-Length:"
 # define LAST_MODIFIED_RESPONSE_HEADER "Last-Modified:"
-# define CONNECTION_RESPONSE_HEADER "Conection:"
+# define CONNECTION_RESPONSE_HEADER "Connection:"
 # define PLAIN_TEXT "text/plain; charset=UTF-8"
 # define CLOSE_CONNECTION "close"
 # define KEEP_ALIVE_CONNECTION "keep-alive"
