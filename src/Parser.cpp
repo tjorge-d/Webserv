@@ -6,7 +6,7 @@
 /*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/07/14 13:23:54 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/07/15 15:04:13 by lmiguel-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,21 @@ static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, st
 			current_method != "OPTION" && current_method != "PUT" && current_method != "TRACE" && current_method != "CONNECT")
 			throw ParserException(Server, "Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD OPTION PUT TRACE CONNECT");
 		locationBlock->allowed_services.push_back(current_method);
+	}
+}
+
+static void setupCGIs(HttpInfo *Server, LocationBlockInfo *locationBlock, std::string acquired_cgis)
+{
+	std::string						current_cgi;
+	std::stringstream				stream(acquired_cgis);
+	
+
+	// check valid methods (also stringstream practice)
+	while (stream >> current_cgi)
+	{
+		if (current_cgi != ".py" && current_cgi != ".php")
+			throw ParserException(Server, "Attempt to configure invalid cgi. Allowed cgis are: .py (python) .php (php scripts)");
+		locationBlock->allowed_cgi.push_back(current_cgi);
 	}
 }
 
@@ -162,9 +177,12 @@ HttpInfo *config_parser(char *file_path, int argc)
 			for (std::vector<std::string>::iterator m = j->second.allowed_services.begin(); \
 			m != j->second.allowed_services.end(); m++)
 				std::cout << *m << std::endl;
+			for (std::vector<std::string>::iterator m = j->second.allowed_cgi.begin(); \
+			m != j->second.allowed_cgi.end(); m++)
+				std::cout << *m << std::endl;
 		}
 	}
-	
+
 
 	//----------------------------PARSER TROUBLESHOOTER ENDS HERE----------------------------
 
@@ -354,6 +372,21 @@ void parseLocationBlock(HttpInfo *Server){
 			}
 			else
 				throw ParserException(Server, "Attempting to set up a location on nonexistent location block.");
+		}
+		if ((Server->parser_info.line.find("cgi_available")) != std::string::npos)
+		{
+			if (Server->parser_info.location_setup_mode == true)
+			{
+				if (Server->parser_info.current_location_block.location.empty() || Server->parser_info.current_location_block.location != "/cgi-bin/")
+					throw ParserException(Server , "Attempting to setup CGIs in empty or outside of cgi-bin location.");
+				Server->parser_info.acquired_cgi = Server->parser_info.line.substr((Server->parser_info.line.find(' ') + 1), 
+					Server->parser_info.line.size() - Server->parser_info.line.find(' ') - 2);
+				if (Server->parser_info.acquired_cgi.empty())
+					throw ParserException(Server, "Your allowed cgis are empty.");
+				setupCGIs(Server, &Server->parser_info.current_location_block, Server->parser_info.acquired_cgi);
+			}
+			else
+				throw ParserException(Server, "Attempting to set up cgis on nonexistent location block.");
 		}
 }
 

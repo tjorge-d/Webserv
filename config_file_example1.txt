@@ -56,6 +56,20 @@ client_max_body_size 100 kb;
 
 			location_block end;
 
+			location_block start;
+
+				default_location /cgi-bin/;
+
+				services_available GET POST DELETE;
+
+				index_file index.html;
+
+				cgi_available .py .php;
+
+				autoindex off;
+
+			location_block end;
+
 		error_page 404 /errors/404.html;
 
 		error_page 413 /errors/413.html;

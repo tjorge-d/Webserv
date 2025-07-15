@@ -58,13 +58,24 @@
 
     <h1>Upload a File (POST Method)</h1>
 
-    <form action="upload" method="POST" enctype="multipart/form-data">
+    <form id= "uploadForm" action="upload" method="POST" enctype="multipart/form-data">
         <label for="image">Select file to upload:</label>
         <input type="file" id="image" name="image" required>
         <button type="submit">Upload</button>
     </form>
 
-    <a href="index.html" class="nav-link">← Back to Home</a>
+	
+	<script>
+		document.getElementById('uploadForm').addEventListener('submit', function(e) {
+			e.preventDefault();
+            const filename = document.getElementById('filename').value;
+			
+            fetch("/sussy_files/" + filename, {
+				method: 'POST'
+            }).then(res => res.text()).then(alert);
+        });
+	</script>
 
+	<a href="index.html" class="nav-link">← Back to Home</a>
 </body>
 </html>

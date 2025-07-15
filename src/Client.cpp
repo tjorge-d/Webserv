@@ -205,9 +205,9 @@ void	Client::appendToRequest(char* buffer, int size)
 				if (*(request.path.end() - 1) == '/')
 					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
-				else if (request.path.find('.') != std::string::npos)
+/* 				else if (request.path.find('.') != std::string::npos)
 					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
-						+ "sussy_files" + request.path;
+					 + request.path; */
 				else
 					request.path = serverBlock.getInfo().server_root + request.path;
 				std::cout << "request path after =" << request.path << std::endl;
@@ -236,10 +236,10 @@ void	Client::handleMethod()
 	}
 	else if (request.method == "DELETE") {
 		std::cout << "to delete: " << request.path << std::endl;
-		if (!std::remove(request.path.c_str())){
+		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
 			//Need to revise simpleHTTP function because of response status
 			//response.simpleHTTP("./var/www/dev/delete_success.html");
-			response.filePath = serverBlock.getInfo().server_root + extracted_path + "delete_success.html";
+			response.filePath = serverBlock.getInfo().server_root + "/parabens.html";
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.

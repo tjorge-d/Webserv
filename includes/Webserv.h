@@ -58,6 +58,7 @@ struct LocationBlockInfo{
 	
 	bool												autoindex;
 	std::vector<std::string>							allowed_services;
+	std::vector<std::string>							allowed_cgi;
 	std::string											location;
 	std::string											index_file;
 };
@@ -81,6 +82,7 @@ struct ParserInfo{
 	std::string							newline;
 	std::string							current_start;
 	std::string							acquired_services;
+	std::string							acquired_cgi;
 	std::string							acquired_max_body_size;
 	std::ifstream						config_file;
 	bool 								max_size_acquired;
