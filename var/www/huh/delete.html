@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DELETE File</title>
+</head>
+<body>
+    <h1>DELETE File</h1>
+    <form id="deleteForm">
+        <label for="filename">Filename to Delete:</label>
+        <input type="text" id="filename" required placeholder="e.g. file.txt">
+        <button type="submit">Send DELETE Request</button>
+    </form>
+
+    <script>
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const filename = document.getElementById('filename').value;
+
+            fetch("/sussy_files/" + filename, {
+                method: 'DELETE'
+            }).then(res => res.text()).then(alert);
+        });
+    </script>
+</body>
+</html>

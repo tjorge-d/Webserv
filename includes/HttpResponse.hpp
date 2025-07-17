@@ -23,6 +23,7 @@ class HttpResponse
 
 		//COOKIE ATTRIBUTES
 		std::string		sessionId;
+		std::string		currentPath;
 
 		std::vector<char>	header;
 		int					headerSize;
@@ -45,6 +46,7 @@ class HttpResponse
 
 		void		openRequestedFile();
 		void		setSessionId(std::string sessionId);
+		void		setPath(std::string path);
 		void		setContentType();
 		void		setContentLength();
 		void		reset();

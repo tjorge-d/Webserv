@@ -93,9 +93,11 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 
 		if (key == "Content-Length")
 			contentLenght = std::atoi(value.c_str());
-		else if (key == "Transfer-Encoding" && value == "chunked"){
+		else if (key == "Transfer-Encoding" && value == "chunked")
 			isChunked = true;
-		}
+		else if (key == "Cookie")
+			this->cookie = value;
+		std::cout << "this->cookie = " << this->cookie << std::endl;
 	}
 
 	// Clean request buffer

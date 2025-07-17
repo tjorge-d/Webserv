@@ -91,6 +91,7 @@ void	Client::sendMode()
 	if (response.statusCode != OK)
 		setConnection(false);
 	response.setSessionId(this->sessionId);
+	response.setPath(request.path);
 	response.createResponse();
 
 	state = WAITING_TO_SEND;
@@ -209,7 +210,7 @@ void	Client::appendToRequest(char* buffer, int size)
 			if (serverBlock.getInfo().locations.count(extracted_path)){
 				std::cout << "request path before =" << request.path << std::endl;
 				if (*(request.path.end() - 1) == '/')
-					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
+					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
 /* 				else if (request.path.find('.') != std::string::npos)
 					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 

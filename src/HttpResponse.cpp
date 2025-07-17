@@ -55,8 +55,12 @@ void	HttpResponse::createResponse()
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
 	//COOKIES BEGIN HERE
-	headerStr += "Set-Cookie: sessionId=" + sessionId + "; Path=/; Max-Age=600; HttpOnly" + std::string(RESPONSE_LINE_END);
-	headerStr += "Set-Cookie: theme=dark; Path=/" + std::string(RESPONSE_LINE_END);
+	headerStr += "Set-Cookie: sessionId=" + sessionId + "; Max-Age=600; Path=/; HttpOnly" + std::string(RESPONSE_LINE_END);
+	//put condition to check if theme switch button was pressed or not. default theme is white (alternate, check filepath to see if alt is there before .html)
+	if (this->currentPath.find("_alt.html") != std::string::npos)
+		headerStr += "Set-Cookie: theme=dark; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
+	else if (this->currentPath.find("_alt.html") == std::string::npos)
+		headerStr += "Set-Cookie: theme=light; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
 	//COOKIES END HERE
 	headerStr += std::string(RESPONSE_LINE_END);
 
@@ -93,6 +97,11 @@ std::string HttpResponse::getLastModifiedHeader()
 void	HttpResponse::setSessionId(std::string clientSessionId){
 
 	this->sessionId = clientSessionId;
+}
+
+void HttpResponse::setPath(std::string path){
+
+	this->currentPath = path;
 }
 
 void	HttpResponse::openRequestedFile()
