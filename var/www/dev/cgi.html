@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CGI Test Page</title>
+</head>
+<body>
+  <h1>Test CGI Script</h1>
+
+  <h2>GET Request</h2>
+  <form action="/cgi-bin/echo.cgi" method="get">
+    <label for="name">Name:</label>
+    <input type="text" name="name" id="name">
+    <br>
+    <label for="age">Age:</label>
+    <input type="text" name="age" id="age">
+    <br>
+    <input type="submit" value="Send GET Request">
+  </form>
+
+  <h2>POST Request</h2>
+  <form action="/cgi-bin/echo.cgi" method="post">
+    <label for="city">City:</label>
+    <input type="text" name="city" id="city">
+    <br>
+    <label for="country">Country:</label>
+    <input type="text" name="country" id="country">
+    <br>
+    <input type="submit" value="Send POST Request">
+  </form>
+</body>
+</html>
