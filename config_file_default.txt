@@ -6,7 +6,7 @@ client_max_body_size 10 Mb;
 
 		server_name gofas;
 
-		root ./var/www
+		root ./var/www;
 
 			location_block start;
 

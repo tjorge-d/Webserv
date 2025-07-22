@@ -24,6 +24,7 @@ class HttpResponse
 		//COOKIE ATTRIBUTES
 		std::string		sessionId;
 		std::string		currentPath;
+		std::string		currentCookie;
 
 		std::vector<char>	header;
 		int					headerSize;

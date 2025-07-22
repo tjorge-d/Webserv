@@ -92,6 +92,7 @@ void	Client::sendMode()
 		setConnection(false);
 	response.setSessionId(this->sessionId);
 	response.setPath(request.path);
+	response.currentCookie = request.cookie;
 	response.createResponse();
 
 	state = WAITING_TO_SEND;
@@ -206,19 +207,21 @@ void	Client::appendToRequest(char* buffer, int size)
 					request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
 			std::cout << "extracted location = " << extracted_path << std::endl;
 			// end of extraction, need to test special cases but overall should function correctly
+			if (!serverBlock.getInfo().locations.count(extracted_path)){
 
-			if (serverBlock.getInfo().locations.count(extracted_path)){
-				std::cout << "request path before =" << request.path << std::endl;
-				if (*(request.path.end() - 1) == '/')
-					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
-						+ serverBlock.getInfo().locations[extracted_path].index_file;
-/* 				else if (request.path.find('.') != std::string::npos)
-					request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
-					 + request.path; */
-				else
-					request.path = serverBlock.getInfo().server_root + request.path;
-				std::cout << "request path after =" << request.path << std::endl;
+				response.statusCode = NOT_FOUND;
+				return ;
 			}
+			std::cout << "request path before =" << request.path << std::endl;
+			if (*(request.path.end() - 1) == '/')
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
+					+ serverBlock.getInfo().locations[extracted_path].index_file;
+/* 			else if (request.path.find('.') != std::string::npos)
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
+				 + request.path; */
+			else
+				request.path = serverBlock.getInfo().server_root + request.path;
+			std::cout << "request path after =" << request.path << std::endl;
 			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
 			handleMethod();
 		}

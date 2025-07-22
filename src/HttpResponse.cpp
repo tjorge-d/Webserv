@@ -54,16 +54,22 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(CONNECTION_RESPONSE_HEADER);
 	headerStr += statusCode == OK ? " " + connection : " " + std::string(CLOSE_CONNECTION);
 	headerStr += std::string(RESPONSE_LINE_END);
+
 	//COOKIES BEGIN HERE
-	headerStr += "Set-Cookie: sessionId=" + sessionId + "; Max-Age=600; Path=/; HttpOnly" + std::string(RESPONSE_LINE_END);
+
+	if (this->currentCookie.find("sessionId=") == std::string::npos)
+		headerStr += "Set-Cookie: sessionId=" + sessionId + "; Max-Age=600; Path=/; HttpOnly" + std::string(RESPONSE_LINE_END);
 	//put condition to check if theme switch button was pressed or not. default theme is white (alternate, check filepath to see if alt is there before .html)
-	if (this->currentPath.find("_alt.html") != std::string::npos)
+	if (this->currentCookie.find("theme=light") != std::string::npos && this->currentPath.find("_alt.html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=dark; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
 	else if (this->currentPath.find("_alt.html") == std::string::npos)
 		headerStr += "Set-Cookie: theme=light; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
-	//COOKIES END HERE
-	headerStr += std::string(RESPONSE_LINE_END);
+	std::cout << "Cookie Current Path = " << currentPath << std::endl;
 
+	//COOKIES END HERE
+	headerStr += "Cache-Control: no-cache, no-store, must-revalidate\r\n";
+	headerStr += "Expires: 0\r\n";
+	headerStr += std::string(RESPONSE_LINE_END);
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
 	headerSize = headerStr.size();
 	std::cout << "Response:" << std::endl << headerStr << std::endl;
