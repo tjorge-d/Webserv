@@ -62,7 +62,7 @@ void	HttpResponse::createResponse()
 	//put condition to check if theme switch button was pressed or not. default theme is white (alternate, check filepath to see if alt is there before .html)
 	if (this->currentPath.find("_alt.html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=dark; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
-	else if (this->currentPath.find("_alt.html") == std::string::npos && this->currentPath.find(".html") != std::string::npos)
+	else if (this->currentPath.find(".html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=light; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
 	std::cout << "Cookie Current Path = " << currentPath << std::endl;
 

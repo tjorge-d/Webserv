@@ -214,8 +214,7 @@ void	Client::appendToRequest(char* buffer, int size)
 			}
 			std::cout << "request path before =" << request.path << std::endl;
 			if (*(request.path.end() - 1) == '/')
-				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
-					+ serverBlock.getInfo().locations[extracted_path].index_file;
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location;
 /* 			else if (request.path.find('.') != std::string::npos)
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
 				 + request.path; */
@@ -236,14 +235,16 @@ void	Client::handleMethod()
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		//response.simpleHTTP("./var/www/dev" + request.path);
-		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
-				+ serverBlock.getInfo().locations[extracted_path].index_file 
-				&& request.cookie.find("theme=dark") != std::string::npos)
-			request.path = serverBlock.getInfo().server_root
-				+ serverBlock.getInfo().locations[extracted_path].location
-				+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html"))
-				+ "_alt"
-				+ serverBlock.getInfo().locations[extracted_path].index_file.substr(serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html"));
+		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location){
+			if (request.cookie.find("theme=dark") != std::string::npos)
+				request.path = serverBlock.getInfo().server_root 
+					+ serverBlock.getInfo().locations[extracted_path].location
+					+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, 
+						serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html")) + "_alt.html";
+			else
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
+						+ serverBlock.getInfo().locations[extracted_path].index_file;
+		}
 		response.filePath = request.path;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
