@@ -236,6 +236,14 @@ void	Client::handleMethod()
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		//response.simpleHTTP("./var/www/dev" + request.path);
+		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
+				+ serverBlock.getInfo().locations[extracted_path].index_file 
+				&& request.cookie.find("theme=dark") != std::string::npos)
+			request.path = serverBlock.getInfo().server_root
+				+ serverBlock.getInfo().locations[extracted_path].location
+				+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html"))
+				+ "_alt"
+				+ serverBlock.getInfo().locations[extracted_path].index_file.substr(serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html"));
 		response.filePath = request.path;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
@@ -249,7 +257,7 @@ void	Client::handleMethod()
 		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
 			//Need to revise simpleHTTP function because of response status
 			//response.simpleHTTP("./var/www/dev/delete_success.html");
-			response.filePath = serverBlock.getInfo().server_root + "/parabens.html";
+			response.filePath = serverBlock.getInfo().server_root + request.path;
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
