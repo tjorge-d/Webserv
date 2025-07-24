@@ -3,7 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <title>HEAD Test</title>
+	<style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        input, button {
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        .theme-button {
+            display: inline-block;
+            margin-top: 500px;
+            padding: 10px 20px;
+            background-color: #080808;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+        }
+
+		.home-button {
+            display: inline-block;
+            margin-top: 100px;
+            padding: 10px 20px;
+            background-color: #080808;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+        }
+
+		.theme-button:hover{
+
+			background-color: #424141;
+		}
+		
+		.home-button:hover{
+
+			background-color: #424141;
+		}
+	</style>
+
+
 </head>
+
+
 <body>
     <h1>HEAD Request</h1>
     <form id="headForm">
@@ -13,6 +62,14 @@
     </form>
 
     <div id="result"></div>
+
+	<div>
+		<a href="index.html" class="home-button"> Return to Homepage</a>
+	</div>
+
+    <div>
+        <a href="head_alt.html" class="theme-button">Switch to Dark Theme</a>
+    </div>
 
     <script>
         document.getElementById('headForm').addEventListener('submit', function(e) {

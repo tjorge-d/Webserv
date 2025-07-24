@@ -20,8 +20,9 @@
 
         .image-container img {
             max-width: 100%;
+			margin-top: 50px;
             height: auto;
-            border: 1px solid #444; /* Darker border for dark mode */
+            border: 1px solid #ccc;
         }
 
         .test-link {
@@ -39,31 +40,52 @@
         }
 
         .link-group {
-            margin-top: 30px;
+            margin-top: 100px;
         }
+
+		.theme-button {
+            display: inline-block;
+            margin-left: 0px;
+			margin-top: 100px;
+            padding: 10px 20px;
+            background-color: #f1f2f3;
+            color: rgb(15, 15, 15);
+            text-decoration: none;
+            border-radius: 15px;
+		}
+
+		.theme-button:hover{
+
+			background-color: #a1a1a1;
+		}
+
     </style>
 </head>
 <body>
 
-    <h1>Welcome to Our Website</h1>
+    <h1>Welcome to Our Webserver Test Page</h1>
+    <p>This is the development interface for testing HTTP methods.</p>
 
-    <!-- New message for logged in -->
-    <p><strong>You are logged in.</strong></p>
-
-    <p> THIS IS THE DEV BUILD </p>
     <div class="image-container">
-        <!--image goes here, something funny-->
-        <img src="flick-esfand.gif" alt="sideye.jpg" />
+		<img src="flick-esfand.gif" alt="sideye.jpg">
     </div>
 
     <div class="link-group">
-        <a href="upload.html" class="test-link">Test POST (Upload)</a>
-        <a href="put.html" class="test-link">Test PUT</a>
-        <a href="delete.html" class="test-link">Test DELETE</a>
-        <a href="head.html" class="test-link">Test HEAD</a>
-        <a href="options.html" class="test-link">Test OPTIONS</a>
-        <a href="trace.html" class="test-link">Test TRACE</a>
+		<a href="upload_alt.html" class="test-link">Test POST (Upload)</a>
+        <a href="put_alt.html" class="test-link">Test PUT</a>
+        <a href="delete_alt.html" class="test-link">Test DELETE</a>
+        <a href="head_alt.html" class="test-link">Test HEAD</a>
+        <a href="options_alt.html" class="test-link">Test OPTIONS</a>
+        <a href="trace_alt.html" class="test-link">Test TRACE</a>
     </div>
+
+	<div class="button">
+		<a href="index.html" class="theme-button"> Switch to Light Theme</a>
+	</div>
+
+<!-- 	<form method="GET" action="index.html">
+		<button class="theme-button">Switch to Light Theme</button>
+	</form> -->
 
 </body>
 </html>

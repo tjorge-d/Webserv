@@ -222,8 +222,8 @@ void	Client::appendToRequest(char* buffer, int size)
 				request.path = serverBlock.getInfo().server_root + request.path;
 			std::cout << "request path after =" << request.path << std::endl;
 			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
-			handleMethod();
-		}
+				handleMethod();
+			}
 		//make exception for error 431 "Request Header Fields Too Large"
 		/* basicClientResponse("Request header fields too large.", getStatus(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		setConnection(false); */
@@ -245,35 +245,43 @@ void	Client::handleMethod()
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
 		}
-		response.filePath = request.path;
+		std::ifstream fileStream(request.path.c_str());
+
+		if (!fileStream.good()){
+			response.statusCode = NOT_FOUND;
+			if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
+				response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
+				response.currentPath = response.filePath;
+			}
+		}
+		else
+			response.filePath = request.path;
+		std::cout << "response.filePath = " << response.filePath << std::endl;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
-		//response.filePath = serverBlock.getInfo().server_root + request.path;
 	}
 	else if (request.method == "DELETE") {
 		std::cout << "to delete: " << request.path << std::endl;
 		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
-			//Need to revise simpleHTTP function because of response status
-			//response.simpleHTTP("./var/www/dev/delete_success.html");
 			response.filePath = serverBlock.getInfo().server_root + request.path;
 		}
 		else{
-			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
 			response.statusCode = INTERNAL_SERVER_ERROR;
+			if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end())
+					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
 		}
 	}
 	else if (request.method == "HEAD") {
-		//response.simpleHTTP("./var/www/" + request.path);
 		response.filePath = serverBlock.getInfo().server_root + request.path;
 		response.contentLenght = 0;
 	}
 	else {
 		response.statusCode = METHOD_NOT_ALLOWED;
-		// response.basicClientResponse(405);
-		// setConnection(false);
+		if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end())
+					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[METHOD_NOT_ALLOWED];
 	}
 	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
