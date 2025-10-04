@@ -76,6 +76,7 @@ void	EventHandler::addClient(int client_fd)
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
 	{
+		printf("Max connections reached. Rejecting client %d\n", client_fd);
 		clients[client_fd]->setRequestStatus(SERVICE_UNAVAILABLE);
 		clients[client_fd]->sendMode();
 		//clients[client_fd]->basicClientResponse(503);
@@ -163,9 +164,22 @@ void	EventHandler::handleServerEvent(int server_fd)
 	}
 
 	// Adds the new client to the map of clients and to epoll
-	Client	*client = new Client(client_fd, *this, *serverBlocks[server_fd]);
-	clients[client_fd] = client;
-	addClient(client_fd);
+	Client	*client = NULL;
+	try {
+		client = new Client(client_fd, *this, *serverBlocks[server_fd]);
+		clients[client_fd] = client;
+		addClient(client_fd);
+	}
+	catch (const std::exception& e) {
+		// Clean up the client if it was created
+		if (client) {
+			delete client;
+			clients.erase(client_fd);
+		}
+		// Close the client file descriptor
+		close(client_fd);
+		throw;
+	}
 }
 
 void	EventHandler::handleClientEvent(epoll_event& event)

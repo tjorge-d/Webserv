@@ -89,11 +89,20 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 		key = trim(key);
 		value = trim(value);
 
+		// Store headers with original case for compatibility, but use lowercase for lookups
 		headerInfo[key] = value;
+		std::string key_lower = toLowerCase(key);
 
-		if (key == "Content-Length")
-			contentLenght = std::atoi(value.c_str());
-		else if (key == "Transfer-Encoding" && value == "chunked"){
+		if (key_lower == "content-length") {
+			int temp_length;
+			// Validate Content-Length: must be non-negative and reasonable size (max 100MB)
+			if (!safeParseInt(value, temp_length, 0, 104857600)) {
+				std::cerr << "Invalid Content-Length: " << value << std::endl;
+				return (BAD_REQUEST);
+			}
+			contentLenght = temp_length;
+		}
+		else if (key_lower == "transfer-encoding" && toLowerCase(value) == "chunked"){
 			isChunked = true;
 		}
 	}
@@ -105,16 +114,26 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 }
 
 void	HttpRequest::parseRequestBody(){
-	if (headerInfo["Content-Type"].substr(0, headerInfo["Content-Type"].find(";")) == "multipart/form-data")
+	std::string content_type = getHeader("Content-Type");
+	std::string content_type_lower = toLowerCase(content_type);
+	
+	if (content_type_lower.substr(0, content_type_lower.find(";")) == "multipart/form-data")
 		parseMultiPartFormData();
-	else if (headerInfo["Content-Type"].substr(0, headerInfo["Content-Type"].find(";")).substr(0, headerInfo["Content-Type"].find("/")) == "text")
+	else if (content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "text")
 		parseTextPlain();
 }
 
 void	HttpRequest::parseMultiPartFormData(){
 	std::string	boundaryKey = "boundary=";
-	size_t		pos = headerInfo["Content-Type"].find(boundaryKey), nextPart;
-	std::string	boundary = headerInfo["Content-Type"].substr(pos + boundaryKey.size());
+	std::string content_type = getHeader("Content-Type");
+	size_t		pos = content_type.find(boundaryKey), nextPart;
+	
+	if (pos == std::string::npos) {
+		std::cerr << "No boundary found in multipart content-type" << std::endl;
+		return;
+	}
+	
+	std::string	boundary = content_type.substr(pos + boundaryKey.size());
 	std::string delimiter = "--" + boundary, endDelimiter = delimiter + "--";
 	std::string	requestBody(buffer.begin(), buffer.end());
 
@@ -177,3 +196,50 @@ void	HttpRequest::parseTextPlain(){
 
 HttpRequest::ResponseException::ResponseException(std::string info) :
 runtime_error(info){}
+
+bool HttpRequest::safeParseInt(const std::string& str, int& result, int min_val, int max_val)
+{
+	if (str.empty())
+		return false;
+	
+	// Check for non-numeric characters
+	for (size_t i = 0; i < str.length(); i++) {
+		if (!std::isdigit(str[i]) && !(i == 0 && str[i] == '-'))
+			return false;
+	}
+	
+	try {
+		long long temp = std::strtoll(str.c_str(), NULL, 10);
+		if (temp < min_val || temp > max_val)
+			return false;
+		
+		result = static_cast<int>(temp);
+		return true;
+	} catch (...) {
+		return false;
+	}
+}
+
+std::string HttpRequest::toLowerCase(const std::string& str) const
+{
+	std::string result = str;
+	for (size_t i = 0; i < result.length(); i++) {
+		result[i] = std::tolower(result[i]);
+	}
+	return result;
+}
+
+std::string HttpRequest::getHeader(const std::string& key) const
+{
+	std::string key_lower = toLowerCase(key);
+	
+	// Search through headers case-insensitively
+	for (std::map<std::string, std::string>::const_iterator it = headerInfo.begin(); 
+		 it != headerInfo.end(); ++it) {
+		if (toLowerCase(it->first) == key_lower) {
+			return it->second;
+		}
+	}
+	
+	return ""; // Header not found
+}

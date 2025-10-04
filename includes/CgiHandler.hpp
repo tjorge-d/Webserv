@@ -4,7 +4,7 @@
 # include <vector>
 # include <map>
 # include <iostream>
-#include "../includes/HttpRequest.hpp"
+#include "HttpRequest.hpp"
 
 enum    metaVar{
 	AUTH_TYPE = 0,
@@ -15,15 +15,13 @@ enum    metaVar{
 	PATH_TRANSLATED,
 	QUERY_STRING,
 	REMOTE_ADDR,
-	REMOTE_HOST,
-	REMOTE_IDENT,
-	REMOTE_USER,
 	REQUEST_METHOD,
 	SCRIPT_NAME,
 	SERVER_NAME,
 	SERVER_PORT,
 	SERVER_PROTOCOL,
-	SERVER_SOFTWARE
+	SERVER_SOFTWARE,
+	HTTP_COOKIE
 };
 
 class HttpRequest;
@@ -41,7 +39,12 @@ class CgiHandler
 		~CgiHandler();
 
 		void		initEnv(HttpRequest request);
-		std::string	decodeQuery(HttpRequest request);
+		std::string	extractPathInfo(std::string path);
+		std::string	extractPathTranslated(std::string path);
+		std::string	extractQuery(std::string path);
+		std::string	extractScript(std::string path);
+		int			executeCgi(const std::string& scriptPath, const std::string& interpreter,
+		              const std::string& requestBody, std::string& cgiOutput);
 };
 
 #endif

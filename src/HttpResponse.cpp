@@ -88,22 +88,24 @@ std::string HttpResponse::getLastModifiedHeader()
 
 void	HttpResponse::openRequestedFile()
 {
+	size_t queryPos = filePath.find('?');
+	std::string pathWithoutQuery = (queryPos != std::string::npos) ? filePath.substr(0, queryPos) : filePath;
 	// Protects the function to execute it safely
 	if (fileStream.is_open())
 		throw ResponseException("A file is already opened");
 	
 	// Opens the file and retrieves the necessary information
-	fileStream.open(filePath.c_str(), std::ios::in);
+	fileStream.open(pathWithoutQuery.c_str(), std::ios::in);
 	if (!fileStream.is_open())
-		throw ResponseException("Failed to open the file \"" + filePath + "\"");
+		throw ResponseException("Failed to open the file \"" + pathWithoutQuery + "\"");
 	if (!fileStream.good())
 		{
 			fileStream.close();
 			throw ResponseException("Error while opening File");
 		}
-	std::cout << "FILE OPENED -> " << filePath.c_str() << std::endl;
-	if (stat(filePath.c_str(), &fileStats) == -1)
-		throw ResponseException("Failed to retrieve the stats of the file \"" + filePath + "\"");
+	std::cout << "FILE OPENED -> " << pathWithoutQuery.c_str() << std::endl;
+	if (stat(pathWithoutQuery.c_str(), &fileStats) == -1)
+		throw ResponseException("Failed to retrieve the stats of the file \"" + pathWithoutQuery + "\"");
 }
 
 void	HttpResponse::setContentType()
@@ -124,7 +126,7 @@ void	HttpResponse::setContentLength()
 	if (statusCode != OK)
 		contentLenght = getStatus(statusCode).size();
 	else if (!fileStream.is_open())
-		contentLenght = 0;
+		contentLenght = body.size();
 	else
 		contentLenght = fileStats.st_size;
 }

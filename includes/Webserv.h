@@ -16,7 +16,7 @@
 # include <climits>
 
 # define SOCKET_BACKLOG		5 // Max queue size for listening sockets
-# define MAX_CONNECTIONS	2 // Max connections to the server
+# define MAX_CONNECTIONS	10 // Max connections to the server
 # define BODY_SIZE_MAX		2147483647; //2 Gb max
 
 # define HTTP_ACCEPTED_VERSION "HTTP/1.1"
@@ -115,5 +115,6 @@ void parseServerBlock(HttpInfo *Server);
 void parseServerInfo(HttpInfo *Server);
 std::string	getStatus(int code);
 std::string trim(const std::string &s);
+std::string sanitizePath(const std::string &path, const std::string &webroot);
 
 #endif

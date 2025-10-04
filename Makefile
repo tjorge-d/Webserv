@@ -1,10 +1,11 @@
-NAME= webserv
+NAME = webserv
 
-CXX= c++
-CXXFLAGS=-Wall -Werror -Wextra -std=c++98 -g
+CXX = c++
+CXXFLAGS =-Wall -Werror -Wextra -std=c++98 -g -fsanitize=address
 
-SRC_A= $(addprefix src/, $(SOURCES_A))
-SOURCES_A= main.cpp	\
+SRC_A = $(addprefix src/, $(SOURCES_A))
+SOURCES_A = CgiHandler.cpp	\
+main.cpp	\
 EventHandler.cpp	\
 ListeningSocket.cpp	\
 ConnectingSocket.cpp	\
@@ -13,10 +14,11 @@ Client.cpp	\
 ServerBlock.cpp	\
 HttpResponse.cpp	\
 HttpRequest.cpp	\
-Parser.cpp
+Parser.cpp	\
+Server.cpp
 
-OBJ_DIR= objects
-OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))
+OBJ_DIR = objects
+OBJ = $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))
 
 all: $(NAME)
 

@@ -20,10 +20,12 @@ class HttpResponse
 		std::string 	contentType;
 		int				contentLenght;
 		std::string 	connection;
+		bool			cgi;
 
 		std::vector<char>	header;
 		int					headerSize;
 		int 				bytesSent;
+		std::string			body;
 		
 		std::string		filePath;
 		struct stat		fileStats;

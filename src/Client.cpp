@@ -12,7 +12,8 @@ postFile(),
 connected(true),
 recievingHeader(true),
 recievingBody(false),
-state(WAITING_TO_RECIEVE)
+state(WAITING_TO_RECIEVE),
+lastActivity(time(NULL))
 {
 	std::cout << "Client constructor called\n";
 }
@@ -88,7 +89,8 @@ void	Client::sendMode()
 
 	if (response.statusCode != OK)
 		setConnection(false);
-	response.createResponse();
+	if (!response.cgi)
+		response.createResponse();
 
 	state = WAITING_TO_SEND;
 	response.bytesSent = 0;
@@ -103,6 +105,9 @@ int	Client::recieveRequestChunk()
 	if(state != RECIEVING_REQUEST){
 		throw ClientException("Invalid client state to call recieveResponseChunk()", fd);
 	}
+
+	// Update activity timestamp
+	updateActivity();
 
 	// Stores the data from the client fd in a buffer
 	char	buffer[CHUNK_SIZE];
@@ -231,7 +236,8 @@ void	Client::handleMethod()
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		//response.simpleHTTP("./var/www/dev" + request.path);
-		response.filePath = request.path;
+		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
+		response.filePath = safe_path;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
 	{
@@ -240,20 +246,23 @@ void	Client::handleMethod()
 		//response.filePath = serverBlock.getInfo().server_root + request.path;
 	}
 	else if (request.method == "DELETE") {
-		std::cout << "to delete: " << request.path << std::endl;
-		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
+		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
+		std::cout << "to delete: " << safe_path << std::endl;
+		if (!std::remove((serverBlock.getInfo().server_root + safe_path).c_str())){
 			//Need to revise simpleHTTP function because of response status
 			//response.simpleHTTP("./var/www/dev/delete_success.html");
 			response.filePath = serverBlock.getInfo().server_root + "/parabens.html";
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
+			dprintf(2, "Failed to delete file: %s\n", strerror(errno));
 			response.statusCode = INTERNAL_SERVER_ERROR;
 		}
 	}
 	else if (request.method == "HEAD") {
 		//response.simpleHTTP("./var/www/" + request.path);
-		response.filePath = serverBlock.getInfo().server_root + request.path;
+		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
+		response.filePath = serverBlock.getInfo().server_root + safe_path;
 		response.contentLenght = 0;
 	}
 	else {
@@ -261,6 +270,47 @@ void	Client::handleMethod()
 		// response.basicClientResponse(405);
 		// setConnection(false);
 	}
+
+	// --- CGI HANDLING ---
+	std::string path = request.path;
+	size_t queryPos = path.find('?');
+	std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
+
+	if (pathWithoutQuery.size() > 3 && pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py") {
+		std::string requestBody = request.body; // For POST, otherwise empty
+		std::string interpreter = "/usr/bin/python3"; // Adjust if needed
+		std::string cgiOutput;
+		CgiHandler cgi(pathWithoutQuery, 0, request); // pid not used here
+
+		int status = cgi.executeCgi(pathWithoutQuery, interpreter, requestBody, cgiOutput);
+
+		if (status == 0) {
+			// Parse CGI output: split headers and body
+			dprintf(2, "CGI Output:\n%s\n", cgiOutput.c_str());
+			size_t headerEnd = cgiOutput.find("\r\n\r\n");
+			if (headerEnd != std::string::npos) {
+				std::string headers = cgiOutput.substr(0, headerEnd + 4); // include \r\n\r\n
+				std::string body = cgiOutput.substr(headerEnd + 4);
+				// Set response headers and body accordingly
+				response.header = std::vector<char>(headers.begin(), headers.end());
+				response.body = body;
+				response.statusCode = 200; // Or parse from CGI output
+				response.cgi = true;
+			} else {
+				// Malformed CGI output
+				dprintf(2, "Malformed CGI output: %s\n", cgiOutput.c_str());
+				response.statusCode = 500;
+			}
+		} else {
+			// CGI execution failed
+			dprintf(2, "CGI execution failed: %s\n", cgiOutput.c_str());
+			response.statusCode = 500;
+		}
+		return; // Done with CGI
+	}
+	// --- END CGI HANDLING ---
+	response.cgi = false;
+
 	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
 
@@ -389,4 +439,15 @@ std::string Client::ClientErrorException::createMessage(std::string info, int fd
 	std::ostringstream oss;
 	oss << info << " (Client " << fd << ")";
 	return oss.str();
+}
+
+// Timeout management methods
+void Client::updateActivity()
+{
+	lastActivity = time(NULL);
+}
+
+bool Client::isTimedOut() const
+{
+	return (time(NULL) - lastActivity > TIMEOUT_SECONDS);
 }
