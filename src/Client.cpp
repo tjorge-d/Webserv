@@ -268,8 +268,9 @@ void	Client::handleMethod()
 	}
 	else if (request.method == "DELETE") {
 		std::cout << "to delete: " << request.path << std::endl;
-		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
-			response.filePath = serverBlock.getInfo().server_root + request.path;
+		if (!std::remove(request.path.c_str())){
+			response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
+			printf("FilePath: %s\n", response.filePath.c_str());
 		}
 		else{
 			response.statusCode = INTERNAL_SERVER_ERROR;
@@ -278,7 +279,7 @@ void	Client::handleMethod()
 		}
 	}
 	else if (request.method == "HEAD") {
-		response.filePath = serverBlock.getInfo().server_root + request.path;
+		response.filePath = request.path;
 		response.contentLenght = 0;
 	}
 	else {
