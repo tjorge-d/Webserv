@@ -17,7 +17,7 @@
             e.preventDefault();
             const filename = document.getElementById('filename').value;
 
-            fetch("/sussy_files/" + filename, {
+            fetch("upload/" + filename, {
                 method: 'DELETE'
             }).then(res => res.text()).then(alert);
         });

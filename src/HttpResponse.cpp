@@ -40,12 +40,9 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(HTTP_ACCEPTED_VERSION) + " " + codeStr.str() + " " + getStatus(statusCode) + std::string(RESPONSE_LINE_END);
 	headerStr += std::string(SERVER_TYPE_RESPONSE_HEADER) + " " + std::string(SERVER_VERSION) + std::string(RESPONSE_LINE_END);
 	headerStr += std::string(DATE_TYPE_RESPONSE_HEADER) + " " + getHttpDateHeader() + std::string(RESPONSE_LINE_END);
-	if (statusCode == OK)
-		setContentType();
-	else
-		contentType = PLAIN_TEXT;
+	setContentType();
 	headerStr += std::string(CONTENT_TYPE_RESPONSE_HEADER) + " " + contentType + std::string(RESPONSE_LINE_END);
-	if (!filePath.empty())
+	if (!filePath.empty() && !cgi)
 		openRequestedFile();
 	setContentLength();
 	lenght << contentLenght;
@@ -111,10 +108,17 @@ void	HttpResponse::openRequestedFile()
 void	HttpResponse::setContentType()
 {
 	// Finds the extension of the file
+	if (cgi)
+		return ;
+
+	if (statusCode != OK) {
+		contentType = PLAIN_TEXT;
+		return ;
+	}
+
 	std::string	extension;
 	extension = filePath.substr(filePath.find_last_of('.'));
 
-	// Sets the correct content type for the type of file being sent
 	if (supportedContentType.count(extension))
 		contentType = supportedContentType[extension];
 	else

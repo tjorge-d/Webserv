@@ -89,8 +89,8 @@ void	Client::sendMode()
 
 	if (response.statusCode != OK)
 		setConnection(false);
-	if (!response.cgi)
-		response.createResponse();
+	//if (!response.cgi)
+	response.createResponse();
 
 	state = WAITING_TO_SEND;
 	response.bytesSent = 0;
@@ -149,7 +149,6 @@ int	Client::recieveRequestChunk()
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
-				//response.simpleHTTP("./var/www/dev/parabens.html");
 				response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
 				std::cout << "response.filePath = " << response.filePath << std::endl;
 			}
@@ -243,15 +242,12 @@ void	Client::handleMethod()
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
-		//response.filePath = serverBlock.getInfo().server_root + request.path;
 	}
 	else if (request.method == "DELETE") {
 		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
 		std::cout << "to delete: " << safe_path << std::endl;
-		if (!std::remove((serverBlock.getInfo().server_root + safe_path).c_str())){
-			//Need to revise simpleHTTP function because of response status
-			//response.simpleHTTP("./var/www/dev/delete_success.html");
-			response.filePath = serverBlock.getInfo().server_root + "/parabens.html";
+		if (!std::remove(safe_path.c_str())){
+			response.filePath = serverBlock.getInfo().server_root + "/dev" + "/parabens.html";
 		}
 		else{
 			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
@@ -261,8 +257,10 @@ void	Client::handleMethod()
 	}
 	else if (request.method == "HEAD") {
 		//response.simpleHTTP("./var/www/" + request.path);
+		printf("Path: %s\n", request.path.c_str());
 		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
-		response.filePath = serverBlock.getInfo().server_root + safe_path;
+		printf("Path after sanitize: %s\n", safe_path.c_str());
+		response.filePath = safe_path;
 		response.contentLenght = 0;
 	}
 	else {
@@ -276,7 +274,7 @@ void	Client::handleMethod()
 	size_t queryPos = path.find('?');
 	std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
 
-	if (pathWithoutQuery.size() > 3 && pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py") {
+	if (pathWithoutQuery.size() > 3 && pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py" && pathWithoutQuery.find("/cgi-bin/") != std::string::npos) {
 		std::string requestBody = request.body; // For POST, otherwise empty
 		std::string interpreter = "/usr/bin/python3"; // Adjust if needed
 		std::string cgiOutput;
@@ -293,8 +291,16 @@ void	Client::handleMethod()
 				std::string body = cgiOutput.substr(headerEnd + 4);
 				// Set response headers and body accordingly
 				response.header = std::vector<char>(headers.begin(), headers.end());
+				response.headerSize = headers.size();
 				response.body = body;
+				response.contentLenght = body.size();
 				response.statusCode = 200; // Or parse from CGI output
+				std::string header = "Content-Type: ";
+				size_t pos = cgiOutput.find(header);
+				size_t start = pos + header.length();
+				size_t end = cgiOutput.find("\r\n", start);
+				response.contentType = cgiOutput.substr(start, end - start);
+				printf("CGI Content-Type: %s\n", response.contentType.c_str());
 				response.cgi = true;
 			} else {
 				// Malformed CGI output
@@ -352,7 +358,7 @@ void	Client::resolveChunkedBody(){
 	{
 		recievingBody = false;
 
-		fileToPost = serverBlock.getInfo().server_root + "/sussy_files/file";
+		fileToPost = serverBlock.getInfo().server_root + "/upload/file";
 		postFile.open(fileToPost.c_str(), std::ios::out);
 		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
 		//response.simpleHTTP("./var/www/dev/parabens.html");
@@ -401,21 +407,29 @@ void	Client::sendBodyChunk()
 	if (state != SENDING_BODY)
 		throw ClientException("Invalid client state to call sendBodyChunk()", fd);
 
-	// Reads from the file stream storing the bytes read
-	char	buffer[CHUNK_SIZE];
-	response.fileStream.read(buffer, CHUNK_SIZE);
-    std::streamsize bytes = response.fileStream.gcount();
-	// fail() will trigger if the eof is found, therefore we ignore it if the eof is found
-	if (response.fileStream.fail() && !response.fileStream.eof())
-        throw ClientException("Failed to read from file", fd);
+	if (!response.body.empty()) {
+        // Send body from memory (CGI or dynamic response)
+        size_t bytes = (response.contentLenght + response.headerSize) - response.bytesSent;
+        if (bytes > CHUNK_SIZE)
+			bytes = CHUNK_SIZE;
+        if (send(fd, response.body.data() + (response.bytesSent - response.headerSize), bytes, 0) == -1)
+            throw ClientException("Failed to send response body", fd);
+        response.bytesSent += bytes;
+    }
+	else {
+		// Reads from the file stream storing the bytes read
+		char	buffer[CHUNK_SIZE];
+		response.fileStream.read(buffer, CHUNK_SIZE);
+    	std::streamsize bytes = response.fileStream.gcount();
+		// fail() will trigger if the eof is found, therefore we ignore it if the eof is found
+		if (response.fileStream.fail() && !response.fileStream.eof())
+    	    throw ClientException("Failed to read from file", fd);
 
-	// Sends the read chunk to the client
-	if (send(fd, buffer, bytes, 0) == -1){
-		std::cout << "Got fucked up" << std::endl;
-		throw ClientException("Failed to send a response", fd);
+		// Sends the read chunk to the client
+		if (send(fd, buffer, bytes, 0) == -1)
+			throw ClientException("Failed to send a response", fd);
+		response.bytesSent += bytes;
 	}
-	response.bytesSent += bytes;
-
 	// Resets the response status of the client when over
 	if (response.bytesSent == response.contentLenght + response.headerSize)
 		recieveMode();
