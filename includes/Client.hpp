@@ -8,7 +8,9 @@
 # include <unistd.h>
 # include <algorithm>
 # include <sys/socket.h>
+# include <cstdlib>
 # include <ctime>
+# include <string>
 # include "EventHandler.hpp"
 # include "ServerBlock.hpp"
 # include "HttpRequest.hpp"
@@ -40,6 +42,7 @@ class Client
 		EventHandler	&events;
 		ServerBlock		&serverBlock;
 		std::string		extracted_path; //location block path
+		std::string		sessionId; //used for cookies, initialized at constructor even if cookies are not used. please see function generateSessionId();
 		
 		// HTTP data
 		HttpRequest			request;
@@ -117,6 +120,9 @@ class Client
 
 		// Sends the response body in a chunk 
 		void	sendBodyChunk();
+
+		// Generates a random sessionId to be used for cookie identification
+		void	generateSessionId();
 
 	class	ClientException : public std::runtime_error
 	{

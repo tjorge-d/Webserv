@@ -22,6 +22,11 @@ class HttpResponse
 		std::string 	connection;
 		bool			cgi;
 
+		//COOKIE ATTRIBUTES
+		std::string		sessionId;
+		std::string		currentPath;
+		std::string		currentCookie;
+
 		std::vector<char>	header;
 		int					headerSize;
 		int 				bytesSent;
@@ -41,7 +46,10 @@ class HttpResponse
 		std::string	getHttpDateHeader();
 		std::string getLastModifiedHeader();
 
+
 		void		openRequestedFile();
+		void		setSessionId(std::string sessionId);
+		void		setPath(std::string path);
 		void		setContentType();
 		void		setContentLength();
 		void		reset();

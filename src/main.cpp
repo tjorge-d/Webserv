@@ -31,6 +31,8 @@ std::string	getStatus(int code){
 
 int main(int argc, char **argv)
 {
+	std::srand(std::time(NULL)); //THIS NEEDS TO BE HERE, IT SETS UP THE SEED AT PROGRAM START THAT IS USED TO GENERATE A SESSIONID FOR ALL CLIENTS
+	
 	try
 	{
 		// Parse configuration

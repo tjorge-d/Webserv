@@ -6,6 +6,7 @@ Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock):
 fd(fd),
 events(events),
 serverBlock(serverBlock),
+sessionId(),
 request(),
 response(),
 postFile(),
@@ -16,6 +17,7 @@ state(WAITING_TO_RECIEVE),
 lastActivity(time(NULL))
 {
 	std::cout << "Client constructor called\n";
+	generateSessionId();
 }
 
 Client::~Client()
@@ -89,7 +91,9 @@ void	Client::sendMode()
 
 	if (response.statusCode != OK)
 		setConnection(false);
-	//if (!response.cgi)
+	response.setSessionId(this->sessionId);
+	response.setPath(request.path);
+	response.currentCookie = request.cookie;
 	response.createResponse();
 
 	state = WAITING_TO_SEND;
@@ -206,15 +210,14 @@ void	Client::appendToRequest(char* buffer, int size)
 					request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
 			std::cout << "extracted location = " << extracted_path << std::endl;
 			// end of extraction, need to test special cases but overall should function correctly
-			if (!serverBlock.getInfo().locations.count(extracted_path))
-			{
+			if (!serverBlock.getInfo().locations.count(extracted_path)){
+
 				response.statusCode = NOT_FOUND;
 				return ;
 			}
 			std::cout << "request path before =" << request.path << std::endl;
 			if (*(request.path.end() - 1) == '/')
-				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
-					+ serverBlock.getInfo().locations[extracted_path].index_file;
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location;
 /* 			else if (request.path.find('.') != std::string::npos)
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
 				 + request.path; */
@@ -222,8 +225,8 @@ void	Client::appendToRequest(char* buffer, int size)
 				request.path = serverBlock.getInfo().server_root + request.path;
 			std::cout << "request path after =" << request.path << std::endl;
 			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
-			handleMethod();
-		}
+				handleMethod();
+			}
 		//make exception for error 431 "Request Header Fields Too Large"
 		/* basicClientResponse("Request header fields too large.", getStatus(REQUEST_HEADER_FIELDS_TOO_LARGE));
 		setConnection(false); */
@@ -235,8 +238,28 @@ void	Client::handleMethod()
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		//response.simpleHTTP("./var/www/dev" + request.path);
-		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
-		response.filePath = safe_path;
+		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location){
+			if (request.cookie.find("theme=dark") != std::string::npos)
+				request.path = serverBlock.getInfo().server_root 
+					+ serverBlock.getInfo().locations[extracted_path].location
+					+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, 
+						serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html")) + "_alt.html";
+			else
+				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
+						+ serverBlock.getInfo().locations[extracted_path].index_file;
+		}
+		std::ifstream fileStream(request.path.c_str());
+
+		if (!fileStream.good()){
+			response.statusCode = NOT_FOUND;
+			if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
+				response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
+				response.currentPath = response.filePath;
+			}
+		}
+		else
+			response.filePath = request.path;
+		std::cout << "response.filePath = " << response.filePath << std::endl;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
 	{
@@ -244,29 +267,24 @@ void	Client::handleMethod()
 		request.bodySize = request.buffer.size();
 	}
 	else if (request.method == "DELETE") {
-		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
-		std::cout << "to delete: " << safe_path << std::endl;
-		if (!std::remove(safe_path.c_str())){
-			response.filePath = serverBlock.getInfo().server_root + "/dev" + "/parabens.html";
+		std::cout << "to delete: " << request.path << std::endl;
+		if (!std::remove((serverBlock.getInfo().server_root + request.path).c_str())){
+			response.filePath = serverBlock.getInfo().server_root + request.path;
 		}
 		else{
-			//response.status = "500 Internal Server Error."; //404 is only used for invalid HTMLs, not for failed deletes.
-			dprintf(2, "Failed to delete file: %s\n", strerror(errno));
 			response.statusCode = INTERNAL_SERVER_ERROR;
+			if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end())
+					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
 		}
 	}
 	else if (request.method == "HEAD") {
-		//response.simpleHTTP("./var/www/" + request.path);
-		printf("Path: %s\n", request.path.c_str());
-		std::string safe_path = sanitizePath(request.path, serverBlock.getInfo().server_root);
-		printf("Path after sanitize: %s\n", safe_path.c_str());
-		response.filePath = safe_path;
+		response.filePath = serverBlock.getInfo().server_root + request.path;
 		response.contentLenght = 0;
 	}
 	else {
 		response.statusCode = METHOD_NOT_ALLOWED;
-		// response.basicClientResponse(405);
-		// setConnection(false);
+		if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end())
+					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[METHOD_NOT_ALLOWED];
 	}
 
 	// --- CGI HANDLING ---
@@ -435,6 +453,19 @@ void	Client::sendBodyChunk()
 		recieveMode();
 }
 
+void	Client::generateSessionId(){
+
+	static const char charset[] =
+        "0123456789"
+        "abcdefghijklmnopqrstuvwxyz"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    static const size_t charsetSize = sizeof(charset) - 1;
+	size_t length = 32;
+
+    for (size_t i = 0; i < length; ++i) {
+        this->sessionId += charset[std::rand() % charsetSize];
+    }
+}
 
 // EXCEPTIONS
 Client::ClientException::ClientException(std::string info, int fd) :

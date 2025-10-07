@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OPTIONS Test</title>
-</head>
+    <title>PUT File</title>
 	<style>
         body {
             background-color: #ffffff;
@@ -21,7 +20,7 @@
 
         .theme-button {
             display: inline-block;
-            margin-top: 500px;
+            margin-top: 400px;
             padding: 10px 20px;
             background-color: #080808;
             color: white;
@@ -49,36 +48,35 @@
 			background-color: #424141;
 		}
 	</style>
-
+</head>
 <body>
-    <h1>OPTIONS Request</h1>
-    <form id="optionsForm">
-        <label for="path">Target Path:</label>
-        <input type="text" id="path" required placeholder="upload">
-        <button type="submit">Send OPTIONS</button>
+    <h1>PUT File</h1>
+    <form id="putForm">
+        <label for="filename">Filename:</label>
+        <input type="text" id="filename" required placeholder="e.g. file.txt"><br><br>
+        <label for="fileContent">File Content:</label><br>
+        <textarea id="fileContent" rows="6" cols="40" placeholder="Enter file content..."></textarea><br>
+        <button type="submit">Send PUT Request</button>
     </form>
 
-    <div id="result"></div>
-
 	<div>
-		<a href="index.html" class="home-button"> Return to Homepage</a>
-	</div>
+        <a href="index.html" class="home-button">Return to Homepage</a>
+    </div>
 
     <div>
-        <a href="options_alt.html" class="theme-button">Switch to Dark Theme</a>
+        <a href="put_alt.html" class="theme-button">Switch to Dark Theme</a>
     </div>
 
     <script>
-        document.getElementById('optionsForm').addEventListener('submit', function(e) {
+        document.getElementById('putForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const path = document.getElementById('path').value;
+            const filename = document.getElementById('filename').value;
+            const content = document.getElementById('fileContent').value;
 
-            fetch(path, {
-                method: 'OPTIONS'
-            }).then(res => {
-                document.getElementById('result').textContent =
-                    'Allowed Methods: ' + res.headers.get('Allow');
-            });
+            fetch('/sussy_files/' + filename, {
+                method: 'PUT',
+                body: content
+            }).then(res => res.text()).then(alert);
         });
     </script>
 </body>

@@ -6,13 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
+            background-color: #121212;
+            color: #d4d4d4;
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
         }
 
         h1 {
-            color: #444;
+            color: #bdbcbc;
         }
 
         form {
@@ -53,12 +55,11 @@
             display: inline-block;
             margin-top: 500px;
             padding: 10px 20px;
-            background-color: #080808;
-            color: white;
+            background-color: #f1f2f3;
+            color: #0a0a0a;
             text-decoration: none;
             border-radius: 15px;
         }
-
 
         .nav-link:hover {
             background-color: #4b3692;
@@ -66,7 +67,7 @@
 
 		.theme-button:hover{
 
-			background-color: #424141;
+			background-color: #a1a1a1;
 		}
 
     </style>
@@ -81,12 +82,12 @@
         <button type="submit">Upload</button>
     </form>
 	
-	<a href="index.html" class="nav-link">← Return to Homepage</a>
+	<a href="index_alt.html" class="nav-link">← Return to Homepage</a>
 
 	<div>
-        <a href="upload_alt.html" class="theme-button">Switch to Dark Theme</a>
+        <a href="upload.html" class="theme-button">Switch to Light Theme</a>
     </div>
-
+	
 	<script>
 		document.getElementById('uploadForm').addEventListener('submit', function(e) {
 			e.preventDefault();

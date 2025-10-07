@@ -104,7 +104,9 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 		}
 		else if (key_lower == "transfer-encoding" && toLowerCase(value) == "chunked"){
 			isChunked = true;
-		}
+		else if (key == "Cookie")
+			this->cookie = value;
+		std::cout << "this->cookie = " << this->cookie << std::endl;
 	}
 
 	// Clean request buffer

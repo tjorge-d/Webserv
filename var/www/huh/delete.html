@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OPTIONS Test</title>
-</head>
-	<style>
+    <title>DELETE File</title>
+    <style>
         body {
             background-color: #ffffff;
             color: #000000;
@@ -29,8 +28,9 @@
             border-radius: 15px;
         }
 
+		
 		.home-button {
-            display: inline-block;
+			display: inline-block;
             margin-top: 100px;
             padding: 10px 20px;
             background-color: #080808;
@@ -48,38 +48,37 @@
 
 			background-color: #424141;
 		}
-	</style>
+    </style>
+
+</head>
 
 <body>
-    <h1>OPTIONS Request</h1>
-    <form id="optionsForm">
-        <label for="path">Target Path:</label>
-        <input type="text" id="path" required placeholder="upload">
-        <button type="submit">Send OPTIONS</button>
+
+    <h1>DELETE File</h1>
+    <form id="deleteForm">
+        <label for="filename">Filename to Delete:</label><br>
+        <input type="text" id="filename" required placeholder="e.g. file.txt"><br>
+        <button type="submit">Send DELETE Request</button>
     </form>
 
-    <div id="result"></div>
-
 	<div>
-		<a href="index.html" class="home-button"> Return to Homepage</a>
-	</div>
+        <a href="index.html" class="home-button">Return to Homepage</a>
+    </div>
 
     <div>
-        <a href="options_alt.html" class="theme-button">Switch to Dark Theme</a>
+        <a href="delete_alt.html" class="theme-button">Switch to Dark Theme</a>
     </div>
 
     <script>
-        document.getElementById('optionsForm').addEventListener('submit', function(e) {
+        document.getElementById('deleteForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const path = document.getElementById('path').value;
+            const filename = document.getElementById('filename').value;
 
-            fetch(path, {
-                method: 'OPTIONS'
-            }).then(res => {
-                document.getElementById('result').textContent =
-                    'Allowed Methods: ' + res.headers.get('Allow');
-            });
+            fetch("/sussy_files/" + filename, {
+                method: 'DELETE'
+            }).then(res => res.text()).then(alert);
         });
     </script>
+
 </body>
 </html>
