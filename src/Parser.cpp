@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/07/15 15:04:13 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/09/22 19:02:26 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -402,6 +402,55 @@ std::string trim(const std::string &s) {
 	}
 
 	return (s.substr(start, end - start));
+}
+
+std::string sanitizePath(const std::string &path, const std::string &webroot) {
+	// Remove any path traversal attempts
+	std::string sanitized = path;
+	
+	// Replace all backslashes with forward slashes for consistency
+	for (size_t i = 0; i < sanitized.length(); i++) {
+		if (sanitized[i] == '\\')
+			sanitized[i] = '/';
+	}
+	
+	// Remove dangerous sequences
+	size_t pos = 0;
+	while ((pos = sanitized.find("../", pos)) != std::string::npos) {
+		sanitized.erase(pos, 3);
+	}
+	while ((pos = sanitized.find("/.", pos)) != std::string::npos) {
+		if (pos + 2 >= sanitized.length() || sanitized[pos + 2] == '/') {
+			sanitized.erase(pos, 2);
+		} else {
+			pos++;
+		}
+	}
+	
+	// Ensure the path starts with /
+	//if (sanitized.empty() || sanitized[0] != '/') {
+	//	if (sanitized[0] == '.' && sanitized[1] == '/')
+	//		sanitized = sanitized.substr(1);
+	//	else
+	//		sanitized = "/" + sanitized;
+	//}
+	sanitized = sanitized.substr(2);
+	
+	// Remove double slashes
+	pos = 0;
+	while ((pos = sanitized.find("//", pos)) != std::string::npos) {
+		sanitized.erase(pos, 1);
+	}
+	
+	// Ensure the sanitized path stays within webroot bounds
+	std::string full_path = webroot + sanitized;
+	
+	// Basic length check to prevent excessively long paths
+	if (full_path.length() > 4096) {
+		return "/";
+	}
+	
+	return sanitized;
 }
 
 ParserException::ParserException(HttpInfo *server, std::string error) :

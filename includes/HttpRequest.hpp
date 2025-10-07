@@ -7,6 +7,8 @@
 # include <stdexcept>
 # include <sys/stat.h>
 # include <algorithm>
+# include <climits>
+# include <cctype>
 # include "Webserv.h"
 
 class HttpRequest
@@ -60,6 +62,15 @@ class HttpRequest
 
 		// Parses body of any text type
 		void	parseTextPlain(void);
+
+		// Safe integer parsing with bounds checking
+		bool	safeParseInt(const std::string& str, int& result, int min_val = 0, int max_val = INT_MAX);
+
+		// Convert string to lowercase for case-insensitive header comparison
+		std::string	toLowerCase(const std::string& str) const;
+
+		// Get header value in case-insensitive manner
+		std::string	getHeader(const std::string& key) const;
 
 	// EXCEPTIONS
 	class	ResponseException : public std::runtime_error

@@ -8,10 +8,12 @@
 # include <unistd.h>
 # include <algorithm>
 # include <sys/socket.h>
+# include <ctime>
 # include "EventHandler.hpp"
 # include "ServerBlock.hpp"
 # include "HttpRequest.hpp"
 # include "HttpResponse.hpp"
+# include "CgiHandler.hpp"
 
 
 # define CHUNK_SIZE 4096
@@ -50,6 +52,10 @@ class Client
 		bool			recievingBody;
 		client_state	state;
 		
+		// Timeout handling
+		time_t			lastActivity;
+		static const time_t TIMEOUT_SECONDS = 30; // 30 second timeout
+		
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)
 		void	appendToRequest(char* str, int size);
@@ -71,6 +77,10 @@ class Client
 		
 		// MEMBER FUNCTIONS
 		void	setRequestStatus(int code);
+
+		// Timeout management
+		void	updateActivity();
+		bool	isTimedOut() const;
 
 		// Tells if the client has a regular connection
 		bool	isConnected() const;
