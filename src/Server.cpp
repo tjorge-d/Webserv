@@ -79,6 +79,23 @@ std::map<int, ServerBlock*> Server::createServerBlocks(HttpInfo &server_info)
         try {
             new_server_block = new ServerBlock(i->second, server_info.client_max_body_size);
             server_blocks[new_server_block->getListenerFD()] = new_server_block;
+
+            // Create upload directories for each location
+            for (std::map<std::string, LocationBlockInfo>::iterator loc_it = i->second.locations.begin();
+                 loc_it != i->second.locations.end(); ++loc_it) {
+                std::string uploadPath = i->second.server_root + loc_it->second.location + "upload";
+                // Ensure no double slash
+                size_t pos = uploadPath.find("//");
+                while (pos != std::string::npos) {
+                    uploadPath.erase(pos, 1);
+                    pos = uploadPath.find("//", pos);
+                }
+                // Create directory if not exists
+                struct stat st;
+                if (stat(uploadPath.c_str(), &st) == -1) {
+                    mkdir(uploadPath.c_str(), 0755);
+                }
+            }
         }
         catch (const std::exception& e) {
             // Clean up the current block if it was created

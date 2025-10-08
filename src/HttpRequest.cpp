@@ -111,17 +111,17 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 	return (OK);
 }
 
-void	HttpRequest::parseRequestBody(){
+void	HttpRequest::parseRequestBody(void){
 	std::string content_type = getHeader("Content-Type");
 	std::string content_type_lower = toLowerCase(content_type);
-	
+
 	if (content_type_lower.substr(0, content_type_lower.find(";")) == "multipart/form-data")
 		parseMultiPartFormData();
 	else if (content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "text")
 		parseTextPlain();
 }
 
-void	HttpRequest::parseMultiPartFormData(){
+void	HttpRequest::parseMultiPartFormData(void){
 	std::string	boundaryKey = "boundary=";
 	std::string content_type = getHeader("Content-Type");
 	size_t		pos = content_type.find(boundaryKey), nextPart;
@@ -175,8 +175,8 @@ void	HttpRequest::parseMultiPartFormData(){
 		if (part.headers.count("Content-Disposition")){
 			std::string	fileNameKey = "filename=";
 			pos = part.headers["Content-Disposition"].find(fileNameKey);
-	 		postFileName = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
-			postFileName = "./var/www/dev/upload/" + postFileName.substr(1,  postFileName.size() - 2);
+				std::string filename = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
+			postFileName = filename.substr(1, filename.size() - 2);
 		}
 		if (part.headers.count("Content-Type"))
 	 		bodyContentType = part.headers["Content-Type"];

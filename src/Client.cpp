@@ -88,11 +88,25 @@ void	Client::recieveMode()
 
 void	Client::sendMode()
 {
-
 	if (response.statusCode != OK)
 		setConnection(false);
 	response.setSessionId(this->sessionId);
-	response.setPath(request.path);
+
+	// THEME COOKIE LOGIC: If theme=dark and .html requested, try _alt.html
+	std::string pathToServe = request.path;
+	if (!request.cookie.empty() && request.cookie.find("theme=dark") != std::string::npos) {
+		size_t extPos = pathToServe.rfind(".html");
+		if (extPos != std::string::npos) {
+			std::string altPath = pathToServe.substr(0, extPos) + "_alt.html";
+			struct stat buffer;
+			if (stat(altPath.c_str(), &buffer) == 0) {
+				pathToServe = altPath;
+			}
+		}
+	}
+
+	response.setPath(pathToServe);
+	response.filePath = pathToServe;
 	response.currentCookie = request.cookie;
 	response.createResponse();
 
@@ -221,12 +235,12 @@ void	Client::handleMethod()
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location){
-			if (request.cookie.find("theme=dark") != std::string::npos)
-				request.path = serverBlock.getInfo().server_root 
-					+ serverBlock.getInfo().locations[extracted_path].location
-					+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, 
-						serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html")) + "_alt.html";
-			else
+			// if (request.cookie.find("theme=dark") != std::string::npos)
+			// 	request.path = serverBlock.getInfo().server_root 
+			// 		+ serverBlock.getInfo().locations[extracted_path].location
+			// 		+ serverBlock.getInfo().locations[extracted_path].index_file.substr(0, 
+			// 			serverBlock.getInfo().locations[extracted_path].index_file.rfind(".html")) + "_alt.html";
+			// else
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
 			printf("Index file path: %s\n", request.path.c_str());
@@ -253,10 +267,11 @@ void	Client::handleMethod()
 	else if (request.method == "DELETE") {
 		std::cout << "to delete: " << request.path << std::endl;
 		if (std::remove(request.path.c_str()) == 0){
-			response.filePath = request.path;
 			printf("FilePath: %s\n", response.filePath.c_str());
+			response.filePath = "";
 		}
 		else{
+			printf("Didn't delete\n");
 			response.statusCode = INTERNAL_SERVER_ERROR;
 			if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end())
 					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
