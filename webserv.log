@@ -1,20 +1,23 @@
-2025-10-08 19:02:11 [INFO] Server starting...
-2025-10-08 19:02:14 [INFO] New client connected: FD 6
-2025-10-08 19:02:14 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 19:02:14 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 19:02:14 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 19:02:14 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 19:02:16 [INFO] Request received: GET /dev/upload.html from FD 6
-2025-10-08 19:02:16 [INFO] Response sent: 200 for GET ./var/www/dev/upload.html from FD 6
-2025-10-08 19:02:21 [INFO] Request received: POST /dev/upload/Client.cpp from FD 6
-2025-10-08 19:02:21 [INFO] Response sent: 200 for POST ./var/www/dev/upload/Client.cpp from FD 6
-2025-10-08 19:02:27 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 19:02:27 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 19:02:27 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 19:02:27 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 19:02:28 [INFO] Request received: GET /dev/upload.html from FD 6
-2025-10-08 19:02:28 [INFO] Response sent: 200 for GET ./var/www/dev/upload.html from FD 6
-2025-10-08 19:02:33 [INFO] Request received: POST /dev/upload/en.subject.pdf from FD 6
-2025-10-08 19:02:33 [INFO] Response sent: 413 for POST ./var/www/dev/upload/en.subject.pdf from FD 6
-2025-10-08 19:02:33 [INFO] Client disconnected: FD 6
-2025-10-08 19:04:14 [INFO] Server shutting down...
+2025-10-08 19:14:16 [INFO] Server starting...
+2025-10-08 19:14:21 [INFO] New client connected: FD 6
+2025-10-08 19:14:21 [INFO] Request received: GET /dev/ from FD 6
+2025-10-08 19:14:21 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
+2025-10-08 19:14:21 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
+2025-10-08 19:14:21 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
+2025-10-08 19:14:23 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-08 19:14:23 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-08 19:14:29 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-08 19:14:29 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
+2025-10-08 19:14:29 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-08 19:15:00 [INFO] Client timed out: FD 6
+2025-10-08 19:15:00 [INFO] Client disconnected: FD 6
+2025-10-08 19:15:28 [INFO] New client connected: FD 6
+2025-10-08 19:15:30 [INFO] Request received: GET /dev/ from FD 6
+2025-10-08 19:15:30 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
+2025-10-08 19:15:30 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
+2025-10-08 19:15:30 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
+2025-10-08 19:16:01 [INFO] Client timed out: FD 6
+2025-10-08 19:16:01 [INFO] Client disconnected: FD 6
+2025-10-08 19:16:54 [INFO] New client connected: FD 6
+2025-10-08 19:16:56 [INFO] Server shutting down...
+2025-10-08 19:16:56 [INFO] Client disconnected: FD 6
