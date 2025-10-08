@@ -173,7 +173,6 @@ void	HttpRequest::parseMultiPartFormData(void){
 			std::string	fileNameKey = "filename=";
 			pos = part.headers["Content-Disposition"].find(fileNameKey);
 				std::string filename = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
-			postFileName = filename.substr(1, filename.size() - 2);
 		}
 		if (part.headers.count("Content-Type"))
 	 		bodyContentType = part.headers["Content-Type"];
@@ -185,7 +184,6 @@ void	HttpRequest::parseMultiPartFormData(void){
 void	HttpRequest::parseTextPlain(){
 	std::string	requestBody(buffer.begin(), buffer.end());
 
-	postFileName = "./var/www/dev/upload/" + path.substr(1);
 	body = requestBody;
 }
 

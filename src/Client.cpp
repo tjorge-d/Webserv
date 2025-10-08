@@ -104,10 +104,10 @@ void	Client::sendMode()
 				pathToServe = altPath;
 			}
 		}
+		response.setPath(pathToServe);
+		response.filePath = pathToServe;
 	}
 
-	response.setPath(pathToServe);
-	response.filePath = pathToServe;
 	response.currentCookie = request.cookie;
 	response.createResponse();
 
@@ -163,8 +163,7 @@ int	Client::recieveRequestChunk()
 			else if (request.bodySize >= request.contentLenght){
 				recievingBody = false;
 				request.parseRequestBody();
-
-				postFile.open(request.postFileName.c_str(), std::ios::out);
+				postFile.open(request.path.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
 			}
@@ -228,6 +227,21 @@ void	Client::appendToRequest(char* buffer, int size)
 
 void	Client::handleMethod()
 {
+	// Get the allowed methods for the current location
+    std::vector<std::string> allowedMethods = serverBlock.getInfo().locations[extracted_path].allowed_services;
+    
+    // Check if the request method is in the allowed list
+    bool methodPermitted = std::find(allowedMethods.begin(), allowedMethods.end(), request.method) != allowedMethods.end();
+    
+    if (!methodPermitted) {
+        response.statusCode = METHOD_NOT_ALLOWED;
+        if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end()) {
+            response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[METHOD_NOT_ALLOWED];
+        }
+		else
+			response.filePath = "";
+        return;  // Stop processing the request
+    }
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
 		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location){
@@ -283,9 +297,16 @@ void	Client::handleMethod()
 	size_t queryPos = path.find('?');
 	std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
 
-	if (pathWithoutQuery.size() > 3 && pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py" && pathWithoutQuery.find("/cgi-bin/") != std::string::npos) {
+	if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos &&
+		(pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py" ||
+		 pathWithoutQuery.substr(pathWithoutQuery.size() - 4) == ".php")) {
 		std::string requestBody = request.body; // For POST, otherwise empty
-		std::string interpreter = "/usr/bin/python3"; // Adjust if needed
+		std::string interpreter;
+		if (pathWithoutQuery.substr(pathWithoutQuery.size() - 3) == ".py") {
+			interpreter = "/usr/bin/python3";
+		} else if (pathWithoutQuery.substr(pathWithoutQuery.size() - 4) == ".php") {
+			interpreter = "/usr/bin/php";
+		}
 		std::string cgiOutput;
 		CgiHandler cgi(pathWithoutQuery, 0, request); // pid not used here
 
@@ -303,7 +324,7 @@ void	Client::handleMethod()
 				response.headerSize = headers.size();
 				response.body = body;
 				response.contentLenght = body.size();
-				response.statusCode = 200; // Or parse from CGI output
+				response.statusCode = OK; // Or parse from CGI output
 				std::string header = "Content-Type: ";
 				size_t pos = cgiOutput.find(header);
 				size_t start = pos + header.length();
@@ -312,11 +333,11 @@ void	Client::handleMethod()
 				response.cgi = true;
 			} else {
 				// Malformed CGI output
-				response.statusCode = 500;
+				response.statusCode = INTERNAL_SERVER_ERROR;
 			}
 		} else {
 			// CGI execution failed
-			response.statusCode = 500;
+			response.statusCode = INTERNAL_SERVER_ERROR;
 		}
 		return; // Done with CGI
 	}
@@ -391,6 +412,7 @@ void	Client::sendHeaderChunk()
 		if (response.statusCode != OK){
 			if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
 				throw ClientException("Failed to send a response", fd);
+			Logger::log(INFO, "Response sent: " + intToString(response.statusCode) + " for " + request.method + " " + request.path + " from FD " + intToString(fd));
 			recieveMode();
 		}
 	}
@@ -427,7 +449,10 @@ void	Client::sendBodyChunk()
 	}
 	// Resets the response status of the client when over
 	if (response.bytesSent == response.contentLenght + response.headerSize)
+	{
+		Logger::log(INFO, "Response sent: " + intToString(response.statusCode) + " for " + request.method + " " + request.path + " from FD " + intToString(fd));
 		recieveMode();
+	}
 }
 
 void	Client::generateSessionId(){

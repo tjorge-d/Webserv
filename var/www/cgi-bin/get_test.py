@@ -23,6 +23,6 @@ def build_response_body(name, age):
 
 build_response_headers()
 params = get_params()
-name = params.get('name', ['Guest'])[0]
-age = params.get('age', ['unknown'])[0]
+name = params.get('name_py', ['Guest'])[0]
+age = params.get('age_py', ['unknown'])[0]
 build_response_body(name, age)

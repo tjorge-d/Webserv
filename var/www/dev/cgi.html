@@ -6,13 +6,24 @@
 <body>
   <h1>Test CGI Script</h1>
 
-  <h2>GET Request</h2>
+  <h2>GET Request (Python)</h2>
   <form action="/cgi-bin/get_test.py" method="get">
     <label for="name">Name:</label>
-    <input type="text" name="name" id="name">
+    <input type="text" name="name_py" id="name_py">
     <br>
     <label for="age">Age:</label>
-    <input type="text" name="age" id="age">
+    <input type="text" name="age_py" id="age_py">
+    <br>
+    <input type="submit" value="Send GET Request">
+  </form>
+
+  <h2>GET Request (PHP)</h2>
+  <form action="/cgi-bin/get_test.php" method="get">
+    <label for="name">Name:</label>
+    <input type="text" name="name_php" id="name_php">
+    <br>
+    <label for="age">Age:</label>
+    <input type="text" name="age_php" id="age_php">
     <br>
     <input type="submit" value="Send GET Request">
   </form>

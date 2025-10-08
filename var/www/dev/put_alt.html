@@ -74,12 +74,13 @@
         document.getElementById('putForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const filename = document.getElementById('filename').value;
-            const content = document.getElementById('fileContent').value;
-
-            fetch('upload/' + filename, {
+            const formData = new FormData(this);
+            fetch("upload/" + filename, {
                 method: 'PUT',
-                body: content
-            }).then(res => res.text()).then(alert);
+                body: formData
+            }).then(res => res.text()).then(responseText => {
+                document.body.textContent = responseText;
+            });
         });
     </script>
 </body>

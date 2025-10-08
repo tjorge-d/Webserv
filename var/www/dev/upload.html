@@ -75,7 +75,7 @@
 
     <h1>Upload a File (POST Method)</h1>
 
-    <form id= "uploadForm" action="upload" method="POST" enctype="multipart/form-data">
+    <form id= "uploadForm" enctype="multipart/form-data">
         <label for="image">Select file to upload:</label>
         <input type="file" id="filename" name="image" required>
         <button type="submit">Upload</button>
@@ -102,7 +102,9 @@
                 if (res.ok) {
                     window.location.href = "upload_success.html";
                 } else {
-                    window.location.href = "upload_failed.html";
+                    return res.text().then(responseText => {
+                        document.body.textContent = responseText;
+                    });
                 }
             });
         });

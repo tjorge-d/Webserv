@@ -1,13 +1,19 @@
-2025-10-08 12:30:55 [INFO] Server starting...
-2025-10-08 12:30:58 [INFO] New client connected: FD 6
-2025-10-08 12:30:58 [INFO] New client connected: FD 8
-2025-10-08 12:30:58 [INFO] Request received: GET /dev/upload.html from FD 6
-2025-10-08 12:30:58 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 12:30:58 [INFO] New client connected: FD 9
-2025-10-08 12:31:29 [INFO] Client timed out: FD 9
-2025-10-08 12:31:29 [INFO] Client disconnected: FD 9
-2025-10-08 12:31:29 [INFO] Client timed out: FD 6
-2025-10-08 12:31:29 [INFO] Client timed out: FD 8
-2025-10-08 12:31:29 [INFO] Client disconnected: FD 6
-2025-10-08 12:31:29 [INFO] Client disconnected: FD 8
-2025-10-08 12:31:37 [INFO] Server shutting down...
+2025-10-08 17:29:37 [INFO] Server starting...
+2025-10-08 17:29:40 [INFO] New client connected: FD 6
+2025-10-08 17:29:40 [INFO] New client connected: FD 8
+2025-10-08 17:29:40 [INFO] Request received: GET /dev/ from FD 6
+2025-10-08 17:29:40 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
+2025-10-08 17:29:40 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
+2025-10-08 17:29:40 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
+2025-10-08 17:29:40 [INFO] New client connected: FD 9
+2025-10-08 17:29:41 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-08 17:29:41 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-08 17:29:44 [INFO] Request received: GET /cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
+2025-10-08 17:29:44 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.php for FD 6
+2025-10-08 17:29:44 [INFO] Response sent: 500 for GET ./var/www/cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
+2025-10-08 17:29:44 [INFO] Client disconnected: FD 6
+2025-10-08 17:30:11 [INFO] Client timed out: FD 8
+2025-10-08 17:30:11 [INFO] Client timed out: FD 9
+2025-10-08 17:30:11 [INFO] Client disconnected: FD 8
+2025-10-08 17:30:11 [INFO] Client disconnected: FD 9
+2025-10-08 17:56:04 [INFO] Server shutting down...
