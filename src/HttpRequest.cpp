@@ -65,8 +65,6 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 		return (HTTP_VERSION_NOT_SUPPORTED);
 	}
 
-	std::cout << "The request header is valid" << std::endl;
-
 	// Parse header into a comprehensible map with all its information, might be annoying because
 	// all the inforamtion is not clearly declared in a variable in the class but this way any kind
 	// of header with any kind of information can be parsed all the same
@@ -102,7 +100,6 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 			isChunked = true;
 		else if (key_lower == "cookie")
 			this->cookie = value;
-		std::cout << "this->cookie = " << this->cookie << std::endl;
 	}
 
 	// Clean request buffer

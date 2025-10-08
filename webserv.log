@@ -1,0 +1,13 @@
+2025-10-08 12:30:55 [INFO] Server starting...
+2025-10-08 12:30:58 [INFO] New client connected: FD 6
+2025-10-08 12:30:58 [INFO] New client connected: FD 8
+2025-10-08 12:30:58 [INFO] Request received: GET /dev/upload.html from FD 6
+2025-10-08 12:30:58 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-08 12:30:58 [INFO] New client connected: FD 9
+2025-10-08 12:31:29 [INFO] Client timed out: FD 9
+2025-10-08 12:31:29 [INFO] Client disconnected: FD 9
+2025-10-08 12:31:29 [INFO] Client timed out: FD 6
+2025-10-08 12:31:29 [INFO] Client timed out: FD 8
+2025-10-08 12:31:29 [INFO] Client disconnected: FD 6
+2025-10-08 12:31:29 [INFO] Client disconnected: FD 8
+2025-10-08 12:31:37 [INFO] Server shutting down...

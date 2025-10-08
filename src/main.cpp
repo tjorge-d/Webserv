@@ -1,5 +1,6 @@
 #include "../includes/Webserv.h"
 #include "../includes/Server.hpp"
+#include "../includes/Logger.hpp"
 #include <arpa/inet.h>
 
 std::string	getStatus(int code){
@@ -32,7 +33,9 @@ std::string	getStatus(int code){
 int main(int argc, char **argv)
 {
 	std::srand(std::time(NULL)); //THIS NEEDS TO BE HERE, IT SETS UP THE SEED AT PROGRAM START THAT IS USED TO GENERATE A SESSIONID FOR ALL CLIENTS
-	
+
+	Logger::init("webserv.log", true, INFO);
+
 	try
 	{
 		// Parse configuration
@@ -46,9 +49,12 @@ int main(int argc, char **argv)
 	}
 	catch (const std::exception &e)
 	{
+		Logger::log(ERROR, "Fatal error: " + std::string(e.what()));
 		std::cerr << "Error: " << e.what() << std::endl;
+		Logger::close();
 		return 1;
 	}
 
+	Logger::close();
 	return 0;
 }

@@ -11,7 +11,6 @@ args(),
 cgiPath(cgiPath),
 cgiPid(cgiPid)
 {
-	std::cout << "CGI constructor called\n";
 	initEnv(request);
 }
 
@@ -150,9 +149,7 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
 
         char* argv[] = {const_cast<char*>(interpreter.c_str()), const_cast<char*>(scriptPath.c_str()), NULL};
 
-		dprintf(2, "Executing CGI: %s %s\n", interpreter.c_str(), scriptPath.c_str());
         execve(interpreter.c_str(), argv, &envp[0]);
-		dprintf(2, "Failed to execute CGI: %s %s\n", interpreter.c_str(), scriptPath.c_str());
         exit(1);
     }
     close(inPipe[0]);

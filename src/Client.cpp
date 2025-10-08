@@ -1,8 +1,9 @@
 #include "../includes/Client.hpp"
+#include "../includes/Logger.hpp"
 
 // CONSTRUCTORS & DESTRUCTORS
 
-Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock): 
+Client::Client(int fd, EventHandler &events, ServerBlock &serverBlock):
 fd(fd),
 events(events),
 serverBlock(serverBlock),
@@ -16,13 +17,13 @@ recievingBody(false),
 state(WAITING_TO_RECIEVE),
 lastActivity(time(NULL))
 {
-	std::cout << "Client constructor called\n";
+	Logger::log(INFO, "New client connected: FD " + intToString(fd));
 	generateSessionId();
 }
 
 Client::~Client()
 {
-	std::cout << "Client destructor called\n";
+	Logger::log(INFO, "Client disconnected: FD " + intToString(fd));
 	closeClient();
 }
 
@@ -137,7 +138,6 @@ int	Client::recieveRequestChunk()
 	
 	// Apppends the filled buffer to _request
 	if(recievingHeader){
-		std::cout << "HEADEEEEER\n" << buffer << std::endl; 
 		appendToRequest(buffer, bytes);
 	}
 
@@ -177,7 +177,6 @@ int	Client::recieveRequestChunk()
 		if(recievingHeader)
 			throw ClientException("Incomplete request header", fd);
 		if (!recievingBody || request.chunkedComplete){
-			std::cout << "SEND MODE\n" << std::endl;
 			sendMode();
 		}
 	}
@@ -199,8 +198,8 @@ void	Client::appendToRequest(char* buffer, int size)
 		// Parses the header if found
 		if (it != request.buffer.end())
 		{
-			std::cout << "Request header found" << std::endl;
 			response.statusCode = request.parseRequestHeader(it + 4);
+			Logger::log(INFO, "Request received: " + request.method + " " + request.path + " from FD " + intToString(fd));
 			recievingHeader = false;
 			if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
 				response.connection = "close";
@@ -212,19 +211,16 @@ void	Client::appendToRequest(char* buffer, int size)
 				extracted_path = "/";
 			else
 				extracted_path = request.path.substr(request.path.find('/'), request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
-			std::cout << "extracted location = " << extracted_path << std::endl;
 			// end of extraction
 			if (!serverBlock.getInfo().locations.count(extracted_path)){
 
 				response.statusCode = NOT_FOUND;
 				return ;
 			}
-			std::cout << "request path before =" << request.path << std::endl;
 			if (*(request.path.end() - 1) == '/')
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location;
 			else
 				request.path = serverBlock.getInfo().server_root + request.path;
-			std::cout << "request path after =" << request.path << std::endl;
 			handleMethod();
 			}
 	}
@@ -243,7 +239,6 @@ void	Client::handleMethod()
 			// else
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
-			printf("Index file path: %s\n", request.path.c_str());
 		}
 		std::ifstream fileStream(request.path.c_str());
 
@@ -256,7 +251,6 @@ void	Client::handleMethod()
 		}
 		else
 			response.filePath = request.path;
-		std::cout << "response.filePath = " << response.filePath << std::endl;
 	}
 	else if(request.method == "POST" || request.method == "PUT")
 	{
@@ -265,13 +259,10 @@ void	Client::handleMethod()
 		response.filePath = request.path;
 	}
 	else if (request.method == "DELETE") {
-		std::cout << "to delete: " << request.path << std::endl;
 		if (std::remove(request.path.c_str()) == 0){
-			printf("FilePath: %s\n", response.filePath.c_str());
 			response.filePath = "";
 		}
 		else{
-			printf("Didn't delete\n");
 			response.statusCode = INTERNAL_SERVER_ERROR;
 			if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end())
 					response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
@@ -298,11 +289,11 @@ void	Client::handleMethod()
 		std::string cgiOutput;
 		CgiHandler cgi(pathWithoutQuery, 0, request); // pid not used here
 
+		Logger::log(INFO, "Executing CGI: " + pathWithoutQuery + " for FD " + intToString(fd));
 		int status = cgi.executeCgi(pathWithoutQuery, interpreter, requestBody, cgiOutput);
 
 		if (!status) {
 			// Parse CGI output: split headers and body
-			dprintf(2, "CGI Output:\n%s\n", cgiOutput.c_str());
 			size_t headerEnd = cgiOutput.find("\r\n\r\n");
 			if (headerEnd != std::string::npos) {
 				std::string headers = cgiOutput.substr(0, headerEnd + 4);
@@ -318,16 +309,13 @@ void	Client::handleMethod()
 				size_t start = pos + header.length();
 				size_t end = cgiOutput.find("\r\n", start);
 				response.contentType = cgiOutput.substr(start, end - start);
-				printf("CGI Content-Type: %s\n", response.contentType.c_str());
 				response.cgi = true;
 			} else {
 				// Malformed CGI output
-				dprintf(2, "Malformed CGI output: %s\n", cgiOutput.c_str());
 				response.statusCode = 500;
 			}
 		} else {
 			// CGI execution failed
-			dprintf(2, "CGI execution failed: %s\n", cgiOutput.c_str());
 			response.statusCode = 500;
 		}
 		return; // Done with CGI
@@ -391,7 +379,6 @@ void	Client::sendHeaderChunk()
 	if (CHUNK_SIZE + response.bytesSent > response.headerSize)
 		chunk_size = response.headerSize - response.bytesSent;
 
-	std::cout << "BYTES SENT -> " << response.bytesSent << std::endl;
 	// Sends the read chunk to the client
 	int	bytes = send(fd, &response.header[response.bytesSent], chunk_size, 0);
 	if (bytes == -1)
@@ -400,13 +387,10 @@ void	Client::sendHeaderChunk()
 
 	// Changes the state of the client when necessary
 	if (response.bytesSent == response.headerSize){
-		std::cout << std::endl << "Client " << getFD() << " (Sending Body)" << std::endl;
 		state = SENDING_BODY;
 		if (response.statusCode != OK){
-			std::cout << "Sending error message -> " << getStatus(response.statusCode).c_str() << std::endl;
 			if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
 				throw ClientException("Failed to send a response", fd);
-			std::cout << "Sent!" << std::endl;
 			recieveMode();
 		}
 	}

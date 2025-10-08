@@ -1,5 +1,7 @@
 #include "../includes/Server.hpp"
+#include "../includes/Logger.hpp"
 #include <signal.h>
+#include <vector>
 
 // Static member initialization
 Server* Server::instance = NULL;
@@ -115,18 +117,17 @@ std::map<int, ServerBlock*> Server::createServerBlocks(HttpInfo &server_info)
 
 void Server::pendingClients()
 {
-    for (std::map<int, Client *>::iterator i = clients.begin(); i != clients.end(); i++)
+    std::vector<int> clientsToDelete;
+
+    for (std::map<int, Client *>::iterator i = clients.begin(); i != clients.end(); ++i)
     {
         try
         {
             // Check for timeout first
             if (i->second->isTimedOut())
             {
-                std::cout << "Client " << i->second->getFD() << " timed out" << std::endl;
-                std::map<int, Client *>::iterator delete_i = i--;
-                eventHandler->deleteClient(delete_i->second->getFD());
-                if (i == clients.end())
-                    break;
+                Logger::log(INFO, "Client timed out: FD " + intToString(i->second->getFD()));
+                clientsToDelete.push_back(i->first);
                 continue;
             }
 
@@ -144,12 +145,8 @@ void Server::pendingClients()
                 i->second->sendBodyChunk();
                 break;
 
-            case DONE: {
-                std::map<int, Client *>::iterator delete_i = i--;
-                eventHandler->deleteClient(delete_i->second->getFD());
-                if (i == clients.end())
-                    break;
-                }
+            case DONE:
+                clientsToDelete.push_back(i->first);
                 break;
 
             default:;
@@ -157,13 +154,15 @@ void Server::pendingClients()
         }
         catch (const std::exception &e)
         {
-            std::map<int, Client *>::iterator delete_i = i--;
-            std::cerr << "Error : " << e.what() << std::endl;
-            std::cout << "Deleting client " << delete_i->second->getFD() << "..." << std::endl;
-            eventHandler->deleteClient(delete_i->second->getFD());
-            if (i == clients.end())
-                break;
+            Logger::log(ERROR, "Client error: " + std::string(e.what()) + " for FD " + intToString(i->second->getFD()));
+            clientsToDelete.push_back(i->first);
         };
+    }
+
+    // Delete clients after iteration
+    for (std::vector<int>::iterator it = clientsToDelete.begin(); it != clientsToDelete.end(); ++it)
+    {
+        eventHandler->deleteClient(*it);
     }
 }
 
@@ -195,7 +194,7 @@ void Server::cleanup()
 // MAIN OPERATIONS
 void Server::run()
 {
-    std::cout << "Server starting..." << std::endl;
+    Logger::log(INFO, "Server starting...");
     
     while (running) {
         try {
@@ -220,11 +219,12 @@ void Server::run()
             }
         }
         catch (const std::exception &e) {
+            Logger::log(ERROR, "Server loop error: " + std::string(e.what()));
             std::cerr << "Server loop error: " << e.what() << std::endl;
         }
     }
-    
-    std::cout << "Server shutting down..." << std::endl;
+
+    Logger::log(INFO, "Server shutting down...");
 }
 
 void Server::stop()

@@ -73,14 +73,11 @@ void	EventHandler::addClient(int client_fd)
 	// Fills a "Max Clients" response if the server is full
 	if (connections == maxConnections)
 	{
-		printf("Max connections reached. Rejecting client %d\n", client_fd);
 		clients[client_fd]->setRequestStatus(SERVICE_UNAVAILABLE);
 		clients[client_fd]->sendMode();
 	}
 	else
 		connections++;
-	
-	std::cout << "The client " << client_fd << " connected" << std::endl;
 }
 
 void	EventHandler::removeClient(int client_fd)
@@ -97,7 +94,6 @@ void	EventHandler::deleteClient(int	client_fd)
 
 	delete clients[client_fd];
 	clients.erase(client_fd);
-	std::cout << "The client " << client_fd << " disconnected" << std::endl;
 }
 
 void	EventHandler::modifyClient(int client_fd, uint32_t flags)
@@ -153,10 +149,7 @@ void	EventHandler::handleServerEvent(int server_fd)
 
 	// Checks if the client is already connected
 	if (clients.count(client_fd))
-	{
-		std::cout << "The Client " << client_fd << " is already connected!" << std::endl;
 		return ;
-	}
 
 	// Adds the new client to the map of clients and to epoll
 	Client	*client = NULL;
@@ -179,7 +172,6 @@ void	EventHandler::handleServerEvent(int server_fd)
 
 void	EventHandler::handleClientEvent(epoll_event& event)
 {
-	std::cout << "\nThe client " << event.data.fd << " triggered an event" << std::endl;
 	
 	// Checks if the event was triggered because of disconnection
 	if (event.events & EPOLLRDHUP)
@@ -189,18 +181,10 @@ void	EventHandler::handleClientEvent(epoll_event& event)
 	}
 	// Checks if the client is ready to be read from
 	else if (event.events & EPOLLIN)
-	{
-		std::cout << std::endl << "Client " << event.data.fd << " (Recieving)" << std::endl;
 		clients[event.data.fd]->setState(RECIEVING_REQUEST);
-		std::cout << "The client " << event.data.fd << " is ready to be read from" << std::endl;
-	}
 	// Checks if the client is ready to write to
 	else if (event.events & EPOLLOUT)
-	{
-		std::cout << std::endl << "Client " << event.data.fd << " (Sending Header)" << std::endl;
 		clients[event.data.fd]->setState(SENDING_HEADER);
-		std::cout << "The client " << event.data.fd << " is ready to write to" << std::endl;
-	}
 }
 
 // EXCEPTIONS

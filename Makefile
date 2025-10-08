@@ -1,7 +1,7 @@
 NAME = webserv
 
 CXX = c++
-CXXFLAGS =-Wall -Werror -Wextra -std=c++98 -g -fsanitize=address
+CXXFLAGS =-Wall -Werror -Wextra -std=c++98 -g #-fsanitize=address
 
 SRC_A = $(addprefix src/, $(SOURCES_A))
 SOURCES_A = CgiHandler.cpp	\
@@ -15,7 +15,8 @@ ServerBlock.cpp	\
 HttpResponse.cpp	\
 HttpRequest.cpp	\
 Parser.cpp	\
-Server.cpp
+Server.cpp	\
+Logger.cpp
 
 OBJ_DIR = objects
 OBJ = $(addprefix $(OBJ_DIR)/, $(SRC_A:src/%.cpp=%.o))

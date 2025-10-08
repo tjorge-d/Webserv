@@ -61,7 +61,6 @@ void	HttpResponse::createResponse()
 		headerStr += "Set-Cookie: theme=dark; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
 	else if (this->currentPath.find(".html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=light; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
-	std::cout << "Cookie Current Path = " << currentPath << std::endl;
 
 	//COOKIES END HERE
 	headerStr += "Cache-Control: no-cache, no-store, must-revalidate\r\n";
@@ -69,7 +68,6 @@ void	HttpResponse::createResponse()
 	headerStr += std::string(RESPONSE_LINE_END);
 	header = std::vector<char>(headerStr.begin(), headerStr.end());
 	headerSize = headerStr.size();
-	std::cout << "Response:" << std::endl << headerStr << std::endl;
 
 }
 
@@ -124,7 +122,6 @@ void	HttpResponse::openRequestedFile()
 			fileStream.close();
 			throw ResponseException("Error while opening File");
 		}
-	std::cout << "FILE OPENED -> " << pathWithoutQuery.c_str() << std::endl;
 	if (stat(pathWithoutQuery.c_str(), &fileStats) == -1)
 		throw ResponseException("Failed to retrieve the stats of the file \"" + pathWithoutQuery + "\"");
 }
