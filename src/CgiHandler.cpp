@@ -5,11 +5,10 @@
 
 // CONSTRUCTORS & DESTRUCTORS
 
-CgiHandler::CgiHandler(std::string cgiPath, pid_t cgiPid, HttpRequest request):
+CgiHandler::CgiHandler(std::string cgiPath, HttpRequest request):
 env(),
 args(),
-cgiPath(cgiPath),
-cgiPid(cgiPid)
+cgiPath(cgiPath)
 {
 	initEnv(request);
 }

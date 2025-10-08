@@ -32,10 +32,9 @@ class CgiHandler
 		std::map<std::string, std::string>  env;
 		std::vector<std::string>            args;
 		std::string                         cgiPath;
-		pid_t                               cgiPid;
 
 	public:
-		CgiHandler(std::string cgiPath, pid_t cgiPid, HttpRequest request);
+		CgiHandler(std::string cgiPath, HttpRequest request);
 		~CgiHandler();
 
 		void		initEnv(HttpRequest request);
