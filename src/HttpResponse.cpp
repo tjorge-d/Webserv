@@ -166,6 +166,7 @@ void	HttpResponse::reset()
 	connection.clear();
 
 	header.clear();
+	body.clear();
 	headerSize = 0;
 	bytesSent = 0;
 

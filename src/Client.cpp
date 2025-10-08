@@ -540,6 +540,8 @@ void Client::handleMethod()
 
         int status = cgi.executeCgi(pathWithoutQuery, interpreter, requestBody, cgiOutput);
 
+		std::cout << "status: " << status << std::endl;
+
         if (!status)
         {
 
@@ -549,6 +551,8 @@ void Client::handleMethod()
 
             if (headerEnd != std::string::npos)
             {
+
+				std::cout << "headerEnd != std::string::npos" << std::endl;
 
                 std::string headers = cgiOutput.substr(0, headerEnd + 4);
 
@@ -577,6 +581,11 @@ void Client::handleMethod()
                 response.contentType = cgiOutput.substr(start, end - start);
 
                 response.cgi = true;
+
+				std::cout << "response.headerSize = " << response.headerSize << std::endl;
+				std::cout << "response.contentLength = " << response.contentLenght << std::endl;
+				std::cout << "response.body = " << response.body << std::endl;
+				std::cout << "response.contentType = " << response.contentType << std::endl;
             }
             else
             {
@@ -593,6 +602,8 @@ void Client::handleMethod()
 
             response.statusCode = INTERNAL_SERVER_ERROR;
         }
+
+		std::cout << "response.statusCode = " << response.statusCode << std::endl;
 
         return; // Done with CGI
     }
