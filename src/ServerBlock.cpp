@@ -5,17 +5,13 @@
 ServerBlock::ServerBlock(ServerBlockInfo &info, int &size) :
 listener(INADDR_ANY, info.port, SOCKET_BACKLOG),
 info(info),
-maxBodySize(size){}
-// httpInfo(httpInfo)
-// {
-// 	//std::cout << "ServerBlock default constructor called\n";
-// }
+maxBodySize(size)
+{}
+
 
 
 ServerBlock::~ServerBlock()
-{
-	//std::cout << "ServerBlock default destructor called\n";
-}
+{}
 
 // GETTERS
 

@@ -153,14 +153,11 @@ int	Client::recieveRequestChunk()
 				postFile.open(request.postFileName.c_str(), std::ios::out);
 				postFile.write(request.body.c_str(), request.body.size());
 				postFile.close();
-				response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
-				std::cout << "response.filePath = " << response.filePath << std::endl;
 			}
 		}
 	}
 
 	// Behaves accordingly in case of not having anything else to read
-	// std::cout << "Bytes -> " << bytes << " Chunk Size -> " << CHUNK_SIZE << std::endl;
 	if(bytes < CHUNK_SIZE || !bytes)
 	{
 		if(recievingHeader)
@@ -191,25 +188,18 @@ void	Client::appendToRequest(char* buffer, int size)
 			std::cout << "Request header found" << std::endl;
 			response.statusCode = request.parseRequestHeader(it + 4);
 			recievingHeader = false;
-			// if (response.statusCode != OK){
-			// 	response.basicClientResponse(response.statusCode);
-			// 	setConnection(false);
-			// }
-			// Should replace setConnection function called in simpleHTTP (already done)
 			if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
 				response.connection = "close";
 			else
 				response.connection = "keep-alive";
 
-			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
 			// extract location, return extract, replace request.path locations /dev/flick_esfand.gif becomes /dev/, /upload.html becomes /
 			if (request.path.find("/") == request.path.rfind("/"))
 				extracted_path = "/";
 			else
-				extracted_path = request.path.substr(request.path.find('/'),
-					request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
+				extracted_path = request.path.substr(request.path.find('/'), request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
 			std::cout << "extracted location = " << extracted_path << std::endl;
-			// end of extraction, need to test special cases but overall should function correctly
+			// end of extraction
 			if (!serverBlock.getInfo().locations.count(extracted_path)){
 
 				response.statusCode = NOT_FOUND;
@@ -218,18 +208,11 @@ void	Client::appendToRequest(char* buffer, int size)
 			std::cout << "request path before =" << request.path << std::endl;
 			if (*(request.path.end() - 1) == '/')
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location;
-/* 			else if (request.path.find('.') != std::string::npos)
-				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location 
-				 + request.path; */
 			else
 				request.path = serverBlock.getInfo().server_root + request.path;
 			std::cout << "request path after =" << request.path << std::endl;
-			// ------------------------------------THIS NEEDS TO BE DONE SOMEWHERE ELSE ---------------------------------------------------
-				handleMethod();
+			handleMethod();
 			}
-		//make exception for error 431 "Request Header Fields Too Large"
-		/* basicClientResponse("Request header fields too large.", getStatus(REQUEST_HEADER_FIELDS_TOO_LARGE));
-		setConnection(false); */
 	}
 }
 
@@ -237,7 +220,6 @@ void	Client::handleMethod()
 {
 	//VERIFY ALLOWED METHODS/SERVICES
     if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE"){
-		//response.simpleHTTP("./var/www/dev" + request.path);
 		if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location){
 			if (request.cookie.find("theme=dark") != std::string::npos)
 				request.path = serverBlock.getInfo().server_root 
@@ -247,6 +229,7 @@ void	Client::handleMethod()
 			else
 				request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
 						+ serverBlock.getInfo().locations[extracted_path].index_file;
+			printf("Index file path: %s\n", request.path.c_str());
 		}
 		std::ifstream fileStream(request.path.c_str());
 
@@ -265,11 +248,12 @@ void	Client::handleMethod()
 	{
 		recievingBody = true;
 		request.bodySize = request.buffer.size();
+		response.filePath = request.path;
 	}
 	else if (request.method == "DELETE") {
 		std::cout << "to delete: " << request.path << std::endl;
-		if (!std::remove(request.path.c_str())){
-			response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
+		if (std::remove(request.path.c_str()) == 0){
+			response.filePath = request.path;
 			printf("FilePath: %s\n", response.filePath.c_str());
 		}
 		else{
@@ -301,12 +285,12 @@ void	Client::handleMethod()
 
 		int status = cgi.executeCgi(pathWithoutQuery, interpreter, requestBody, cgiOutput);
 
-		if (status == 0) {
+		if (!status) {
 			// Parse CGI output: split headers and body
 			dprintf(2, "CGI Output:\n%s\n", cgiOutput.c_str());
 			size_t headerEnd = cgiOutput.find("\r\n\r\n");
 			if (headerEnd != std::string::npos) {
-				std::string headers = cgiOutput.substr(0, headerEnd + 4); // include \r\n\r\n
+				std::string headers = cgiOutput.substr(0, headerEnd + 4);
 				std::string body = cgiOutput.substr(headerEnd + 4);
 				// Set response headers and body accordingly
 				response.header = std::vector<char>(headers.begin(), headers.end());
@@ -335,8 +319,6 @@ void	Client::handleMethod()
 	}
 	// --- END CGI HANDLING ---
 	response.cgi = false;
-
-	std::cout << "Body Size: " << request.bodySize << std::endl;
 }
 
 void	Client::resolveChunkedBody(){
@@ -380,8 +362,6 @@ void	Client::resolveChunkedBody(){
 		fileToPost = serverBlock.getInfo().server_root + "/upload/file";
 		postFile.open(fileToPost.c_str(), std::ios::out);
 		postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
-		//response.simpleHTTP("./var/www/dev/parabens.html");
-		response.filePath = serverBlock.getInfo().server_root + extracted_path + "parabens.html";
 	}
 }
 
@@ -390,8 +370,6 @@ void	Client::sendHeaderChunk()
 	// Protects the client from sending if not necessary
 	if (state != SENDING_HEADER)
 		throw ClientException("Invalid client state to call sendHeaderChunk()", fd);
-
-	// checkar erros e buildar o response header
 
 	// Protects the function from sending invalid memory
 	int	chunk_size = CHUNK_SIZE;
@@ -414,7 +392,6 @@ void	Client::sendHeaderChunk()
 			if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
 				throw ClientException("Failed to send a response", fd);
 			std::cout << "Sent!" << std::endl;
-			//setConnection(false);
 			recieveMode();
 		}
 	}
@@ -495,5 +472,5 @@ void Client::updateActivity()
 
 bool Client::isTimedOut() const
 {
-	return (time(NULL) - lastActivity > TIMEOUT_SECONDS);
+	return (time(NULL) - lastActivity > timeoutSeconds);
 }

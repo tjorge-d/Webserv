@@ -77,11 +77,11 @@
 
     <form id= "uploadForm" action="upload" method="POST" enctype="multipart/form-data">
         <label for="image">Select file to upload:</label>
-        <input type="file" id="image" name="image" required>
+        <input type="file" id="filename" name="image" required>
         <button type="submit">Upload</button>
     </form>
 	
-	<a href="index.html" class="nav-link">← Return to Homepage</a>
+	<a href="index.html" class="home-button">Return to Homepage</a>
 
 	<div>
         <a href="upload_alt.html" class="theme-button">Switch to Dark Theme</a>
@@ -90,11 +90,21 @@
 	<script>
 		document.getElementById('uploadForm').addEventListener('submit', function(e) {
 			e.preventDefault();
-            const filename = document.getElementById('filename').value;
+            const fileInput = document.getElementById('filename');
+            const filename = fileInput.files[0] ? fileInput.files[0].name : '';
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
 			
-            fetch("/sussy_files/" + filename, {
-				method: 'POST'
-            }).then(res => res.text()).then(alert);
+            fetch("upload/" + filename, {
+				method: 'POST', 
+                body: formData
+            }).then(res => {
+                if (res.ok) {
+                    window.location.href = "upload_success.html";
+                } else {
+                    window.location.href = "upload_failed.html";
+                }
+            });
         });
 	</script>
 

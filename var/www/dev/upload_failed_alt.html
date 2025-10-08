@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DELETE File - Dark</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to Our Website</title>
     <style>
         body {
             background-color: #121212;
@@ -51,42 +53,22 @@
 			background-color: #a1a1a1;
 		}
     </style>
-	
 </head>
-
 <body>
 
-    <h1>DELETE File</h1>
-    <form id="deleteForm">
-        <label for="filename">Filename to Delete:</label><br>
-        <input type="text" id="filename" required placeholder="e.g. file.txt"><br>
-        <button type="submit">Send DELETE Request</button>
-    </form>
+    <h1>UPLOAD FAILED!</h1>
 
-	<div>
-		<a href="index_alt.html" class="home-button"> Return to Homepage</a>
-	</div>
-
-    <div>
-        <a href="delete.html" class="theme-button">Switch to Light Theme</a>
+	<p> I BET IT WAS SOMETHING SUSSY... </p>
+    <div class="image-container">
+        <!--image goes here, something funny-->
+        <img src="sideye.jpg" alt="sideye.jpg">
     </div>
 
-    <script>
-        document.getElementById('deleteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const filename = document.getElementById('filename').value;
+    <p>To upload more images click below to go to the upload page.</p>
 
-            fetch("upload/" + filename, {
-                method: 'DELETE'
-            }).then(res => {
-                if (res.ok) {
-                    window.location.href = "delete_success.html";
-                } else {
-                    window.location.href = "delete_failed.html";
-                }
-            });
-        });
-    </script>
+    <a href="upload.html" class="upload-link">Go to Upload Page</a>
+
+    <a href="index.html" class="home-button">Return to Homepage</a>
 
 </body>
 </html>

@@ -5,21 +5,17 @@
 ConnectingSocket::ConnectingSocket(int domain, int type, int protocol, u_long interface, int port) :
 Socket(domain, type, protocol, interface, port)
 {
-	//std::cout << "Socket custom constructor called\n";
 	configureSocket();
 }
 
 ConnectingSocket::ConnectingSocket(u_long interface, int port) :
 Socket(AF_INET, SOCK_STREAM, 0, interface, port)
 {
-	//std::cout << "Socket custom constructor called\n";
 	configureSocket();
 }
 
 ConnectingSocket::~ConnectingSocket()
-{
-	//std::cout << "ConnectingSocket default destructor called\n";
-}
+{}
 
 // MEMBER FUNCTIONS
 

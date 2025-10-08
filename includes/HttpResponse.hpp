@@ -46,7 +46,6 @@ class HttpResponse
 		std::string	getHttpDateHeader();
 		std::string getLastModifiedHeader();
 
-
 		void		openRequestedFile();
 		void		setSessionId(std::string sessionId);
 		void		setPath(std::string path);

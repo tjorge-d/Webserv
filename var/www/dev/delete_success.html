@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TRACE Test</title>
-	<style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Welcome to Our Website</title>
+    <style>
         body {
             background-color: #ffffff;
             color: #000000;
@@ -28,8 +30,9 @@
             border-radius: 15px;
         }
 
+		
 		.home-button {
-            display: inline-block;
+			display: inline-block;
             margin-top: 100px;
             padding: 10px 20px;
             background-color: #080808;
@@ -47,37 +50,23 @@
 
 			background-color: #424141;
 		}
-	</style>
+    </style>
 </head>
 <body>
-    <h1>TRACE Request</h1>
-    <form id="traceForm">
-        <label for="path">Target Path:</label>
-        <input type="text" id="path" required value="/">
-        <button type="submit">Send TRACE</button>
-    </form>
 
-    <div id="result" style="white-space: pre;"></div>
+    <h1>DELETED SUCCESSFULLY!</h1>
 
-	<div>
-		<a href="index.html" class="home-button">Return to Homepage</a>
-	</div>
-
-    <div>
-        <a href="trace_alt.html" class="theme-button">Switch to Dark Theme</a>
+	<p> I BET IT WAS SOMETHING SUSSY... </p>
+    <div class="image-container">
+        <!--image goes here, something funny-->
+        <img src="sideye.jpg" alt="sideye.jpg">
     </div>
 
-    <script>
-        document.getElementById('traceForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const path = document.getElementById('path').value;
+    <p>To upload more images click below to go to the upload page.</p>
 
-            fetch(path, {
-                method: 'TRACE'
-            }).then(res => res.text()).then(data => {
-                document.getElementById('result').textContent = data;
-            });
-        });
-    </script>
+    <a href="upload.html" class="upload-link">Go to Upload Page</a>
+
+    <a href="index.html" class="home-button">Return to Homepage</a>
+
 </body>
 </html>

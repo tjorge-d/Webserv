@@ -90,7 +90,6 @@ std::map<int, ServerBlock*> Server::createServerBlocks(HttpInfo &server_info)
             }
             server_blocks.clear();
             
-            // Re-throw the exception
             throw;
         }
     }

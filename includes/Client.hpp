@@ -57,7 +57,7 @@ class Client
 		
 		// Timeout handling
 		time_t			lastActivity;
-		static const time_t TIMEOUT_SECONDS = 30; // 30 second timeout
+		static const time_t timeoutSeconds = 30;
 		
 		// MEMBER FUNCTIONS
 		// Appends a char* to _request(vector<char>)

@@ -18,7 +18,7 @@ class HttpRequest
 		std::vector<char>					buffer;
 		std::vector<MultiFormData>			formParts;
 		std::string		 					chunkBuffer;
-		std::string							cookie; //use istringstream instead?
+		std::string							cookie;
 		std::string 						method;
 		std::string 						path;
 		std::string							version;
@@ -30,9 +30,6 @@ class HttpRequest
 		int									bodySize;
 		bool 								isChunked;
 		bool 								chunkedComplete;
-
-		//will need to add sections for cookies, at least a private attribute to store sessionId
-
 		
 		// CONSTRUCTORS/DESTRUCTORS
 		HttpRequest();

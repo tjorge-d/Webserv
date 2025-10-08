@@ -86,15 +86,15 @@ std::string	HttpResponse::getHttpDateHeader()
 
 std::string HttpResponse::getLastModifiedHeader()
 {
-    if (stat(filePath.c_str(), &fileStats) == -1)
+	if (filePath.empty() || stat(filePath.c_str(), &fileStats) == -1)
 		return "";
 
-    std::tm gmt;
-    gmtime_r(&fileStats.st_mtime, &gmt);
+	std::tm gmt;
+	gmtime_r(&fileStats.st_mtime, &gmt);
 
-	char	buffer[100];
-    std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
-    return std::string(buffer);    
+	char buffer[100];
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &gmt);
+	return std::string(buffer);
 }
 
 void	HttpResponse::setSessionId(std::string clientSessionId){
@@ -140,9 +140,11 @@ void	HttpResponse::setContentType()
 		return ;
 	}
 
-	std::string	extension;
-	extension = filePath.substr(filePath.find_last_of('.'));
-
+	if (filePath.empty()) {
+		contentType = "application/octet-stream";
+		return;
+	}
+	std::string extension = filePath.substr(filePath.find_last_of('.'));
 	if (supportedContentType.count(extension))
 		contentType = supportedContentType[extension];
 	else

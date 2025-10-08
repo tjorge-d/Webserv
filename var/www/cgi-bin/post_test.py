@@ -6,7 +6,6 @@ from urllib.parse import parse_qs
 
 def get_params():
     content_length = int(os.environ.get('CONTENT_LENGTH', 0))
-    print(f"Content-Length: {content_length}\r\n", end='')
     post_data = sys.stdin.read(content_length) if content_length > 0 else ""
     params = parse_qs(post_data)
     return params
@@ -15,7 +14,7 @@ def build_response_headers():
     print(f"Content-Type: text/html\r\n", end='')
     print(f"\r\n", end='')
 
-def build_response_body(name, age):
+def build_response_body(city, country):
     print(f"<!DOCTYPE html>")
     print(f"<html>")
     print(f"<body>")

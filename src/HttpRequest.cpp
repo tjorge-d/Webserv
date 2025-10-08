@@ -54,8 +54,6 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
     std::istringstream requestStream(requestString);
     std::string requestLine;
     if (!std::getline(requestStream, requestLine) || requestLine.empty()){
-		//basicClientResponse("Bad request.", getStatus(400));
-		//setConnection(false);
 		return (BAD_REQUEST);
 	}
 
@@ -64,8 +62,6 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
     lineStream >> method >> path >> version;
 
 	if (version != HTTP_ACCEPTED_VERSION){
-		//basicClientResponse("Unsupported HTTP version.", getStatus(505));
-		//setConnection(false);
 		return (HTTP_VERSION_NOT_SUPPORTED);
 	}
 
@@ -243,5 +239,5 @@ std::string HttpRequest::getHeader(const std::string& key) const
 		}
 	}
 	
-	return ""; // Header not found
+	return "";
 }

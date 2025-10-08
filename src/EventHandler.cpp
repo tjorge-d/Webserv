@@ -10,7 +10,6 @@ eventsNumber(0),
 events(),
 serverBlocks(server_blocks) 
 {
-	//std::cout << "EventHandler custom constructor called" << std::endl;
 	// Creates an epoll instance in the kernel
 	epollFd = epoll_create(1);
 	if(epollFd == -1)
@@ -33,10 +32,8 @@ serverBlocks(server_blocks)
 
 EventHandler::~EventHandler()
 {
-	//std::cout << "EventHandler default destructor called" << std::endl;
 	safeClose();
 }
-
 
 // GETTERS
 
@@ -79,8 +76,6 @@ void	EventHandler::addClient(int client_fd)
 		printf("Max connections reached. Rejecting client %d\n", client_fd);
 		clients[client_fd]->setRequestStatus(SERVICE_UNAVAILABLE);
 		clients[client_fd]->sendMode();
-		//clients[client_fd]->basicClientResponse(503);
-		//clients[client_fd]->setConnection(false);
 	}
 	else
 		connections++;

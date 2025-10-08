@@ -9,7 +9,6 @@ _protocol(protocol),
 _interface(interface),
 _port(port)
 {
-	//std::cout << "Socket custom constructor called\n";
 	//Creates a socket
 	_fd = socket(_domain, _type, _protocol);
 	if(_fd == -1)
@@ -18,7 +17,6 @@ _port(port)
 
 Socket::~Socket()
 {
-	//std::cout << "Socket default destructor called\n";
 	// Closes the socket safely
 	closeSocket();
 }
