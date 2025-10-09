@@ -1,9 +1,12 @@
 #!/usr/bin/php
 <?php
-$name = isset($_GET['name']) ? $_GET['name'] : 'Guest';
-$age = isset($_GET['age']) ? $_GET['age'] : 'unknown';
+$query_string = getenv('QUERY_STRING');
+parse_str($query_string, $get_params);
 
-header('Content-Type: text/html');
+$name = isset($get_params['name_php']) ? $get_params['name_php'] : 'Guest';
+$age = isset($get_params['age_php']) ? $get_params['age_php'] : 'unknown';
+
+echo "Content-Type: text/html\r\n\r\n";
 
 echo "<!DOCTYPE html>\n";
 echo "<html>\n";

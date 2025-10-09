@@ -1,181 +1,20 @@
-2025-10-08 20:03:51 [INFO] Server starting...
-2025-10-08 20:03:56 [INFO] New client connected: FD 6
-2025-10-08 20:03:56 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-08 20:03:56 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-08 20:04:00 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:00 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
-2025-10-08 20:04:00 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:01 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-08 20:04:01 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-08 20:04:01 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:04:01 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:04:04 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:04 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
-2025-10-08 20:04:04 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:04 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:04 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
-2025-10-08 20:04:04 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.py?name_py=123&age_py=13 from FD 6
-2025-10-08 20:04:05 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-08 20:04:05 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-08 20:04:36 [INFO] Client timed out: FD 6
-2025-10-08 20:04:36 [INFO] Client disconnected: FD 6
-2025-10-08 20:40:10 [INFO] New client connected: FD 6
-2025-10-08 20:40:10 [INFO] Request received: GET /dev/ from FD 6
-2025-10-08 20:40:10 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:40:10 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:10 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:11 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:40:11 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:40:12 [INFO] Request received: GET /dev/index_alt.html from FD 6
-2025-10-08 20:40:12 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 6
-2025-10-08 20:40:12 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:12 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:13 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:40:13 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:40:13 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:13 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:40:44 [INFO] Client timed out: FD 6
-2025-10-08 20:40:44 [INFO] Client disconnected: FD 6
-2025-10-08 20:42:24 [INFO] New client connected: FD 6
-2025-10-08 20:42:24 [INFO] Request received: GET /dev/index_alt.html from FD 6
-2025-10-08 20:42:24 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 6
-2025-10-08 20:42:24 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:24 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:24 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:42:24 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:42:28 [INFO] Request received: GET /dev/ from FD 6
-2025-10-08 20:42:28 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:42:28 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:28 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:28 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:42:28 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:42:29 [INFO] Request received: GET /dev/index_alt.html from FD 6
-2025-10-08 20:42:29 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 6
-2025-10-08 20:42:29 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:29 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:55 [INFO] Request received: GET /dev/delete.html from FD 6
-2025-10-08 20:42:55 [INFO] Response sent: 200 for GET ./var/www/dev/delete.html from FD 6
-2025-10-08 20:42:55 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:42:55 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:42:56 [INFO] Request received: GET /dev/delete_alt.html from FD 6
-2025-10-08 20:42:56 [INFO] Response sent: 200 for GET ./var/www/dev/delete_alt.html from FD 6
-2025-10-08 20:42:56 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:42:56 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:42:56 [INFO] Request received: GET /dev/index_alt.html from FD 6
-2025-10-08 20:42:56 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 6
-2025-10-08 20:42:56 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:56 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:58 [INFO] Request received: GET /dev/put.html from FD 6
-2025-10-08 20:42:58 [INFO] Response sent: 200 for GET ./var/www/dev/put.html from FD 6
-2025-10-08 20:42:59 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:42:59 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:42:59 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:42:59 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:00 [INFO] Request received: GET /dev/put.html from FD 6
-2025-10-08 20:43:00 [INFO] Response sent: 200 for GET ./var/www/dev/put.html from FD 6
-2025-10-08 20:43:01 [INFO] Request received: GET /dev/put_alt.html from FD 6
-2025-10-08 20:43:01 [INFO] Response sent: 200 for GET ./var/www/dev/put_alt.html from FD 6
-2025-10-08 20:43:01 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:43:01 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:43:01 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:43:01 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:43:01 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:01 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:02 [INFO] Request received: GET /dev/put.html from FD 6
-2025-10-08 20:43:02 [INFO] Response sent: 200 for GET ./var/www/dev/put.html from FD 6
-2025-10-08 20:43:03 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:43:03 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:43:03 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:03 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:04 [INFO] Request received: GET /dev/put.html from FD 6
-2025-10-08 20:43:04 [INFO] Response sent: 200 for GET ./var/www/dev/put.html from FD 6
-2025-10-08 20:43:05 [INFO] Request received: GET /dev/put_alt.html from FD 6
-2025-10-08 20:43:05 [INFO] Response sent: 200 for GET ./var/www/dev/put_alt.html from FD 6
-2025-10-08 20:43:06 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:43:06 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:43:06 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:06 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:43:37 [INFO] Client timed out: FD 6
-2025-10-08 20:43:37 [INFO] Client disconnected: FD 6
-2025-10-08 20:44:31 [INFO] New client connected: FD 6
-2025-10-08 20:44:31 [INFO] Request received: GET /dev/delete.html from FD 6
-2025-10-08 20:44:31 [INFO] Response sent: 200 for GET ./var/www/dev/delete.html from FD 6
-2025-10-08 20:44:31 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:31 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:33 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:33 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:33 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:33 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:33 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:33 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:34 [INFO] Request received: GET /dev/upload.html from FD 6
-2025-10-08 20:44:34 [INFO] Response sent: 200 for GET ./var/www/dev/upload.html from FD 6
-2025-10-08 20:44:35 [INFO] Request received: GET /dev/upload_alt.html from FD 6
-2025-10-08 20:44:35 [INFO] Response sent: 200 for GET ./var/www/dev/upload_alt.html from FD 6
-2025-10-08 20:44:35 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:35 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:35 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:35 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:39 [INFO] Request received: GET /dev/put.html from FD 6
-2025-10-08 20:44:39 [INFO] Response sent: 200 for GET ./var/www/dev/put.html from FD 6
-2025-10-08 20:44:40 [INFO] Request received: GET /dev/put_alt.html from FD 6
-2025-10-08 20:44:40 [INFO] Response sent: 200 for GET ./var/www/dev/put_alt.html from FD 6
-2025-10-08 20:44:40 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:40 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:41 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:41 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:41 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:41 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:42 [INFO] Request received: GET /dev/delete.html from FD 6
-2025-10-08 20:44:42 [INFO] Response sent: 200 for GET ./var/www/dev/delete.html from FD 6
-2025-10-08 20:44:43 [INFO] Request received: GET /dev/delete_alt.html from FD 6
-2025-10-08 20:44:43 [INFO] Response sent: 200 for GET ./var/www/dev/delete_alt.html from FD 6
-2025-10-08 20:44:43 [INFO] Request received: GET /dev/index_alt.html from FD 6
-2025-10-08 20:44:43 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 6
-2025-10-08 20:44:43 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:43 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:45 [INFO] Request received: GET /dev/delete.html from FD 6
-2025-10-08 20:44:45 [INFO] Response sent: 200 for GET ./var/www/dev/delete.html from FD 6
-2025-10-08 20:44:45 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:45 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:48 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:48 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:48 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:48 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:49 [INFO] Request received: GET /dev/head.html from FD 6
-2025-10-08 20:44:49 [INFO] Response sent: 200 for GET ./var/www/dev/head.html from FD 6
-2025-10-08 20:44:49 [INFO] Request received: GET /dev/head_alt.html from FD 6
-2025-10-08 20:44:49 [INFO] Response sent: 200 for GET ./var/www/dev/head_alt.html from FD 6
-2025-10-08 20:44:49 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:49 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:50 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:50 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:50 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:50 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:51 [INFO] Request received: GET /dev/options.html from FD 6
-2025-10-08 20:44:51 [INFO] Response sent: 200 for GET ./var/www/dev/options.html from FD 6
-2025-10-08 20:44:52 [INFO] Request received: GET /dev/options_alt.html from FD 6
-2025-10-08 20:44:52 [INFO] Response sent: 200 for GET ./var/www/dev/options_alt.html from FD 6
-2025-10-08 20:44:53 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:53 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:53 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:53 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:53 [INFO] Request received: GET /dev/trace.html from FD 6
-2025-10-08 20:44:53 [INFO] Response sent: 200 for GET ./var/www/dev/trace.html from FD 6
-2025-10-08 20:44:54 [INFO] Request received: GET /dev/trace_alt.html from FD 6
-2025-10-08 20:44:54 [INFO] Response sent: 200 for GET ./var/www/dev/trace_alt.html from FD 6
-2025-10-08 20:44:54 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:54 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:54 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:54 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:55 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-08 20:44:55 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-08 20:44:55 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-08 20:44:55 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-08 20:44:58 [INFO] Request received: GET /dev/index.html from FD 6
-2025-10-08 20:44:58 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
-2025-10-08 20:44:58 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
-2025-10-08 20:44:58 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
-2025-10-08 20:45:29 [INFO] Client timed out: FD 6
-2025-10-08 20:45:29 [INFO] Client disconnected: FD 6
-2025-10-08 20:51:23 [INFO] Server shutting down...
+2025-10-10 00:27:41 [INFO] Server starting...
+2025-10-10 00:27:48 [INFO] New client connected: FD 6
+2025-10-10 00:27:48 [INFO] New client connected: FD 8
+2025-10-10 00:27:49 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-10 00:27:49 [INFO] New client connected: FD 9
+2025-10-10 00:27:49 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-10 00:27:49 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-10 00:27:54 [INFO] Request received: GET /cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
+2025-10-10 00:27:54 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.php for FD 6
+2025-10-10 00:27:54 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
+2025-10-10 00:28:19 [INFO] Client timed out: FD 8
+2025-10-10 00:28:19 [INFO] Client disconnected: FD 8
+2025-10-10 00:28:20 [INFO] Client timed out: FD 9
+2025-10-10 00:28:20 [INFO] Client disconnected: FD 9
+2025-10-10 00:28:25 [INFO] Client timed out: FD 6
+2025-10-10 00:28:25 [INFO] Client disconnected: FD 6
+2025-10-10 00:29:21 [INFO] Server shutting down...

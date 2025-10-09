@@ -591,7 +591,7 @@ void Client::handleMethod()
             {
 
                 // Malformed CGI output
-
+				printf("CGI execution failed with status %d\n", status);
                 response.statusCode = INTERNAL_SERVER_ERROR;
             }
         }
@@ -599,7 +599,7 @@ void Client::handleMethod()
         {
 
             // CGI execution failed
-
+			printf("CGI execution failed with status %d\n", status);
             response.statusCode = INTERNAL_SERVER_ERROR;
         }
 
