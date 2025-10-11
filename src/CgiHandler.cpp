@@ -3,6 +3,15 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <iostream>
+#include <sys/time.h>
+
+#define CGI_TIMEOUT_SECONDS 1  // adjust as needed
+
 // CONSTRUCTORS & DESTRUCTORS
 
 CgiHandler::CgiHandler(std::string cgiPath, HttpRequest request):
@@ -158,9 +167,48 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
     char buffer[4096];
     ssize_t n;
     cgiOutput.clear();
-    while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0)
-        cgiOutput.append(buffer, n);
-    close(outPipe[0]);
-    waitpid(pid, NULL, 0);
+    // while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0)
+    //     cgiOutput.append(buffer, n);
+    // close(outPipe[0]);
+    // waitpid(pid, NULL, 0);
+	
+    int status;
+    struct timeval start_time, now;
+
+    gettimeofday(&start_time, NULL);
+
+    while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0) {
+		cgiOutput.append(buffer, n);
+        pid_t result = waitpid(pid, &status, WNOHANG);
+		printf("Result: %d\n", result);
+        if (result == -1) {
+            std::cerr << "waitpid failed: " << strerror(errno) << std::endl;
+            return 500;
+        }
+
+        if (result == pid) {
+            // CGI process finished
+            if (WIFEXITED(status)) {
+                break; // Return script's exit code
+            } else if (WIFSIGNALED(status)) {
+                std::cerr << "CGI was killed by signal " << WTERMSIG(status) << std::endl;
+                break;
+            }
+        }
+
+        // Check for timeout
+        gettimeofday(&now, NULL);
+        long elapsed = now.tv_sec - start_time.tv_sec;
+        if (elapsed >= CGI_TIMEOUT_SECONDS) {
+            std::cerr << "CGI script timed out. Killing process " << pid << std::endl;
+            kill(pid, SIGKILL);
+            //waitpid(pid, NULL, 0); // clean up zombie
+            break; // Gateway Timeout
+        }
+
+        // Sleep briefly to avoid busy-waiting
+        usleep(1000); // 1ms
+	}
+	close(outPipe[0]);
     return (0);
 }

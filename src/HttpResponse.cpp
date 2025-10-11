@@ -167,6 +167,7 @@ void	HttpResponse::reset()
 
 	header.clear();
 	body.clear();
+	cgi = false;
 	headerSize = 0;
 	bytesSent = 0;
 

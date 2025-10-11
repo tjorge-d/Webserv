@@ -167,16 +167,19 @@ void Client::sendMode()
                 size_t start = pos + header.length();
                 size_t end = cgiOutput.find("\r\n", start);
                 response.contentType = cgiOutput.substr(start, end - start);
+                printf("Output: %s\n", cgiOutput.c_str());
             }
             else
             {
                 // Malformed CGI output
+                printf("Fucked\n");
                 response.statusCode = INTERNAL_SERVER_ERROR;
             }
         }
         else
         {
             // CGI execution failed
+            printf("Fucked2\n");
             response.statusCode = INTERNAL_SERVER_ERROR;
         }
     }
@@ -239,6 +242,7 @@ int Client::recieveRequestChunk()
                 std::string path = request.path;
                 size_t queryPos = path.find('?');
                 std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
+                printf("Path without query: %s\n", pathWithoutQuery.c_str());
                 if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos)
                     response.cgi = true;
                 if ((request.method == "POST" || request.method == "PUT") && !response.cgi) {
@@ -325,7 +329,10 @@ void Client::handleMethod()
             request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
                            + serverBlock.getInfo().locations[extracted_path].index_file;
         }
-        std::ifstream fileStream(request.path.c_str());
+        std::string path = request.path;
+        size_t queryPos = path.find('?');
+        std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
+        std::ifstream fileStream(pathWithoutQuery.c_str());
         if (!fileStream.good())
         {
             response.statusCode = NOT_FOUND;
@@ -337,6 +344,7 @@ void Client::handleMethod()
         }
         else
             response.filePath = request.path;
+        recievingBody = true;
     }
     else if (request.method == "POST" || request.method == "PUT")
     {

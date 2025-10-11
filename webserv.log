@@ -1,14 +1,27 @@
-2025-10-11 06:35:27 [INFO] Server starting...
-2025-10-11 06:35:30 [INFO] New client connected: FD 7
-2025-10-11 06:35:30 [INFO] Request received: GET /dev/index.html from FD 7
-2025-10-11 06:35:30 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 7
-2025-10-11 06:35:30 [INFO] New client connected: FD 8
-2025-10-11 06:35:48 [INFO] Request received: GET /dev/index_alt.html from FD 7
-2025-10-11 06:35:48 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 7
-2025-10-11 06:35:49 [INFO] Request received: GET /dev/upload.html from FD 7
-2025-10-11 06:35:49 [INFO] Response sent: 200 for GET ./var/www/dev/upload.html from FD 7
-2025-10-11 06:36:01 [INFO] Client timed out: FD 8
-2025-10-11 06:36:01 [INFO] Client disconnected: FD 8
-2025-10-11 06:36:20 [INFO] Client timed out: FD 7
-2025-10-11 06:36:20 [INFO] Client disconnected: FD 7
-2025-10-11 06:36:46 [INFO] Server shutting down...
+2025-10-11 17:29:19 [INFO] Server starting...
+2025-10-11 17:29:23 [INFO] New client connected: FD 6
+2025-10-11 17:29:23 [INFO] Request received: GET /dev/ from FD 6
+2025-10-11 17:29:23 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 6
+2025-10-11 17:29:23 [INFO] Request received: GET /dev/flick-esfand.gif from FD 6
+2025-10-11 17:29:23 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 6
+2025-10-11 17:29:26 [INFO] New client connected: FD 7
+2025-10-11 17:29:26 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-11 17:29:26 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-11 17:29:29 [INFO] Client disconnected: FD 7
+2025-10-11 17:29:29 [INFO] Client disconnected: FD 6
+2025-10-11 17:29:29 [INFO] New client connected: FD 6
+2025-10-11 17:29:29 [INFO] New client connected: FD 7
+2025-10-11 17:29:29 [INFO] Request received: POST /cgi-bin/post_test.py from FD 6
+2025-10-11 17:29:29 [INFO] Executing CGI: ./var/www/cgi-bin/post_test.py for FD 6
+2025-10-11 17:29:30 [INFO] Client disconnected: FD 7
+2025-10-11 17:29:30 [INFO] Response sent: 200 for POST ./var/www/cgi-bin/post_test.py from FD 6
+2025-10-11 17:29:30 [INFO] Client disconnected: FD 6
+2025-10-11 17:29:41 [INFO] New client connected: FD 6
+2025-10-11 17:29:41 [INFO] New client connected: FD 7
+2025-10-11 17:29:41 [INFO] Request received: GET /dev/cgi.html from FD 6
+2025-10-11 17:29:41 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
+2025-10-11 17:30:12 [INFO] Client timed out: FD 6
+2025-10-11 17:30:12 [INFO] Client timed out: FD 7
+2025-10-11 17:30:12 [INFO] Client disconnected: FD 6
+2025-10-11 17:30:12 [INFO] Client disconnected: FD 7
+2025-10-11 17:31:12 [INFO] Server shutting down...

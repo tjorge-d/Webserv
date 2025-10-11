@@ -26,6 +26,8 @@ def build_response_body(city, country):
 
 build_response_headers()
 params = get_params()
+while (True):
+    print("Infinity")
 city = params.get('city', [''])[0]
 country = params.get('country', [''])[0]
 build_response_body(city, country)
