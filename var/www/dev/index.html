@@ -9,66 +9,61 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            color: #ffffff;
+            background: url('flick-esfand.gif') no-repeat center center fixed;
+            background-size: cover;
         }
 
         h1 {
-            color: #333333;
+            color: #ffffff;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.6);
         }   
 
-        .image-container img {
-            max-width: 100%;
-			margin-top: 50px;
-            height: auto;
-            border: 1px solid #ccc;
+        p {
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
         }
 
         .test-link {
             display: inline-block;
             margin: 10px;
             padding: 10px 20px;
-            background-color: #007BFF;
+            background-color: rgba(0, 123, 255, 0.8);
             color: white;
             text-decoration: none;
             border-radius: 5px;
         }
 
         .test-link:hover {
-            background-color: #0056b3;
+            background-color: rgba(0, 86, 179, 0.8);
         }
 
         .link-group {
             margin-top: 100px;
         }
 
-		.theme-button {
+        .theme-button {
             display: inline-block;
             margin-left: 0px;
-			margin-top: 100px;
+            margin-top: 100px;
             padding: 10px 20px;
-            background-color: #080808;
+            background-color: rgba(8, 8, 8, 0.8);
             color: white;
             text-decoration: none;
             border-radius: 15px;
-		}
+        }
 
-		.theme-button:hover{
-
-			background-color: #424141;
-		}
-
+        .theme-button:hover {
+            background-color: rgba(66, 65, 65, 0.8);
+        }
     </style>
 </head>
 <body>
 
     <h1>Welcome to Our Webserver Test Page</h1>
     <p>This is the development interface for testing HTTP methods.</p>
-	
-    <div class="image-container">
-		<img src="flick-esfand.gif" alt="sideye.jpg">
-    </div>
 
     <div class="link-group">
-		<a href="upload.html" class="test-link">Test POST (Upload)</a>
+        <a href="upload.html" class="test-link">Test POST (Upload)</a>
         <a href="put.html" class="test-link">Test PUT</a>
         <a href="delete.html" class="test-link">Test DELETE</a>
         <a href="head.html" class="test-link">Test HEAD</a>
@@ -77,9 +72,9 @@
         <a href="cgi.html" class="test-link">Test CGI</a>
     </div>
 
-	<div class="button">
-		<a href="index_alt.html" class="theme-button"> Switch to Dark Theme</a>
-	</div>
+    <div class="button">
+        <a href="index_alt.html" class="theme-button">Switch to Light Theme</a>
+    </div>
 
 </body>
 </html>

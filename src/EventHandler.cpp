@@ -65,6 +65,7 @@ void	EventHandler::addClient(int client_fd)
 	// Adds the client to the epoll instance in the kernel
 	if(epoll_ctl(epollFd, EPOLL_CTL_ADD, client_fd, &event) != 0)
 	{
+		printf("Client fucked\n");
 		delete clients[client_fd];
 		clients.erase(client_fd);
 		throw EPollErrorException("Failed to add a client event to epoll");

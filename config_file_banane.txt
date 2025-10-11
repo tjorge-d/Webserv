@@ -1,0 +1,47 @@
+client_max_body_size 100 kb;
+
+	server_block start;
+
+		domain_port 8081;
+
+		server_name Banane!;
+
+		root ./YoupiBanane;
+
+			location_block start;
+
+				default_location /;
+
+				services_available GET;
+
+				index_file youpi.bad_extension;
+
+				autoindex off;
+
+			location_block end;
+
+            location_block start;
+
+				default_location /post_body;
+
+				services_available POST;
+
+				index_file youpi.bad_extension;
+
+				autoindex off;
+
+			location_block end;
+
+            location_block start;
+
+				default_location /directory/;
+
+				services_available GET;
+
+				index_file youpi.bad_extension;
+
+				autoindex off;
+
+			location_block end;
+
+	server_block end;

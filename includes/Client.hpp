@@ -18,7 +18,7 @@
 # include "CgiHandler.hpp"
 
 
-# define CHUNK_SIZE 4096
+# define CHUNK_SIZE 10000//4096
 # define MAX_BODY 1048576
 
 class EventHandler;

@@ -1,88 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Welcome to our Website</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-color: #121212; /* Dark background */
-            color: #d4cfcf; /* Light text for dark mode */
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebServer Method Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      color: #000000;
+      position: relative;
+      overflow: hidden;
+      height: 100vh;
+      background: url('flick-esfand.gif') no-repeat center center fixed;
+      background-size: cover;
+      filter: brightness(1.5) contrast(0.9); /* brighten the gif */
+    }
 
-        h1 {
-            color: #90caf9; /* Light blue for heading */
-        }
+    /* Optional: white translucent overlay for softer whitening */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.25); /* adjust opacity for effect */
+      pointer-events: none;
+      z-index: 0;
+    }
 
-        .image-container img {
-            max-width: 100%;
-			margin-top: 50px;
-            height: auto;
-            border: 1px solid #ccc;
-        }
+    h1, p, .link-group, .button {
+      position: relative;
+      z-index: 1; /* above overlay */
+      text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.3);
+    }
 
-        .test-link {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
+    h1 {
+      color: #222;
+    }
 
-        .test-link:hover {
-            background-color: #0056b3;
-        }
+    .test-link {
+      display: inline-block;
+      margin: 10px;
+      padding: 10px 20px;
+      background-color: rgba(0, 123, 255, 0.85);
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
 
-        .link-group {
-            margin-top: 100px;
-        }
+    .test-link:hover {
+      background-color: rgba(0, 86, 179, 0.85);
+    }
 
-		.theme-button {
-            display: inline-block;
-            margin-left: 0px;
-			margin-top: 100px;
-            padding: 10px 20px;
-            background-color: #f1f2f3;
-            color: rgb(15, 15, 15);
-            text-decoration: none;
-            border-radius: 15px;
-		}
+    .link-group {
+      margin-top: 100px;
+    }
 
-		.theme-button:hover{
+    .theme-button {
+      display: inline-block;
+      margin-top: 100px;
+      padding: 10px 20px;
+      background-color: rgba(8, 8, 8, 0.8);
+      color: white;
+      text-decoration: none;
+      border-radius: 15px;
+    }
 
-			background-color: #a1a1a1;
-		}
-
-    </style>
+    .theme-button:hover {
+      background-color: rgba(66, 65, 65, 0.8);
+    }
+  </style>
 </head>
 <body>
 
-    <h1>Welcome to Our Webserver Test Page</h1>
-    <p>This is the development interface for testing HTTP methods.</p>
+  <h1>Welcome to Our Webserver Test Page</h1>
+  <p>This is the development interface for testing HTTP methods.</p>
 
-    <div class="image-container">
-		<img src="flick-esfand.gif" alt="sideye.jpg">
-    </div>
+  <div class="link-group">
+    <a href="upload.html" class="test-link">Test POST (Upload)</a>
+    <a href="put.html" class="test-link">Test PUT</a>
+    <a href="delete.html" class="test-link">Test DELETE</a>
+    <a href="head.html" class="test-link">Test HEAD</a>
+    <a href="options.html" class="test-link">Test OPTIONS</a>
+    <a href="trace.html" class="test-link">Test TRACE</a>
+    <a href="cgi.html" class="test-link">Test CGI</a>
+  </div>
 
-    <div class="link-group">
-		<a href="upload.html" class="test-link">Test POST (Upload)</a>
-        <a href="put.html" class="test-link">Test PUT</a>
-        <a href="delete.html" class="test-link">Test DELETE</a>
-        <a href="head.html" class="test-link">Test HEAD</a>
-        <a href="options.html" class="test-link">Test OPTIONS</a>
-        <a href="trace.html" class="test-link">Test TRACE</a>
-        <a href="cgi.html" class="test-link">Test CGI</a>
-    </div>
-
-	<div class="button">
-		<a href="index.html" class="theme-button"> Switch to Light Theme</a>
-	</div>
+  <div class="button">
+    <a href="index.html" class="theme-button">Switch to Dark Theme</a>
+  </div>
 
 </body>
 </html>
