@@ -50,7 +50,6 @@ int main(int argc, char **argv)
 	catch (const std::exception &e)
 	{
 		Logger::log(ERROR, "Fatal error: " + std::string(e.what()));
-		std::cerr << "Error: " << e.what() << std::endl;
 		Logger::close();
 		return 1;
 	}

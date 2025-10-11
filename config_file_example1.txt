@@ -24,7 +24,7 @@ client_max_body_size 100 kb;
 
 				default_location /dev/;
 
-				services_available GET POST DELETE;
+				services_available GET POST DELETE PUT OPTION HEAD TRACE;
 
 				index_file index.html;
 

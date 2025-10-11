@@ -220,7 +220,6 @@ void Server::run()
         }
         catch (const std::exception &e) {
             Logger::log(ERROR, "Server loop error: " + std::string(e.what()));
-            std::cerr << "Server loop error: " << e.what() << std::endl;
         }
     }
 

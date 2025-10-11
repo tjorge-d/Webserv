@@ -98,8 +98,9 @@ int	HttpRequest::parseRequestHeader(std::vector<char>::iterator header_end)
 		}
 		else if (key_lower == "transfer-encoding" && toLowerCase(value) == "chunked")
 			isChunked = true;
-		else if (key_lower == "cookie")
+		else if (key_lower == "cookie"){
 			this->cookie = value;
+		}
 	}
 
 	// Clean request buffer
@@ -114,7 +115,8 @@ void	HttpRequest::parseRequestBody(void){
 
 	if (content_type_lower.substr(0, content_type_lower.find(";")) == "multipart/form-data")
 		parseMultiPartFormData();
-	else if (content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "text")
+	else if (content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "text" ||
+			 content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "application")
 		parseTextPlain();
 }
 

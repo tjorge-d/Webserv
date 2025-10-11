@@ -162,6 +162,5 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
         cgiOutput.append(buffer, n);
     close(outPipe[0]);
     waitpid(pid, NULL, 0);
-	printf("CGI output:\n%s\n", cgiOutput.c_str());
     return (0);
 }

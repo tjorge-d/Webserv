@@ -3,7 +3,7 @@
 
 // CONSTRUCTORS & DESTRUCTORS
 
-HttpResponse::HttpResponse()
+HttpResponse::HttpResponse(): cgi(false)
 {
 	supportedContentType[".html"] = "text/html"; 
 	supportedContentType[".txt"] = "text/plain";

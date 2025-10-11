@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lmiguel- <lmiguel-@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcameira <jcameira@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/17 17:16:29 by lmiguel-          #+#    #+#             */
-/*   Updated: 2025/04/16 14:38:25 by lmiguel-         ###   ########.fr       */
+/*   Updated: 2025/10/11 05:14:29 by jcameira         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,9 @@ void parserOKChecker(ServerInfo *webserver, std::string acquired_services, std::
 	while (stream >> current_method)
 	{
 		std::cout << current_method << std::endl;
-		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
-			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
+		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD"
+			&& current_method != "PUT" && current_method != "OPTIONS" && current_method != "TRACE")
+			throw ParserException("Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD PUT OPTIONS TRACE.");
 		methods.push_back(current_method);
 	}
 	/* webserver->location.domain.allowed_services = methods; */

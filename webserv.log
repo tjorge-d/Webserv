@@ -1,20 +1,14 @@
-2025-10-10 00:27:41 [INFO] Server starting...
-2025-10-10 00:27:48 [INFO] New client connected: FD 6
-2025-10-10 00:27:48 [INFO] New client connected: FD 8
-2025-10-10 00:27:49 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-10 00:27:49 [INFO] New client connected: FD 9
-2025-10-10 00:27:49 [INFO] Request received: GET /dev/cgi.html from FD 6
-2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/dev/cgi.html from FD 6
-2025-10-10 00:27:49 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-10 00:27:49 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-10 00:27:54 [INFO] Request received: GET /cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
-2025-10-10 00:27:54 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.php for FD 6
-2025-10-10 00:27:54 [INFO] Response sent: 200 for GET ./var/www/cgi-bin/get_test.php?name_php=qwe&age_php=qwe from FD 6
-2025-10-10 00:28:19 [INFO] Client timed out: FD 8
-2025-10-10 00:28:19 [INFO] Client disconnected: FD 8
-2025-10-10 00:28:20 [INFO] Client timed out: FD 9
-2025-10-10 00:28:20 [INFO] Client disconnected: FD 9
-2025-10-10 00:28:25 [INFO] Client timed out: FD 6
-2025-10-10 00:28:25 [INFO] Client disconnected: FD 6
-2025-10-10 00:29:21 [INFO] Server shutting down...
+2025-10-11 06:35:27 [INFO] Server starting...
+2025-10-11 06:35:30 [INFO] New client connected: FD 7
+2025-10-11 06:35:30 [INFO] Request received: GET /dev/index.html from FD 7
+2025-10-11 06:35:30 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 7
+2025-10-11 06:35:30 [INFO] New client connected: FD 8
+2025-10-11 06:35:48 [INFO] Request received: GET /dev/index_alt.html from FD 7
+2025-10-11 06:35:48 [INFO] Response sent: 200 for GET ./var/www/dev/index_alt.html from FD 7
+2025-10-11 06:35:49 [INFO] Request received: GET /dev/upload.html from FD 7
+2025-10-11 06:35:49 [INFO] Response sent: 200 for GET ./var/www/dev/upload.html from FD 7
+2025-10-11 06:36:01 [INFO] Client timed out: FD 8
+2025-10-11 06:36:01 [INFO] Client disconnected: FD 8
+2025-10-11 06:36:20 [INFO] Client timed out: FD 7
+2025-10-11 06:36:20 [INFO] Client disconnected: FD 7
+2025-10-11 06:36:46 [INFO] Server shutting down...
