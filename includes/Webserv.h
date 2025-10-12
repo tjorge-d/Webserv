@@ -17,7 +17,7 @@
 # include <ctime>
 
 # define SOCKET_BACKLOG		5 // Max queue size for listening sockets
-# define MAX_CONNECTIONS	10 // Max connections to the server
+# define MAX_CONNECTIONS	1000 // Max connections to the server
 # define BODY_SIZE_MAX		2147483647; //2 Gb max
 
 # define HTTP_ACCEPTED_VERSION "HTTP/1.1"

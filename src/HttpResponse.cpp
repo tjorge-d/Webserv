@@ -57,9 +57,9 @@ void	HttpResponse::createResponse()
 	if (this->currentCookie.find("sessionId=") == std::string::npos)
 		headerStr += "Set-Cookie: sessionId=" + sessionId + "; Max-Age=600; Path=/; HttpOnly" + std::string(RESPONSE_LINE_END);
 	//put condition to check if theme switch button was pressed or not. default theme is white (alternate, check filepath to see if alt is there before .html)
-	if (this->currentPath.find("_alt.html") != std::string::npos)
+	if (this->filePath.find("_alt.html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=dark; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
-	else if (this->currentPath.find(".html") != std::string::npos)
+	else if (this->filePath.find(".html") != std::string::npos)
 		headerStr += "Set-Cookie: theme=light; Max-Age=600; Path=/" + std::string(RESPONSE_LINE_END);
 
 	//COOKIES END HERE
@@ -132,7 +132,7 @@ void	HttpResponse::setContentType()
 	if (cgi)
 		return ;
 
-	if (statusCode != OK) {
+	if (statusCode != OK && filePath.empty()) {
 		contentType = PLAIN_TEXT;
 		return ;
 	}
@@ -150,7 +150,7 @@ void	HttpResponse::setContentType()
 
 void	HttpResponse::setContentLength()
 {
-	if (statusCode != OK)
+	if (statusCode != OK && filePath.empty())
 		contentLenght = getStatus(statusCode).size();
 	else if (!fileStream.is_open())
 		contentLenght = body.size();

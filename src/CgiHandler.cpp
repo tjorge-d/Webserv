@@ -180,7 +180,6 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
     while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0) {
 		cgiOutput.append(buffer, n);
         pid_t result = waitpid(pid, &status, WNOHANG);
-		printf("Result: %d\n", result);
         if (result == -1) {
             std::cerr << "waitpid failed: " << strerror(errno) << std::endl;
             return 500;

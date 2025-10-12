@@ -51,9 +51,8 @@ static void setupServices(HttpInfo *Server, LocationBlockInfo *locationBlock, st
 	// check valid methods (also stringstream practice)
 	while (stream >> current_method)
 	{
-		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD" &&
-			current_method != "OPTION" && current_method != "PUT" && current_method != "TRACE" && current_method != "CONNECT")
-			throw ParserException(Server, "Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD OPTION PUT TRACE CONNECT");
+		if (current_method != "GET" && current_method != "POST" && current_method != "DELETE" && current_method != "HEAD")
+			throw ParserException(Server, "Attempt to configure invalid service. Allowed services are: GET POST DELETE HEAD");
 		locationBlock->allowed_services.push_back(current_method);
 	}
 }

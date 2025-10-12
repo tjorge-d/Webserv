@@ -113,6 +113,7 @@ void	HttpRequest::parseRequestBody(void){
 	std::string content_type = getHeader("Content-Type");
 	std::string content_type_lower = toLowerCase(content_type);
 
+	std::string	requestBody(buffer.begin(), buffer.end());
 	if (content_type_lower.substr(0, content_type_lower.find(";")) == "multipart/form-data")
 		parseMultiPartFormData();
 	else if (content_type_lower.substr(0, content_type_lower.find(";")).substr(0, content_type_lower.find("/")) == "text" ||
@@ -168,18 +169,26 @@ void	HttpRequest::parseMultiPartFormData(void){
         pos = partEnd;
 	}
 
+	std::string filename;
 	for (std::vector<MultiFormData>::iterator it = formParts.begin(); it != formParts.end(); ++it){
 		MultiFormData &part = *it;
 
 		if (part.headers.count("Content-Disposition")){
 			std::string	fileNameKey = "filename=";
 			pos = part.headers["Content-Disposition"].find(fileNameKey);
-				std::string filename = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
+			filename = part.headers["Content-Disposition"].substr(pos + fileNameKey.size());
 		}
 		if (part.headers.count("Content-Type"))
 	 		bodyContentType = part.headers["Content-Type"];
 
 		body.append(part.content.c_str(), part.content.size());
+	}
+	if (method == "POST"){
+		size_t filePos = path.rfind("/");
+		size_t fQuotes = filename.find('"');
+		size_t lQuotes = filename.rfind('"');
+    	if (filePos != std::string::npos)
+			path = path.substr(0, filePos + 1) + "upload/" + filename.substr(fQuotes + 1, lQuotes - 1);
 	}
 }
 

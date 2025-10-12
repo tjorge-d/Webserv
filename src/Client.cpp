@@ -102,26 +102,7 @@ void Client::recieveMode()
 
 void Client::sendMode()
 {
-    // if (response.statusCode != OK)
-    //     setConnection(false);
     response.setSessionId(this->sessionId);
-    // THEME COOKIE LOGIC: If theme=dark and .html requested, try _alt.html
-    std::string pathToServe = request.path;
-    if (!request.cookie.empty() && request.cookie.find("theme=dark") != std::string::npos)
-    {
-        size_t extPos = pathToServe.rfind(".html");
-        if (extPos != std::string::npos)
-        {
-            std::string altPath = pathToServe.substr(0, extPos) + "_alt.html";
-            struct stat buffer;
-            if (stat(altPath.c_str(), &buffer) == 0)
-            {
-                pathToServe = altPath;
-            }
-        }
-        response.setPath(pathToServe);
-        response.filePath = pathToServe;
-    }
     response.currentCookie = request.cookie;
 
     // --- CGI HANDLING ---
@@ -146,14 +127,12 @@ void Client::sendMode()
         CgiHandler cgi(pathWithoutQuery, request); // pid not used here
         Logger::log(INFO, "Executing CGI: " + pathWithoutQuery + " for FD " + intToString(fd));
         int status = cgi.executeCgi(pathWithoutQuery, interpreter, requestBody, cgiOutput);
-		std::cout << "status: " << status << std::endl;
         if (!status)
         {
             // Parse CGI output: split headers and body
             size_t headerEnd = cgiOutput.find("\r\n\r\n");
             if (headerEnd != std::string::npos)
             {
-				std::cout << "headerEnd != std::string::npos" << std::endl;
                 std::string headers = cgiOutput.substr(0, headerEnd + 4);
                 std::string body = cgiOutput.substr(headerEnd + 4);
                 // Set response headers and body accordingly
@@ -167,23 +146,38 @@ void Client::sendMode()
                 size_t start = pos + header.length();
                 size_t end = cgiOutput.find("\r\n", start);
                 response.contentType = cgiOutput.substr(start, end - start);
-                printf("Output: %s\n", cgiOutput.c_str());
             }
             else
             {
                 // Malformed CGI output
-                printf("Fucked\n");
                 response.statusCode = INTERNAL_SERVER_ERROR;
+                if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
+                response.currentPath = response.filePath;
+                }
+                else
+                    response.filePath = "";
             }
         }
         else
         {
             // CGI execution failed
-            printf("Fucked2\n");
             response.statusCode = INTERNAL_SERVER_ERROR;
+            if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
+                response.currentPath = response.filePath;
+            }
+            else
+                response.filePath = "";
         }
     }
     // --- END CGI HANDLING ---
+    if (request.method == "POST" && response.statusCode == OK){
+        if (request.path.find("_alt.html") != std::string::npos)
+            response.filePath = serverBlock.getInfo().server_root + extracted_path + "upload_success.html";
+        else
+            response.filePath = serverBlock.getInfo().server_root + extracted_path + "upload_success_alt.html";
+    }
     response.createResponse();
     state = WAITING_TO_SEND;
     response.bytesSent = 0;
@@ -203,17 +197,16 @@ int Client::recieveRequestChunk()
     // Stores the data from the client fd in a buffer
     char buffer[CHUNK_SIZE];
     int bytes = recv(fd, buffer, CHUNK_SIZE, 0);
-    if (bytes == -1 && errno != EAGAIN && errno != EWOULDBLOCK)
-    {
+    std::cout << "bytes after recv = " << bytes << std::endl;
+    if (bytes == -1)
         throw ClientException("Failed to recieve a request", fd);
-    }
     // Apppends the filled buffer to _request
     if (recievingHeader)
     {
         appendToRequest(buffer, bytes);
     }
     // Writes the buffer content onto the POST method path
-    else if (recievingBody)
+    if (recievingBody)
     {
         if (request.isChunked)
         {
@@ -222,6 +215,7 @@ int Client::recieveRequestChunk()
         }
         else
         {
+            printf("Body size = %d\nContent Lenght = %d\n", request.bodySize, request.contentLenght);
             if (bytes > 0)
             {
                 request.appendToBuffer(buffer, bytes);
@@ -230,10 +224,13 @@ int Client::recieveRequestChunk()
             if (request.bodySize > serverBlock.getMaxBodySize())
             {
                 response.statusCode = CONTENT_TOO_LARGE;
-                if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end())
+                if (serverBlock.getErrorPages().find(CONTENT_TOO_LARGE) != serverBlock.getErrorPages().end()){
                     response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[CONTENT_TOO_LARGE];
+                    response.currentPath = response.filePath;
+                }
+                else
+                    response.filePath = "";
                 recievingBody = false;
-                bytes = -1;
             }
             else if (request.bodySize >= request.contentLenght)
             {
@@ -242,10 +239,9 @@ int Client::recieveRequestChunk()
                 std::string path = request.path;
                 size_t queryPos = path.find('?');
                 std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
-                printf("Path without query: %s\n", pathWithoutQuery.c_str());
                 if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos)
                     response.cgi = true;
-                if ((request.method == "POST" || request.method == "PUT") && !response.cgi) {
+                if ((request.method == "POST") && !response.cgi) {
                     postFile.open(request.path.c_str(), std::ios::out);
                     postFile.write(request.body.c_str(), request.body.size());
                     postFile.close();
@@ -256,14 +252,23 @@ int Client::recieveRequestChunk()
     // Behaves accordingly in case of not having anything else to read
     if (bytes < CHUNK_SIZE || !bytes)
     {
-        if (recievingHeader)
+        printf("Entrou nela\n");
+        if (recievingHeader){
             //throw ClientException("Incomplete request header", fd);
             response.statusCode = BAD_REQUEST;
+            if (serverBlock.getErrorPages().find(BAD_REQUEST) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[BAD_REQUEST];
+                response.currentPath = response.filePath;
+            }
+            else
+                response.filePath = "";
+        }
         if (!recievingBody || request.chunkedComplete)
         {
+            printf("Enviando\n");
             sendMode();
         }
-    }
+        }
     return (bytes);
 }
 
@@ -271,7 +276,6 @@ void Client::appendToRequest(char *buffer, int size)
 {
     // Appends the buffer given as an argument to the request
     request.appendToBuffer(buffer, size);
-    printf("Header: %s\n", buffer);
     if (recievingHeader)
     {
         // Checks if the read data contains the end of a request header
@@ -279,8 +283,13 @@ void Client::appendToRequest(char *buffer, int size)
         // Parses the header if found
         if (it != request.buffer.end())
         {
-            printf("Entrei nela\n");
             response.statusCode = request.parseRequestHeader(it + 4);
+            if (serverBlock.getErrorPages().find(response.statusCode) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[response.statusCode];
+                response.currentPath = response.filePath;
+            }
+            else
+                response.filePath = "";
             Logger::log(INFO, "Request received: " + request.method + " " + request.path + " from FD " + intToString(fd));
             recievingHeader = false;
             if (request.headerInfo.count("Connection") && request.headerInfo["Connection"] == "close")
@@ -293,10 +302,21 @@ void Client::appendToRequest(char *buffer, int size)
             else
                 extracted_path = request.path.substr(request.path.find('/'), request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
             // end of extraction
+            printf("Extracted path : %s\n\n", extracted_path.c_str());
+            for (std::map<std::string, LocationBlockInfo>::iterator it = serverBlock.getInfo().locations.begin(); it != serverBlock.getInfo().locations.end(); it++){
+                printf("Location : %s\n", it->first.c_str());
+                printf("info : %s\n\n", it->second.location.c_str());
+            }
             if (!serverBlock.getInfo().locations.count(extracted_path))
             {
-                printf("Fucked\n");
+                printf("Entrei\n");
                 response.statusCode = NOT_FOUND;
+                if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
+                response.currentPath = response.filePath;
+                }
+                else
+                    response.filePath = "";
                 return;
             }
             if (*(request.path.end() - 1) == '/')
@@ -317,16 +337,17 @@ void Client::handleMethod()
     if (!methodPermitted)
     {
         response.statusCode = METHOD_NOT_ALLOWED;
-        if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end())
-        {
+        if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end()){
             response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[METHOD_NOT_ALLOWED];
+            response.currentPath = response.filePath;
         }
         else
             response.filePath = "";
         return; // Stop processing the request
     }
     // VERIFY ALLOWED METHODS/SERVICES
-    if (request.method == "GET" || request.method == "OPTIONS" || request.method == "TRACE")
+    printf("Request Method : %s\n", request.method.c_str());
+    if (request.method == "GET")
     {
         if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location)
         {
@@ -336,23 +357,22 @@ void Client::handleMethod()
         std::string path = request.path;
         size_t queryPos = path.find('?');
         std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
-        printf("Without Query: %s\n", pathWithoutQuery.c_str());
         std::ifstream fileStream(pathWithoutQuery.c_str());
         if (!fileStream.good())
         {
-            printf("Fucked2\n");
             response.statusCode = NOT_FOUND;
-            if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end())
-            {
+            if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
                 response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
                 response.currentPath = response.filePath;
             }
+            else
+                response.filePath = "";
         }
         else
             response.filePath = request.path;
         recievingBody = true;
     }
-    else if (request.method == "POST" || request.method == "PUT")
+    else if (request.method == "POST")
     {
         recievingBody = true;
         request.bodySize = request.buffer.size();
@@ -360,6 +380,7 @@ void Client::handleMethod()
     }
     else if (request.method == "DELETE")
     {
+        printf("PATH : %s\n", request.path.c_str());
         if (std::remove(request.path.c_str()) == 0)
         {
             response.filePath = "";
@@ -367,20 +388,43 @@ void Client::handleMethod()
         else
         {
             response.statusCode = INTERNAL_SERVER_ERROR;
-            if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end())
+            if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end()){
                 response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
+                response.currentPath = response.filePath;
+            }
+            else
+                response.filePath = "";
         }
     }
     else if (request.method == "HEAD")
     {
-        response.filePath = request.path;
+        std::string path = request.path;
+        size_t queryPos = path.find('?');
+        std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
+        std::ifstream fileStream(pathWithoutQuery.c_str());
+        if (!fileStream.good())
+        {
+            response.statusCode = NOT_FOUND;
+            if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
+                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
+                response.currentPath = response.filePath;
+            }
+            else
+                response.filePath = "";
+        }
+        else
+            response.filePath = request.path;
         response.contentLenght = 0;
     }
     else
     {
         response.statusCode = METHOD_NOT_ALLOWED;
-        if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end())
+        if (serverBlock.getErrorPages().find(METHOD_NOT_ALLOWED) != serverBlock.getErrorPages().end()){
             response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[METHOD_NOT_ALLOWED];
+            response.currentPath = response.filePath;
+        }
+        else
+            response.filePath = "";
     }
 }
 
@@ -437,7 +481,7 @@ void Client::sendHeaderChunk()
     if (response.bytesSent == response.headerSize)
     {
         state = SENDING_BODY;
-        if (response.statusCode != OK)
+        if (response.statusCode != OK && response.filePath.empty())
         {
             if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
                 throw ClientException("Failed to send a response", fd);

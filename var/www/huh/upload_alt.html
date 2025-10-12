@@ -78,26 +78,15 @@
 
     <form id= "uploadForm" action="upload" method="POST" enctype="multipart/form-data">
         <label for="image">Select file to upload:</label>
-        <input type="file" id="image" name="image" required>
+        <input type="file" id="filename" name="image" required>
         <button type="submit">Upload</button>
     </form>
 	
-	<a href="index_alt.html" class="nav-link">← Return to Homepage</a>
+	<a href="index_alt.html" class="home-button">Return to Homepage</a>
 
 	<div>
         <a href="upload.html" class="theme-button">Switch to Light Theme</a>
     </div>
-	
-	<script>
-		document.getElementById('uploadForm').addEventListener('submit', function(e) {
-			e.preventDefault();
-            const filename = document.getElementById('filename').value;
-			
-            fetch("/sussy_files/" + filename, {
-				method: 'POST'
-            }).then(res => res.text()).then(alert);
-        });
-	</script>
 
 </body>
 </html>

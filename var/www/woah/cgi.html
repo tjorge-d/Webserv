@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CGI Page</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        input, button {
+            margin-top: 10px;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        .theme-button {
+            display: inline-block;
+            margin-top: 50px;
+            padding: 10px 20px;
+            background-color: #080808;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+        }
+
+		
+		.home-button {
+			display: inline-block;
+            margin-top: 100px;
+            padding: 10px 20px;
+            background-color: #080808;
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+        }
+
+		.theme-button:hover{
+
+			background-color: #424141;
+		}
+		
+		.home-button:hover{
+
+			background-color: #424141;
+		}
+    </style>
+	
+</head>
+<body>
+  <h1>Test CGI Script</h1>
+
+  <h2>GET Request (Python)</h2>
+  <form action="/cgi-bin/get_test.py" method="get">
+    <label for="name">Name:</label>
+    <input type="text" name="name_py" id="name_py">
+    <br>
+    <label for="age">Age:</label>
+    <input type="text" name="age_py" id="age_py">
+    <br>
+    <input type="submit" value="Send GET Request">
+  </form>
+
+  <h2>GET Request (PHP)</h2>
+  <form action="/cgi-bin/get_test.php" method="get">
+    <label for="name">Name:</label>
+    <input type="text" name="name_php" id="name_php">
+    <br>
+    <label for="age">Age:</label>
+    <input type="text" name="age_php" id="age_php">
+    <br>
+    <input type="submit" value="Send GET Request">
+  </form>
+
+  <h2>POST Request</h2>
+  <form action="/cgi-bin/post_test.py" method="post">
+    <label for="city">City:</label>
+    <input type="text" name="city" id="city">
+    <br>
+    <label for="country">Country:</label>
+    <input type="text" name="country" id="country">
+    <br>
+    <input type="submit" value="Send POST Request">
+  </form>
+
+
+	<div>
+		<a href="index.html" class="home-button"> Return to Homepage</a>
+	</div>
+
+    <div>
+        <a href="cgi_alt.html" class="theme-button">Switch to Dark Theme</a>
+    </div>
+
+
+</body>
+</html>

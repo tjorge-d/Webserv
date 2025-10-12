@@ -24,7 +24,7 @@ client_max_body_size 100 kb;
 
 				default_location /dev/;
 
-				services_available GET POST DELETE PUT OPTION HEAD TRACE;
+				services_available GET POST DELETE HEAD;
 
 				index_file index.html;
 
@@ -48,7 +48,7 @@ client_max_body_size 100 kb;
 
 				default_location /woah/;
 
-				services_available GET POST DELETE;
+				services_available POST DELETE;
 
 				index_file index.html;
 
@@ -72,9 +72,9 @@ client_max_body_size 100 kb;
 
 		error_page 404 /errors/404.html;
 
-		error_page 413 /errors/413.html;
-
 		error_page 409 /errors/409.html;
+
+		error_page 413 /errors/413.html;
 
 		error_page 500 /errors/500.html;
 
