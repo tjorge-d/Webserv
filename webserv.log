@@ -1,25 +1,22 @@
-2025-10-18 17:53:14 [INFO] Server starting...
-2025-10-18 17:53:27 [INFO] New client connected: FD 6
-2025-10-18 17:53:27 [INFO] Request received: GET / from FD 6
-2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/index.html from FD 6
-2025-10-18 17:53:27 [INFO] Request received: GET /flick-esfand.gif from FD 6
-2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/flick-esfand.gif from FD 6
-2025-10-18 17:53:27 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-18 17:53:29 [INFO] Request received: GET /cgi.html from FD 6
-2025-10-18 17:53:29 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
-2025-10-18 17:53:29 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-18 17:53:29 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-18 17:53:40 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
-2025-10-18 17:53:40 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
-2025-10-18 17:53:40 [ERROR] Client error: Failed to send a response (Client 6: Success) for FD 6
-2025-10-18 17:53:40 [INFO] Client disconnected: FD 6
-2025-10-18 17:54:52 [INFO] New client connected: FD 6
-2025-10-18 17:54:52 [INFO] Request received: GET /cgi.html from FD 6
-2025-10-18 17:54:52 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
-2025-10-18 17:54:52 [INFO] Request received: GET /favicon.ico from FD 6
-2025-10-18 17:54:52 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
-2025-10-18 17:54:55 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
-2025-10-18 17:54:55 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
-2025-10-18 17:54:55 [ERROR] Client error: Failed to send a response (Client 6: Success) for FD 6
-2025-10-18 17:54:55 [INFO] Client disconnected: FD 6
+2025-10-18 19:24:32 [INFO] Server starting...
+2025-10-18 19:24:35 [INFO] New client connected: FD 6
+2025-10-18 19:24:35 [INFO] Request received: GET /cgi.html from FD 6
+2025-10-18 19:24:35 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
+2025-10-18 19:24:35 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-18 19:24:35 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-18 19:24:36 [INFO] Request received: GET /cgi.html from FD 6
+2025-10-18 19:24:36 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
+2025-10-18 19:24:38 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-18 19:24:38 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
+2025-10-18 19:24:38 [INFO] Response sent: 500 for GET ./var/www/cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-18 19:24:38 [INFO] Client disconnected: FD 6
+2025-10-18 19:24:39 [INFO] New client connected: FD 6
+2025-10-18 19:24:39 [INFO] Request received: GET /cgi-bin/sideye.jpg from FD 6
+2025-10-18 19:24:39 [INFO] Response sent: 404 for GET ./var/www/cgi-bin/sideye.jpg from FD 6
+2025-10-18 19:24:39 [INFO] Client disconnected: FD 6
+2025-10-18 19:24:39 [INFO] New client connected: FD 6
+2025-10-18 19:24:39 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-18 19:24:39 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-18 19:25:10 [INFO] Client timed out: FD 6
+2025-10-18 19:25:10 [INFO] Client disconnected: FD 6
+2025-10-18 19:26:30 [INFO] Server shutting down...

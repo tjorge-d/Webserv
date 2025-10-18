@@ -42,6 +42,7 @@ void	HttpRequest::reset()
 	chunkBuffer.clear();
 	isChunked = false;
 	chunkedComplete = false;
+	cgi = false;
 	contentLenght = 0;
 	bodySize = 0;
 }
@@ -198,9 +199,11 @@ void	HttpRequest::parseTextPlain(){
 
 	body = requestBody;
 
-	size_t last_slash = path.rfind('/', path.length() - 1);
+	if (method == "POST" && !cgi){
+		size_t last_slash = path.rfind('/', path.length() - 1);
         
-    path = path.substr(0, last_slash) + "/upload" + path.substr(last_slash);
+    	path = path.substr(0, last_slash) + "/upload" + path.substr(last_slash);
+	}
 }
 
 HttpRequest::ResponseException::ResponseException(std::string info) :

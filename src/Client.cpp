@@ -87,7 +87,6 @@ void Client::recieveMode()
     // When an unconnected client finishes its loop prevents him from starting a new one
     recievingHeader = true;
     recievingBody = false;
-    printf("Reseting everything\n");
     request.reset();
     response.reset();
     if (!connected)
@@ -169,18 +168,13 @@ void Client::sendMode()
                 }
                 else
                     response.filePath = "";
+                response.cgi = false;
             }
         }
         else
         {
             // CGI execution failed
-            response.statusCode = INTERNAL_SERVER_ERROR;
-            if (serverBlock.getErrorPages().find(INTERNAL_SERVER_ERROR) != serverBlock.getErrorPages().end()){
-                response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[INTERNAL_SERVER_ERROR];
-                response.currentPath = response.filePath;
-            }
-            else
-                response.filePath = "";
+            throw ClientException("CGI failed execution", fd);
         }
     }
     // --- END CGI HANDLING ---
@@ -212,7 +206,6 @@ int Client::recieveRequestChunk()
     if (bytes == -1 || bytes == 0)
         throw ClientException("Failed to recieve a request", fd);
     // Apppends the filled buffer to _request
-    // printf("Buffer : \n%s\n", buffer);
     if (recievingHeader)
         appendToRequest(buffer, bytes);
     else{
@@ -249,12 +242,8 @@ int Client::recieveRequestChunk()
             {
                 recievingBody = false;
                 request.parseRequestBody();
-                printf("File : %s\n", request.path.c_str());
                 if ((request.method == "POST") && !response.cgi) {
-                    printf("File Path : %s\n", request.path.c_str());
-                    printf("Body : %s\n", request.body.c_str());
                     postFile.open(request.path.c_str(), std::ios::out | std::ios::trunc);
-                    printf("Size : %lu, contentLenght : %d\n", request.body.size(), request.contentLenght);
                     postFile.write(request.body.c_str(), request.body.size());
 
                     // TESTE
@@ -356,8 +345,10 @@ void Client::handleMethod()
     std::string path = request.path;
     size_t queryPos = path.find('?');
     std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
-    if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos)
+    if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos){
+        request.cgi = true;
         response.cgi = true;
+    }
     if (request.method == "GET")
     {
         if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location)
@@ -544,14 +535,14 @@ void Client::sendBodyChunk()
         if (response.fileStream.fail() && !response.fileStream.eof())
             throw ClientException("Failed to read from file", fd);
         // Sends the read chunk to the client
-        ssize_t bytesSent = send(fd, buffer, bytes, 0);
+        if (bytes > 0){
+            ssize_t bytesSent = send(fd, buffer, bytes, 0);
 
-        // TESTE
-        if (bytesSent == -1 || bytesSent == 0){
-            printf("Fuck\n");
-            throw ClientException("Failed to send a response", fd);
+            // TESTE
+            if (bytesSent == -1 || bytesSent == 0){
+                throw ClientException("Failed to send a response", fd);
+            }
         }
-
         response.bytesSent += bytes;
     }
     // Resets the response status of the client when over

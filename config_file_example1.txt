@@ -60,7 +60,7 @@ client_max_body_size 100 kb;
 
 				default_location /cgi-bin/;
 
-				services_available GET POST DELETE;
+				services_available GET POST;
 
 				index_file index.html;
 

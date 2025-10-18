@@ -10,7 +10,7 @@
 #include <iostream>
 #include <sys/time.h>
 
-#define CGI_TIMEOUT_SECONDS 1  // adjust as needed
+#define CGI_TIMEOUT_SECONDS 3  // adjust as needed
 
 // CONSTRUCTORS & DESTRUCTORS
 
@@ -165,7 +165,7 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
     ssize_t bytes = write(inPipe[1], requestBody.c_str(), requestBody.size());
 
 	// TESTE
-	if (bytes == -1 || bytes == 0)
+	if (bytes == -1)
 		return (-1);
 	
     close(inPipe[1]);
@@ -212,7 +212,7 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
 	close(outPipe[0]);
 
 	// TESTE
-	if (bytesRead == -1 || bytesRead == 0)
+	if (bytesRead == -1)
 		return (-1);
 
     return (0);

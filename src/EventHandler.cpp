@@ -125,14 +125,13 @@ void	EventHandler::checkEvents()
 			// Checks if the event comes from a server or a client and handles it
 			if(serverBlocks.count(events[i].data.fd))
 				handleServerEvent(events[i].data.fd);
-			else
+			else if(events[i].data.fd >= 0)
 				handleClientEvent(events[i]);
 		}
 		catch(const std::exception& e)
 		{
 			std::cerr << e.what() << std::endl;
 			if (!serverBlocks.count(events[i].data.fd)){
-				printf("Fuck4\n");
 				deleteClient(events[i].data.fd);
 			}
 		}	
@@ -178,7 +177,6 @@ void	EventHandler::handleClientEvent(epoll_event& event)
 	// Checks if the event was triggered because of disconnection
 	if (event.events & EPOLLRDHUP)
 	{
-		printf("Fuck3\n");
 		deleteClient(event.data.fd);
 		return ;
 	}

@@ -3,8 +3,9 @@
 
 // CONSTRUCTORS & DESTRUCTORS
 
-HttpResponse::HttpResponse(): cgi(false)
+HttpResponse::HttpResponse()
 {
+	reset();
 	supportedContentType[".html"] = "text/html"; 
 	supportedContentType[".txt"] = "text/plain";
 	supportedContentType[".css"] = "text/css";

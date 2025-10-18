@@ -19,7 +19,7 @@ def get_theme_from_cookie():
 
 def build_response_headers():
     print(f"Content-Type: text/html\r\n", end='')
-    print(f"\r\n", end='')
+    # print(f"\r\n", end='')
 
 def build_response_body(name, age, theme):
     if theme == 'dark':

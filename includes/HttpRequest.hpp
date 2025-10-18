@@ -28,6 +28,7 @@ class HttpRequest
 		std::map<std::string, std::string>	headerInfo;
 		int									contentLenght;
 		int									bodySize;
+		bool								cgi;
 		bool 								isChunked;
 		bool 								chunkedComplete;
 		
