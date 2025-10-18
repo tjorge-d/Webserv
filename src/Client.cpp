@@ -197,16 +197,13 @@ int Client::recieveRequestChunk()
     // Stores the data from the client fd in a buffer
     char buffer[CHUNK_SIZE];
     int bytes = recv(fd, buffer, CHUNK_SIZE, 0);
-    std::cout << "bytes after recv = " << bytes << std::endl;
     if (bytes == -1)
         throw ClientException("Failed to recieve a request", fd);
     // Apppends the filled buffer to _request
     if (recievingHeader)
-    {
         appendToRequest(buffer, bytes);
-    }
     // Writes the buffer content onto the POST method path
-    if (recievingBody)
+    else if (recievingBody)
     {
         if (request.isChunked)
         {
@@ -215,7 +212,6 @@ int Client::recieveRequestChunk()
         }
         else
         {
-            printf("Body size = %d\nContent Lenght = %d\n", request.bodySize, request.contentLenght);
             if (bytes > 0)
             {
                 request.appendToBuffer(buffer, bytes);
@@ -252,7 +248,6 @@ int Client::recieveRequestChunk()
     // Behaves accordingly in case of not having anything else to read
     if (bytes < CHUNK_SIZE || !bytes)
     {
-        printf("Entrou nela\n");
         if (recievingHeader){
             //throw ClientException("Incomplete request header", fd);
             response.statusCode = BAD_REQUEST;
@@ -264,10 +259,7 @@ int Client::recieveRequestChunk()
                 response.filePath = "";
         }
         if (!recievingBody || request.chunkedComplete)
-        {
-            printf("Enviando\n");
             sendMode();
-        }
         }
     return (bytes);
 }
@@ -302,14 +294,8 @@ void Client::appendToRequest(char *buffer, int size)
             else
                 extracted_path = request.path.substr(request.path.find('/'), request.path.find('/', request.path.find('/') + 1) - request.path.find('/') + 1);
             // end of extraction
-            printf("Extracted path : %s\n\n", extracted_path.c_str());
-            for (std::map<std::string, LocationBlockInfo>::iterator it = serverBlock.getInfo().locations.begin(); it != serverBlock.getInfo().locations.end(); it++){
-                printf("Location : %s\n", it->first.c_str());
-                printf("info : %s\n\n", it->second.location.c_str());
-            }
             if (!serverBlock.getInfo().locations.count(extracted_path))
             {
-                printf("Entrei\n");
                 response.statusCode = NOT_FOUND;
                 if (serverBlock.getErrorPages().find(NOT_FOUND) != serverBlock.getErrorPages().end()){
                 response.filePath = serverBlock.getInfo().server_root + serverBlock.getErrorPages()[NOT_FOUND];
@@ -346,7 +332,6 @@ void Client::handleMethod()
         return; // Stop processing the request
     }
     // VERIFY ALLOWED METHODS/SERVICES
-    printf("Request Method : %s\n", request.method.c_str());
     if (request.method == "GET")
     {
         if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location)
@@ -370,17 +355,19 @@ void Client::handleMethod()
         }
         else
             response.filePath = request.path;
-        recievingBody = true;
+        recievingBody = false;
     }
     else if (request.method == "POST")
     {
-        recievingBody = true;
         request.bodySize = request.buffer.size();
         response.filePath = request.path;
+        recievingBody = true;
     }
     else if (request.method == "DELETE")
     {
-        printf("PATH : %s\n", request.path.c_str());
+        size_t last_slash = request.path.rfind('/', request.path.length() - 1);
+    
+        request.path = request.path.substr(0, last_slash) + "/upload" + request.path.substr(last_slash);
         if (std::remove(request.path.c_str()) == 0)
         {
             response.filePath = "";
@@ -395,6 +382,7 @@ void Client::handleMethod()
             else
                 response.filePath = "";
         }
+        recievingBody = false;
     }
     else if (request.method == "HEAD")
     {
@@ -415,6 +403,7 @@ void Client::handleMethod()
         else
             response.filePath = request.path;
         response.contentLenght = 0;
+        recievingBody = false;
     }
     else
     {

@@ -76,7 +76,7 @@
             e.preventDefault();
             const filename = document.getElementById('filename').value;
 
-            fetch("upload/" + filename, {
+            fetch(filename, {
                 method: 'DELETE'
             }).then(res => {
                 if (res.ok) {
