@@ -85,6 +85,11 @@ void Client::closeClient()
 void Client::recieveMode()
 {
     // When an unconnected client finishes its loop prevents him from starting a new one
+    recievingHeader = true;
+    recievingBody = false;
+    printf("Reseting everything\n");
+    request.reset();
+    response.reset();
     if (!connected)
     {
         state = DONE;
@@ -92,10 +97,6 @@ void Client::recieveMode()
     }
     // Resets the client attributes to a recieving starting point
     state = WAITING_TO_RECIEVE;
-    recievingHeader = true;
-    recievingBody = false;
-    request.reset();
-    response.reset();
     // Changes the client event to trigger when ready to be read from
     events.modifyClient(fd, EPOLLIN | EPOLLRDHUP | EPOLLET);
 }
@@ -140,6 +141,17 @@ void Client::sendMode()
                 response.headerSize = headers.size();
                 response.body = body;
                 response.contentLenght = body.size();
+                if(request.method == "POST"){
+                    request.path = request.path.substr(0, request.path.rfind("/")) + "/upload/file.html";
+                    postFile.open(request.path.c_str(), std::ios::out | std::ios::trunc);
+                    postFile.write(response.body.c_str(), response.contentLenght);
+
+                    //TESTE
+                    if (!postFile.good())
+                        throw ClientException("Failed to write the file", fd);
+
+                    postFile.close();
+                }
                 response.statusCode = OK; // Or parse from CGI output
                 std::string header = "Content-Type: ";
                 size_t pos = cgiOutput.find(header);
@@ -197,13 +209,18 @@ int Client::recieveRequestChunk()
     // Stores the data from the client fd in a buffer
     char buffer[CHUNK_SIZE];
     int bytes = recv(fd, buffer, CHUNK_SIZE, 0);
-    if (bytes == -1)
+    if (bytes == -1 || bytes == 0)
         throw ClientException("Failed to recieve a request", fd);
     // Apppends the filled buffer to _request
+    // printf("Buffer : \n%s\n", buffer);
     if (recievingHeader)
         appendToRequest(buffer, bytes);
+    else{
+        request.appendToBuffer(buffer, bytes);
+        request.bodySize += bytes;
+    }
     // Writes the buffer content onto the POST method path
-    else if (recievingBody)
+    if (recievingBody)
     {
         if (request.isChunked)
         {
@@ -212,11 +229,11 @@ int Client::recieveRequestChunk()
         }
         else
         {
-            if (bytes > 0)
-            {
-                request.appendToBuffer(buffer, bytes);
-                request.bodySize += bytes;
-            }
+            // if (bytes > 0)
+            // {
+            //     request.appendToBuffer(buffer, bytes);
+            //     request.bodySize += bytes;
+            // }
             if (request.bodySize > serverBlock.getMaxBodySize())
             {
                 response.statusCode = CONTENT_TOO_LARGE;
@@ -232,21 +249,25 @@ int Client::recieveRequestChunk()
             {
                 recievingBody = false;
                 request.parseRequestBody();
-                std::string path = request.path;
-                size_t queryPos = path.find('?');
-                std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
-                if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos)
-                    response.cgi = true;
+                printf("File : %s\n", request.path.c_str());
                 if ((request.method == "POST") && !response.cgi) {
-                    postFile.open(request.path.c_str(), std::ios::out);
+                    printf("File Path : %s\n", request.path.c_str());
+                    printf("Body : %s\n", request.body.c_str());
+                    postFile.open(request.path.c_str(), std::ios::out | std::ios::trunc);
+                    printf("Size : %lu, contentLenght : %d\n", request.body.size(), request.contentLenght);
                     postFile.write(request.body.c_str(), request.body.size());
+
+                    // TESTE
+                    if (!postFile.good())
+                        throw ClientException("Failed to write the file", fd);
+
                     postFile.close();
                 }
             }
         }
     }
     // Behaves accordingly in case of not having anything else to read
-    if (bytes < CHUNK_SIZE || !bytes)
+    if (bytes < CHUNK_SIZE)
     {
         if (recievingHeader){
             //throw ClientException("Incomplete request header", fd);
@@ -332,6 +353,11 @@ void Client::handleMethod()
         return; // Stop processing the request
     }
     // VERIFY ALLOWED METHODS/SERVICES
+    std::string path = request.path;
+    size_t queryPos = path.find('?');
+    std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
+    if (pathWithoutQuery.size() > 3 && pathWithoutQuery.find("/cgi-bin/") != std::string::npos)
+        response.cgi = true;
     if (request.method == "GET")
     {
         if (request.path == serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location)
@@ -339,9 +365,6 @@ void Client::handleMethod()
             request.path = serverBlock.getInfo().server_root + serverBlock.getInfo().locations[extracted_path].location
                            + serverBlock.getInfo().locations[extracted_path].index_file;
         }
-        std::string path = request.path;
-        size_t queryPos = path.find('?');
-        std::string pathWithoutQuery = (queryPos != std::string::npos) ? path.substr(0, queryPos) : path;
         std::ifstream fileStream(pathWithoutQuery.c_str());
         if (!fileStream.good())
         {
@@ -449,6 +472,10 @@ void Client::resolveChunkedBody()
         fileToPost = serverBlock.getInfo().server_root + "/upload/file";
         postFile.open(fileToPost.c_str(), std::ios::out);
         postFile.write(request.body.c_str(), static_cast<int>(request.body.size()));
+        
+        // TESTE
+        if (!postFile.good())
+            throw ClientException("Failed to recieve a request", fd);
     }
 }
 
@@ -462,9 +489,12 @@ void Client::sendHeaderChunk()
     if (CHUNK_SIZE + response.bytesSent > response.headerSize)
         chunk_size = response.headerSize - response.bytesSent;
     // Sends the read chunk to the client
-    int bytes = send(fd, &response.header[response.bytesSent], chunk_size, 0);
-    if (bytes == -1)
+    ssize_t bytes = send(fd, &response.header[response.bytesSent], chunk_size, 0);
+
+    //TESTE
+    if (bytes == -1 || bytes == 0)
         throw ClientException("Failed to send a response", fd);
+
     response.bytesSent += bytes;
     // Changes the state of the client when necessary
     if (response.bytesSent == response.headerSize)
@@ -472,8 +502,12 @@ void Client::sendHeaderChunk()
         state = SENDING_BODY;
         if (response.statusCode != OK && response.filePath.empty())
         {
-            if (send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0) == -1)
-                throw ClientException("Failed to send a response", fd);
+            ssize_t bytes = send(fd, getStatus(response.statusCode).c_str(), getStatus(response.statusCode).size(), 0);
+
+            //TEST
+            if (bytes == -1 || bytes == 0)
+                 throw ClientException("Failed to send a response", fd);
+
             Logger::log(INFO, "Response sent: " + intToString(response.statusCode) + " for " + request.method + " " + request.path + " from FD " + intToString(fd));
             recieveMode();
         }
@@ -491,8 +525,13 @@ void Client::sendBodyChunk()
         size_t bytes = (response.contentLenght + response.headerSize) - response.bytesSent;
         if (bytes > CHUNK_SIZE)
             bytes = CHUNK_SIZE;
-        if (send(fd, response.body.data() + (response.bytesSent - response.headerSize), bytes, 0) == -1)
+        
+        ssize_t bytesSent = send(fd, response.body.data() + (response.bytesSent - response.headerSize), bytes, 0);
+
+        // TEST
+        if (bytesSent == -1 || bytesSent == 0)
             throw ClientException("Failed to send response body", fd);
+
         response.bytesSent += bytes;
     }
     else
@@ -505,8 +544,14 @@ void Client::sendBodyChunk()
         if (response.fileStream.fail() && !response.fileStream.eof())
             throw ClientException("Failed to read from file", fd);
         // Sends the read chunk to the client
-        if (send(fd, buffer, bytes, 0) == -1)
+        ssize_t bytesSent = send(fd, buffer, bytes, 0);
+
+        // TESTE
+        if (bytesSent == -1 || bytesSent == 0){
+            printf("Fuck\n");
             throw ClientException("Failed to send a response", fd);
+        }
+
         response.bytesSent += bytes;
     }
     // Resets the response status of the client when over

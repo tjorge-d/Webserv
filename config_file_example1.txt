@@ -6,13 +6,13 @@ client_max_body_size 100 kb;
 
 		root ./var/www;
 
-		server_name gofas;
+		server_name gofas1;
 
 			location_block start;
 
 				default_location /;
 
-				services_available GET POST DELETE;
+				services_available GET POST DELETE HEAD;
 
 				index_file index.html;
 
@@ -36,7 +36,7 @@ client_max_body_size 100 kb;
 
 				default_location /huh/;
 
-				services_available GET POST DELETE;
+				services_available GET POST;
 
 				index_file index.html;
 
@@ -48,7 +48,7 @@ client_max_body_size 100 kb;
 
 				default_location /woah/;
 
-				services_available POST DELETE;
+				services_available POST DELETE HEAD;
 
 				index_file index.html;
 

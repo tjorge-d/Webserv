@@ -1,53 +1,25 @@
-2025-10-18 03:14:19 [INFO] Server starting...
-2025-10-18 03:14:23 [INFO] New client connected: FD 7
-2025-10-18 03:14:23 [INFO] Request received: GET /dev/delete.html from FD 7
-2025-10-18 03:14:23 [INFO] Response sent: 200 for GET ./var/www/dev/delete.html from FD 7
-2025-10-18 03:14:24 [INFO] New client connected: FD 8
-2025-10-18 03:14:25 [INFO] Request received: DELETE /dev/123 from FD 7
-2025-10-18 03:14:25 [INFO] Response sent: 200 for DELETE ./var/www/dev/upload/123 from FD 7
-2025-10-18 03:14:25 [INFO] Request received: GET /dev/delete_success.html from FD 7
-2025-10-18 03:14:25 [INFO] Response sent: 200 for GET ./var/www/dev/delete_success.html from FD 7
-2025-10-18 03:14:25 [INFO] Request received: GET /dev/sideye.jpg from FD 7
-2025-10-18 03:14:25 [INFO] Response sent: 200 for GET ./var/www/dev/sideye.jpg from FD 7
-2025-10-18 03:14:32 [INFO] Client disconnected: FD 8
-2025-10-18 03:14:32 [INFO] Client disconnected: FD 7
-2025-10-18 03:14:35 [INFO] New client connected: FD 7
-2025-10-18 03:14:35 [INFO] Request received: GET /dev/index.html from FD 7
-2025-10-18 03:14:35 [INFO] Response sent: 200 for GET ./var/www/dev/index.html from FD 7
-2025-10-18 03:14:35 [INFO] Request received: GET /dev/flick-esfand.gif from FD 7
-2025-10-18 03:14:35 [INFO] Response sent: 200 for GET ./var/www/dev/flick-esfand.gif from FD 7
-2025-10-18 03:14:36 [INFO] New client connected: FD 8
-2025-10-18 03:14:43 [INFO] Client disconnected: FD 8
-2025-10-18 03:14:43 [INFO] Client disconnected: FD 7
-2025-10-18 03:17:34 [INFO] New client connected: FD 7
-2025-10-18 03:17:34 [INFO] Request received: GET / from FD 7
-2025-10-18 03:17:34 [INFO] Response sent: 200 for GET ./var/www/index.html from FD 7
-2025-10-18 03:17:34 [INFO] Request received: GET /flick-esfand.gif from FD 7
-2025-10-18 03:17:34 [INFO] Response sent: 200 for GET ./var/www/flick-esfand.gif from FD 7
-2025-10-18 03:17:34 [INFO] New client connected: FD 8
-2025-10-18 03:17:37 [INFO] Request received: GET /delete.html from FD 7
-2025-10-18 03:17:37 [INFO] Response sent: 200 for GET ./var/www/delete.html from FD 7
-2025-10-18 03:17:39 [INFO] Request received: DELETE /123 from FD 7
-2025-10-18 03:17:39 [INFO] Response sent: 200 for DELETE ./var/www/upload/123 from FD 7
-2025-10-18 03:17:39 [INFO] Request received: GET /delete_success.html from FD 7
-2025-10-18 03:17:39 [INFO] Response sent: 200 for GET ./var/www/delete_success.html from FD 7
-2025-10-18 03:17:39 [INFO] Request received: GET /sideye.jpg from FD 7
-2025-10-18 03:17:39 [INFO] Response sent: 200 for GET ./var/www/sideye.jpg from FD 7
-2025-10-18 03:17:51 [INFO] Request received: GET /huh/ from FD 7
-2025-10-18 03:17:51 [INFO] Response sent: 200 for GET ./var/www/huh/index.html from FD 7
-2025-10-18 03:17:51 [INFO] Request received: GET /huh/flick-esfand.gif from FD 7
-2025-10-18 03:17:51 [INFO] Response sent: 200 for GET ./var/www/huh/flick-esfand.gif from FD 7
-2025-10-18 03:17:53 [INFO] Request received: GET /huh/delete.html from FD 7
-2025-10-18 03:17:53 [INFO] Response sent: 200 for GET ./var/www/huh/delete.html from FD 7
-2025-10-18 03:17:55 [INFO] Request received: DELETE /huh/123 from FD 7
-2025-10-18 03:17:55 [INFO] Response sent: 200 for DELETE ./var/www/huh/upload/123 from FD 7
-2025-10-18 03:17:55 [INFO] Request received: GET /huh/delete_success.html from FD 7
-2025-10-18 03:17:55 [INFO] Response sent: 200 for GET ./var/www/huh/delete_success.html from FD 7
-2025-10-18 03:17:55 [INFO] Request received: GET /huh/sideye.jpg from FD 7
-2025-10-18 03:17:55 [INFO] Response sent: 200 for GET ./var/www/huh/sideye.jpg from FD 7
-2025-10-18 03:18:05 [INFO] Client timed out: FD 8
-2025-10-18 03:18:05 [INFO] Client disconnected: FD 8
-2025-10-18 03:18:14 [INFO] Request received: GET /woah/ from FD 7
-2025-10-18 03:18:14 [INFO] Response sent: 405 for GET ./var/www/woah/ from FD 7
-2025-10-18 03:18:14 [INFO] Client disconnected: FD 7
-2025-10-18 03:19:26 [INFO] Server shutting down...
+2025-10-18 17:53:14 [INFO] Server starting...
+2025-10-18 17:53:27 [INFO] New client connected: FD 6
+2025-10-18 17:53:27 [INFO] Request received: GET / from FD 6
+2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/index.html from FD 6
+2025-10-18 17:53:27 [INFO] Request received: GET /flick-esfand.gif from FD 6
+2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/flick-esfand.gif from FD 6
+2025-10-18 17:53:27 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-18 17:53:27 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-18 17:53:29 [INFO] Request received: GET /cgi.html from FD 6
+2025-10-18 17:53:29 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
+2025-10-18 17:53:29 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-18 17:53:29 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-18 17:53:40 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-18 17:53:40 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
+2025-10-18 17:53:40 [ERROR] Client error: Failed to send a response (Client 6: Success) for FD 6
+2025-10-18 17:53:40 [INFO] Client disconnected: FD 6
+2025-10-18 17:54:52 [INFO] New client connected: FD 6
+2025-10-18 17:54:52 [INFO] Request received: GET /cgi.html from FD 6
+2025-10-18 17:54:52 [INFO] Response sent: 200 for GET ./var/www/cgi.html from FD 6
+2025-10-18 17:54:52 [INFO] Request received: GET /favicon.ico from FD 6
+2025-10-18 17:54:52 [INFO] Response sent: 200 for GET ./var/www/favicon.ico from FD 6
+2025-10-18 17:54:55 [INFO] Request received: GET /cgi-bin/get_test.py?name_py=qwe&age_py=qwe from FD 6
+2025-10-18 17:54:55 [INFO] Executing CGI: ./var/www/cgi-bin/get_test.py for FD 6
+2025-10-18 17:54:55 [ERROR] Client error: Failed to send a response (Client 6: Success) for FD 6
+2025-10-18 17:54:55 [INFO] Client disconnected: FD 6

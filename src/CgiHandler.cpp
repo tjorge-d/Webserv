@@ -135,11 +135,11 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
 {
     int inPipe[2], outPipe[2];
     if (pipe(inPipe) < 0 || pipe(outPipe) < 0)
-        return -1;
+        return (-1);
 
     pid_t pid = fork();
     if (pid < 0)
-        return -1;
+        return (-1);
     if (pid == 0) {
         dup2(inPipe[0], 0);
         dup2(outPipe[1], 1);
@@ -162,23 +162,24 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
     }
     close(inPipe[0]);
     close(outPipe[1]);
-    write(inPipe[1], requestBody.c_str(), requestBody.size());
+    ssize_t bytes = write(inPipe[1], requestBody.c_str(), requestBody.size());
+
+	// TESTE
+	if (bytes == -1 || bytes == 0)
+		return (-1);
+	
     close(inPipe[1]);
     char buffer[4096];
-    ssize_t n;
     cgiOutput.clear();
-    // while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0)
-    //     cgiOutput.append(buffer, n);
-    // close(outPipe[0]);
-    // waitpid(pid, NULL, 0);
 	
     int status;
     struct timeval start_time, now;
 
     gettimeofday(&start_time, NULL);
 
-    while ((n = read(outPipe[0], buffer, sizeof(buffer))) > 0) {
-		cgiOutput.append(buffer, n);
+	ssize_t bytesRead = read(outPipe[0], buffer, sizeof(buffer));
+    while (bytesRead > 0) {
+		cgiOutput.append(buffer, bytesRead);
         pid_t result = waitpid(pid, &status, WNOHANG);
         if (result == -1) {
             std::cerr << "waitpid failed: " << strerror(errno) << std::endl;
@@ -201,13 +202,18 @@ int CgiHandler::executeCgi(const std::string& scriptPath, const std::string& int
         if (elapsed >= CGI_TIMEOUT_SECONDS) {
             std::cerr << "CGI script timed out. Killing process " << pid << std::endl;
             kill(pid, SIGKILL);
-            //waitpid(pid, NULL, 0); // clean up zombie
             break; // Gateway Timeout
         }
 
         // Sleep briefly to avoid busy-waiting
         usleep(1000); // 1ms
+		bytesRead = read(outPipe[0], buffer, sizeof(buffer));
 	}
 	close(outPipe[0]);
+
+	// TESTE
+	if (bytesRead == -1 || bytesRead == 0)
+		return (-1);
+
     return (0);
 }

@@ -38,6 +38,7 @@ void	HttpRequest::reset()
 	version.clear();
 	body.clear();
 	headerInfo.clear();
+	formParts.clear();
 	chunkBuffer.clear();
 	isChunked = false;
 	chunkedComplete = false;
@@ -196,6 +197,10 @@ void	HttpRequest::parseTextPlain(){
 	std::string	requestBody(buffer.begin(), buffer.end());
 
 	body = requestBody;
+
+	size_t last_slash = path.rfind('/', path.length() - 1);
+        
+    path = path.substr(0, last_slash) + "/upload" + path.substr(last_slash);
 }
 
 HttpRequest::ResponseException::ResponseException(std::string info) :

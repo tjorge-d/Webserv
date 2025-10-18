@@ -162,6 +162,7 @@ void Server::pendingClients()
     // Delete clients after iteration
     for (std::vector<int>::iterator it = clientsToDelete.begin(); it != clientsToDelete.end(); ++it)
     {
+        printf("Fuck2\n");
         eventHandler->deleteClient(*it);
     }
 }
